@@ -26,3 +26,6 @@ const studentSchema = new Schema({
 
 // compile student schema into a model
 const Student = mongoose.model('Student',studentSchema);
+
+// export model
+module.exports = Student;

@@ -19,3 +19,6 @@ const schoolSchema = new Schema({
 
 // compile school schema into a model
 const School = mongoose.model('School',schoolSchema);
+
+// export model
+module.exports = School;
