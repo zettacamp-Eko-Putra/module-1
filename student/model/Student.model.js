@@ -1,8 +1,14 @@
+// *************** IMPORT CORE ***************
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 
-// *************** model schema for student
+// *************** MODEL: Student ***************
+
+/**
+ * Student Schema
+ * Describes the structure of the student document in MongoDB.
+ */
 const studentSchema = new Schema({
 
     // First name for the student
@@ -18,14 +24,12 @@ const studentSchema = new Schema({
     dateOfBirth : { type:Date },
 
     // school id the user belongs to
-    schoolID : { type : Schema.Types.ObjectId, ref:'school', required: true },
+    schoolID : { type : Schema.Types.ObjectId, ref:'School', required: true },
 
-    // Delete at for the stundent
+    // Delete at for the student
     deletedAt : { type:Date, default:null}
 })
 
-// compile student schema into a model
+// *************** EXPORT MODEL ***************
 const Student = mongoose.model('Student',studentSchema);
-
-// export model
 module.exports = Student;
