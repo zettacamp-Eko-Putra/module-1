@@ -1,7 +1,13 @@
+// *************** IMPORT CORE ***************
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// *************** model schema for school
+// *************** MODEL: School ***************
+
+/**
+ * School Schema
+ * Describes the structure of the School document in MongoDB.
+ */
 const schoolSchema = new Schema({
 
     // name for the school
@@ -17,8 +23,6 @@ const schoolSchema = new Schema({
     deletedAt : { type:Date, default:null }
 })
 
-// compile school schema into a model
+// *************** EXPORT MODEL ***************
 const School = mongoose.model('School',schoolSchema);
-
-// export model
 module.exports = School;
