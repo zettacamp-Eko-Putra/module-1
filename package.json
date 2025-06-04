@@ -1,6 +1,7 @@
 {
   "name": "module-1",
   "version": "1.0.0",
+  "type": "module",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -19,7 +20,10 @@
   "homepage": "https://github.com/zettacamp-Eko-Putra/module-1#readme",
   "description": "",
   "dependencies": {
+    "@apollo/server": "^4.12.2",
+    "apollo-server": "^3.13.0",
     "express": "^5.1.0",
+    "graphql": "^16.11.0",
     "mongoose": "^8.15.1"
   }
 }

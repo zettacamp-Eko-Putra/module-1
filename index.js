@@ -1,12 +1,52 @@
-
 // *************** IMPORT CORE ***************
-const express = require('express');
-const mongoose = require('mongoose');
+import express from 'express';
+import mongoose from 'mongoose';
+import { ApolloServer } from '@apollo/server';
+import { gql } from 'graphql-tag';
+import { startStandaloneServer } from '@apollo/server/standalone';
+import { userType } from './user/type/User.type.js';
+import { studentType } from './student/type/Student.type.js';
+import { schoolType } from './school/type/School.type.js';
+import  { userResolvers } from './user/resolver/user.resolver.js'
+import  { studentResolvers } from './student/resolver/student.resolver.js'
+import  { schoolResolvers } from './school/resolver/school.resolver.js'
+
 
 // *************** Configuration ***************
 const app = express();
 const port = 3000;
+export const typeDefs = gql`
+  scalar Date
 
+  ${userType}
+  ${studentType}
+  ${schoolType}
+
+  type Query {
+    users: [User]
+    user(id: ID!): User
+    students: [Student]
+    student(id: ID!): Student
+    schools: [School]
+    school(id: ID!): School
+  }
+`;
+
+export const resolvers = {
+  Query: {
+    ...userResolvers.Query,
+    ...studentResolvers.Query,
+    ...schoolResolvers.Query,
+  }
+}
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+const { url } = await startStandaloneServer(server, {
+  listen: { port: 4000 },
+});
+console.log(`🚀  Server ready at: ${url}`);
 
 // *************** Connection express ***************
 app.get('/', (req, res) => {
