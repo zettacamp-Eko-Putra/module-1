@@ -17,7 +17,7 @@ const schoolSchema = new Schema({
     address : { type:String, required: true },
 
     // Student for the school
-    student : { type:Schema.Types.ObjectId, ref:'Student' },
+    student : [{ type:Schema.Types.ObjectId, ref:'Student' }],
 
     // delete at for the school
     deletedAt : { type:Date, default:null }
