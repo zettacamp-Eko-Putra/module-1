@@ -1,9 +1,15 @@
-const mongoose = reqire('mongoose');
+// *************** IMPORT CORE ***************
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 
-// *************** Model Schema for User
-const usesrSchema = new Schema({
+// *************** MODEL: User ***************
+
+/**
+ * User Schema
+ * Describes the structure of the user document in MongoDB.
+ */
+const userSchema = new Schema({
     // First name for the user
     firstName : { type:String, required:true },
 
@@ -20,11 +26,9 @@ const usesrSchema = new Schema({
     role : { type:String, required:true },
 
     // Delete At for the user
-    deletedAt : { type:Date, defaul:null }
+    deletedAt : { type:Date, default:null }
 })
 
-// compile user schema 
+// *************** EXPORT MODEL ***************
 const User = mongoose.model('User',userSchema);
-
-// export model
 module.exports = User;
