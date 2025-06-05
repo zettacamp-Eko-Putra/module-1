@@ -1,0 +1,71 @@
+// *************** IMPORT CORE ***************
+const express = require('express');
+const { ApolloServer, gql } = require('apollo-server-express');
+const mongoose = require('mongoose');
+const { userType, UserQuery, UserMutation } = require('./user/User.typedef');
+const { studentType, StudentQuery } = require('./student/Student.typedef');
+const { schoolType, SchoolQuery } = require('./school/School.typedef');
+const { userResolvers } = require('./user/user.resolver');
+const { studentResolvers } = require('./student/student.resolver');
+const { schoolResolvers } = require('./school/school.resolver');
+const { v4: uuidv4 } = require('uuid');
+
+// *************** Configuration ***************
+const app = express();
+const port = 3000;
+const typeDefs = gql`
+  scalar Date
+
+  type Query {
+    _empty: String 
+  }
+  ${userType}
+  ${UserQuery}
+  ${UserMutation}
+  ${studentType}
+  ${schoolType}
+  ${StudentQuery}
+  ${SchoolQuery}
+
+`;
+
+const resolvers = {
+  Query: {
+    ...userResolvers.Query,
+    ...studentResolvers.Query,
+    ...schoolResolvers.Query,
+  },
+  Mutation: {
+    ...userResolvers.Mutation
+  }
+};
+
+const server = new ApolloServer({
+  typeDefs,
+  resolvers,
+});
+
+async function startServer() {
+  try {
+    await server.start();
+    server.applyMiddleware({ app, path: '/graphql' });
+
+    await mongoose.connect('mongodb://localhost:27017/module', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected');
+
+    app.get('/', (req, res) => {
+      res.send('Server is running');
+    });
+
+    app.listen(port, () => {
+      console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
+    });
+  } catch (error) {
+    console.error('Error starting server:', error);
+  }
+}
+
+startServer();
