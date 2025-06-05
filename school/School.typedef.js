@@ -1,5 +1,5 @@
 // *************** TYPE DEFINITION : School  ***************
-export const schoolType = `
+const schoolType = `
   type School {
 
     #School ID
@@ -14,4 +14,14 @@ export const schoolType = `
     #student belong to the school
     students: [Student]
   }
+     
 `;
+
+const SchoolQuery = `
+    extend type Query {
+        schools: [School]
+        school(id: ID!): School
+    }
+`;
+
+module.exports = { schoolType,SchoolQuery };

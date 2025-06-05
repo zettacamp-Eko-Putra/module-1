@@ -1,68 +1,71 @@
 // *************** IMPORT CORE ***************
-import express from 'express';
-import mongoose from 'mongoose';
-import { ApolloServer } from '@apollo/server';
-import { gql } from 'graphql-tag';
-import { startStandaloneServer } from '@apollo/server/standalone';
-import { userType } from './user/type/User.type.js';
-import { studentType } from './student/type/Student.type.js';
-import { schoolType } from './school/type/School.type.js';
-import  { userResolvers } from './user/resolver/user.resolver.js'
-import  { studentResolvers } from './student/resolver/student.resolver.js'
-import  { schoolResolvers } from './school/resolver/school.resolver.js'
-
+const express = require('express');
+const { ApolloServer, gql } = require('apollo-server-express');
+const mongoose = require('mongoose');
+const { userType, UserQuery, UserMutation } = require('./user/User.typedef');
+const { studentType, StudentQuery } = require('./student/Student.typedef');
+const { schoolType, SchoolQuery } = require('./school/School.typedef');
+const { userResolvers } = require('./user/user.resolver');
+const { studentResolvers } = require('./student/student.resolver');
+const { schoolResolvers } = require('./school/school.resolver');
+const { v4: uuidv4 } = require('uuid');
 
 // *************** Configuration ***************
 const app = express();
 const port = 3000;
-export const typeDefs = gql`
+const typeDefs = gql`
   scalar Date
 
+  type Query {
+    _empty: String 
+  }
   ${userType}
+  ${UserQuery}
+  ${UserMutation}
   ${studentType}
   ${schoolType}
+  ${StudentQuery}
+  ${SchoolQuery}
 
-  type Query {
-    users: [User]
-    user(id: ID!): User
-    students: [Student]
-    student(id: ID!): Student
-    schools: [School]
-    school(id: ID!): School
-  }
 `;
 
-export const resolvers = {
+const resolvers = {
   Query: {
     ...userResolvers.Query,
     ...studentResolvers.Query,
     ...schoolResolvers.Query,
+  },
+  Mutation: {
+    ...userResolvers.Mutation
   }
-}
+};
+
 const server = new ApolloServer({
   typeDefs,
   resolvers,
 });
-const { url } = await startStandaloneServer(server, {
-  listen: { port: 4000 },
-});
-console.log(`🚀  Server ready at: ${url}`);
 
-// *************** Connection express ***************
-app.get('/', (req, res) => {
-  res.send('Server is running');
-});
+async function startServer() {
+  try {
+    await server.start();
+    server.applyMiddleware({ app, path: '/graphql' });
 
+    await mongoose.connect('mongodb://localhost:27017/module', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log('✅ MongoDB connected');
 
-// *************** START: Server listening ***************
-app.listen(port, () => {
-  console.log(`Server listening at http://localhost:${port}`);
-});
+    app.get('/', (req, res) => {
+      res.send('Server is running');
+    });
 
-// *************** END: server listening ***************
+    app.listen(port, () => {
+      console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
+    });
+  } catch (error) {
+    console.error('Error starting server:', error);
+  }
+}
 
-
-// *************** Connection to mongodb ***************
-mongoose.connect('mongodb://localhost:27017/module')
-  .then(() => console.log('✅ MongoDB connected'))
-  .catch((err) => console.error('❌ MongoDB connection error:', err));
+startServer();

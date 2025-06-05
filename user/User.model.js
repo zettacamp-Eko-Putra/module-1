@@ -1,5 +1,5 @@
 // *************** IMPORT CORE ***************
-const mongoose = require('mongoose');
+const mongoose = require ('mongoose');
 const Schema = mongoose.Schema;
 
 
@@ -9,7 +9,7 @@ const Schema = mongoose.Schema;
  * User Schema
  * Describes the structure of the user document in MongoDB.
  */
-const userSchema = new Schema({
+ const userSchema = new Schema({
     // First name for the user
     firstName : { type:String, required:true },
 
@@ -29,6 +29,8 @@ const userSchema = new Schema({
     deletedAt : { type:Date, default:null }
 })
 
+ 
+   
 // *************** EXPORT MODEL ***************
 const User = mongoose.model('User',userSchema);
 module.exports = User;

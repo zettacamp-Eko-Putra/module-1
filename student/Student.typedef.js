@@ -1,5 +1,5 @@
 // *************** TYPE DEFINITION : Student  ***************
-export const studentType = `
+const studentType = `
 
 type Student{
 
@@ -24,4 +24,15 @@ type Student{
     #Date when soft delete
     deletedAt:String
     }
+     
 `;
+
+const StudentQuery = `
+    extend type Query {
+        students: [Student]
+        student(id: ID!): Student
+    }
+`;
+const StudentMutation =`
+    `
+module.exports = { studentType, StudentQuery };

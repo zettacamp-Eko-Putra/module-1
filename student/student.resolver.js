@@ -1,5 +1,5 @@
 // *************** Resolver: Student ***************
-export const studentResolvers = {
+const studentResolvers = {
   Query: {
     students: () => {
     },
@@ -7,3 +7,4 @@ export const studentResolvers = {
     }
   }
 };
+module.exports = { studentResolvers };
