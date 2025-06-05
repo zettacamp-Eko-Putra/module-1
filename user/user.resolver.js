@@ -1,5 +1,5 @@
 // *************** Resolver: User ***************
-const User =  require('./user.model.js');
+const User =  require('./User.model.js');
 const { v4: uuidv4 } = require('uuid');
 const Users = [];
 
