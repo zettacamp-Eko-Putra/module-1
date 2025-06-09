@@ -1,10 +1,13 @@
-// *************** TYPE DEFINITION: School ***************
+// *************** IMPORT MODULE *************** 
+const School =  require('./school.model.js');
 const schoolResolvers = {
   Query: {
-    school: () => {
+    getAllSchool: () => {
     },
-    school: (_, { id }) => {
+    getSchoolById: (_, { id }) => {
     }
   }
 };
+
+// *************** EXPORT MODULE ***************
 module.exports = { schoolResolvers };

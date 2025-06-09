@@ -1,27 +1,37 @@
 // *************** TYPE DEFINITION : School  ***************
+const addressType =`
+  type Address{
+    street: String!,
+    city: String!,
+    province: String!,
+    postalCode: String!  
+}`;
+
 const schoolType = `
   type School {
-
-    #School ID
     id: ID!
-
-    #name of the school
     name: String!
-
-    #address of the school
-    address: String
-
-    #student belong to the school
+    address: [Address]
     students: [Student]
+    status:String!
+    deleted_at:Date
   }
      
 `;
 
 const SchoolQuery = `
     extend type Query {
-        schools: [School]
-        school(id: ID!): School
+        getAllSchool: [School]
+        getSchoolById(id: ID!): School
     }
 `;
 
-module.exports = { schoolType,SchoolQuery };
+const SchoolMutation = `
+  extend type Mutation{
+    createSchool(
+      name:String!,
+      address:[Address]): Student!
+    }`
+
+// *************** EXPORT MODULE ***************
+module.exports = { schoolType,SchoolQuery, SchoolMutation, addressType };

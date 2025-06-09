@@ -1,4 +1,4 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT MODULE *************** 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -12,24 +12,28 @@ const { Schema } = mongoose;
 const studentSchema = new Schema({
 
     // First name for the student
-    firstName : { type:String, required: true },
+    first_name : { type:String, required: true },
 
     // Last name for the student
-    lastName : { type:String, required: true },
+    last_name : { type:String, required: true },
 
     // email for the student
     email : { type:String, required: true, unique:true },
 
-    // date of birth for the user
-    dateOfBirth : { type:Date },
+    // date of birth for the student
+    date_of_birth : { type:Date },
 
-    // school id the user belongs to
-    schoolID : { type : Schema.Types.ObjectId, ref:'School', required: true },
+    // school id the student belongs to
+    school_id: { type : Schema.Types.ObjectId, ref:'School', required: true },
+
+
+    // Student status
+    status: { type :String, enum:["active","delete"], default:"active"},
 
     // Delete at for the student
-    deletedAt : { type:Date, default:null}
+    deleted_at : { type:Date, default:null}
 })
 
-// *************** EXPORT MODEL ***************
+// *************** EXPORT MODULE ***************
 const Student = mongoose.model('Student',studentSchema);
 module.exports = Student;

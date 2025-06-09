@@ -3,12 +3,11 @@ const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const mongoose = require('mongoose');
 const { userType, UserQuery, UserMutation } = require('./user/User.typedef');
-const { studentType, StudentQuery } = require('./student/Student.typedef');
-const { schoolType, SchoolQuery } = require('./school/School.typedef');
+const { studentType, StudentQuery, StudentMutation } = require('./student/Student.typedef');
+const { schoolType, SchoolQuery, addressType } = require('./school/School.typedef');
 const { userResolvers } = require('./user/user.resolver');
 const { studentResolvers } = require('./student/student.resolver');
 const { schoolResolvers } = require('./school/school.resolver');
-const { v4: uuidv4 } = require('uuid');
 
 // *************** Configuration ***************
 const app = express();
@@ -19,13 +18,18 @@ const typeDefs = gql`
   type Query {
     _empty: String 
   }
+  type Mutation {
+    _empty: String
+  }
   ${userType}
   ${UserQuery}
   ${UserMutation}
   ${studentType}
-  ${schoolType}
   ${StudentQuery}
+  ${StudentMutation}
+  ${schoolType}
   ${SchoolQuery}
+  ${addressType}
 
 `;
 
@@ -36,7 +40,8 @@ const resolvers = {
     ...schoolResolvers.Query,
   },
   Mutation: {
-    ...userResolvers.Mutation
+    ...userResolvers.Mutation,
+    ...studentResolvers.Mutation
   }
 };
 

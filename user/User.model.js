@@ -1,4 +1,4 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT MODULE *************** 
 const mongoose = require ('mongoose');
 const Schema = mongoose.Schema;
 
@@ -11,10 +11,10 @@ const Schema = mongoose.Schema;
  */
  const userSchema = new Schema({
     // First name for the user
-    firstName : { type:String, required:true },
+    first_name : { type:String, required:true },
 
     // Last name for the user
-    lastName : { type:String, required:true },
+    last_name : { type:String, required:true },
 
     // email for the user
     email : { type:String, required:true, unique:true },
@@ -25,12 +25,15 @@ const Schema = mongoose.Schema;
     // role for the user
     role : { type:String, required:true },
 
+    // Status for the User
+    status : { type:String, enum:['active', 'deleted'], default: 'active'},
+
     // Delete At for the user
-    deletedAt : { type:Date, default:null }
+    deleted_at : { type:Date, default:null }
 })
 
  
    
-// *************** EXPORT MODEL ***************
+// *************** EXPORT MODULE ***************
 const User = mongoose.model('User',userSchema);
 module.exports = User;

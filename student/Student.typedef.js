@@ -2,27 +2,24 @@
 const studentType = `
 
 type Student{
-
-    #Student ID
     id:ID!
-
-    #Student first name
-    firstName:String!
-
-    #Student last name
-    lastName:String!
-
-    #Student email
+    first_name:String!
+    last_name:String!
     email:String!
+    date_of_birth:Date
+    school_id:ID!
+    status:String!
+    deleted_at:String
+    }
 
-    #student date of birth
-    dateOfBirth:Date
-
-    #School ID student belong to
-    schoolId:ID!
-
-    #Date when soft delete
-    deletedAt:String
+input StudentInput{
+    id:ID
+    first_name:String!
+    last_name:String!
+    email:String!
+    date_of_birth:Date
+    school_id:ID!
+    deleted_at:String
     }
      
 `;
@@ -34,5 +31,11 @@ const StudentQuery = `
     }
 `;
 const StudentMutation =`
-    `
-module.exports = { studentType, StudentQuery };
+    extend type Mutation{
+        createStudent(
+            studentInput: StudentInput!): Student!
+    }
+    `;
+
+// *************** EXPORT MODULE ***************
+module.exports = { studentType, StudentQuery, StudentMutation };

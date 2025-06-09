@@ -2,57 +2,46 @@
 const userType =`
 
     type User {
-        #User id
         id:ID!
-
-        #User first name
-        firstName:String!
-
-        #User last name
-        lastName:String!
-
-        #User email
+        first_name:String!
+        last_name:String!
         email:String!
-
-        #User password
         password:String!
-
-        #User role
         role:String!
-
-        #Date when soft delete
+        status:String!
         deletedAt:Date
     }
+    input UserInput{
+        id:ID
+        first_name:String!
+        last_name:String!
+        email:String!
+        password:String!
+        role:String! 
+    }
+
     
 `;
 const UserQuery = `
     extend type Query {
 
-        getAllUser: [User]
-        getUserById(id: ID!): User
+        GetAllUser: [User]
+        GetUserById(id: ID!): User
     }
 `;
 
 const UserMutation =`
-type Mutation{
-    createUser(
-        firstName:String!,
-        lastName:String!,
-        email:String!,
-        password:String!,
-        role:String!): User!    
+extend type Mutation{
+    CreateUser(
+        userInput: UserInput!): User!    
     
-
-    updateUser(
-        id: ID!,
-        firstName:String,
-        lastName:String,
-        email:String,
-        password:String,
-        role:String): User
+    UpdateUser(
+        userInput: UserInput!): User
         
-    deleteUser(
+    DeleteUser(
         id: ID!): User
     }
-            `;
+`;
+
+// *************** EXPORT MODULE ***************
 module.exports = { userType, UserQuery, UserMutation };

@@ -1,4 +1,4 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT MODULE *************** 
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
@@ -8,21 +8,31 @@ const { Schema } = mongoose;
  * School Schema
  * Describes the structure of the School document in MongoDB.
  */
+const addressSchema = new Schema({
+    street: String,
+    city: String,
+    province: String,
+    postalCode: String
+})
+
 const schoolSchema = new Schema({
 
     // name for the school
     name : { type:String, required: true },
 
     // address for the school
-    address : { type:String, required: true },
+    address : [ addressSchema ],
 
     // Student for the school
     student : [{ type:Schema.Types.ObjectId, ref:'Student' }],
 
+    // School status
+    status : [{ type:String, enum:['active','delete'], default:'active'}],
+
     // delete at for the school
-    deletedAt : { type:Date, default:null }
+    deleted_at : { type:Date, default:null }
 })
 
-// *************** EXPORT MODEL ***************
+// *************** EXPORT MODULE ***************
 const School = mongoose.model('School',schoolSchema);
 module.exports = School;
