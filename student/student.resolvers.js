@@ -1,6 +1,6 @@
 // *************** IMPORT MODULE *************** 
-const Student = require('./Student.model.js')
-const School = require('../school/school.model.js')
+const Student = require('./student.models.js')
+const School = require('../school/school.models.js')
 const mongoose = require('mongoose');
 
 
@@ -83,7 +83,6 @@ async function UpdateStudent(_, { id, studentInput }) {
     studentInput.school_history = student.school_history;
   }
 
-  // Update data student
   const updatedStudent = await Student.findByIdAndUpdate(id, studentInput, { new: true });
 
   return updatedStudent;

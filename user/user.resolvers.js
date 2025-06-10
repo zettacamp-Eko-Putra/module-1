@@ -1,5 +1,5 @@
 // *************** IMPORT MODULE *************** 
-const User =  require('./User.model.js');
+const User =  require('./user.models.js');
 const Users = [];
 
 

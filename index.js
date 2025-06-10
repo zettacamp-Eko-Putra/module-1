@@ -2,12 +2,12 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const mongoose = require('mongoose');
-const { userType, UserQuery, UserMutation } = require('./user/User.typedef');
-const { studentType, StudentQuery, StudentMutation } = require('./student/Student.typedef');
-const { schoolType, SchoolQuery, addressType, SchoolMutation } = require('./school/School.typedef');
-const { userResolvers } = require('./user/user.resolver');
-const { studentResolvers } = require('./student/student.resolver');
-const { schoolResolvers } = require('./school/school.resolver');
+const { userType, UserQuery, UserMutation } = require('./user/user.typedefs');
+const { studentType, StudentQuery, StudentMutation } = require('./student/student.typedefs');
+const { schoolType, SchoolQuery, addressType, SchoolMutation } = require('./school/school.typedefs');
+const { userResolvers } = require('./user/user.resolvers');
+const { studentResolvers } = require('./student/student.resolvers');
+const { schoolResolvers } = require('./school/school.resolvers');
 
 // *************** Configuration ***************
 const app = express();

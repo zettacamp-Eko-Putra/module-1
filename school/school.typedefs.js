@@ -44,6 +44,12 @@ const SchoolMutation = `
   extend type Mutation{
     CreateSchool(
       schoolInput: SchoolInput!): School!
+
+    UpdateSchool(
+      id:ID!,schoolInput: SchoolInput!): School
+
+    DeleteSchool(
+      id: ID!): School
     }`
 
 // *************** EXPORT MODULE ***************
