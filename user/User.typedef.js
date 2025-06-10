@@ -1,4 +1,6 @@
 // *************** TYPE DEFINITION: User ***************
+
+// *************** User Type
 const userType =`
 
     type User {
@@ -9,7 +11,7 @@ const userType =`
         password:String!
         role:String!
         status:String!
-        deletedAt:Date
+        deleted_at:Date
     }
     input UserInput{
         id:ID
@@ -22,6 +24,8 @@ const userType =`
 
     
 `;
+
+// *************** User Query
 const UserQuery = `
     extend type Query {
 
@@ -30,13 +34,14 @@ const UserQuery = `
     }
 `;
 
+// *************** User Mutation
 const UserMutation =`
 extend type Mutation{
     CreateUser(
         userInput: UserInput!): User!    
     
     UpdateUser(
-        userInput: UserInput!): User
+        id:ID!,userInput: UserInput!): User
         
     DeleteUser(
         id: ID!): User

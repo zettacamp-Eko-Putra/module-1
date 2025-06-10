@@ -26,9 +26,11 @@ const studentSchema = new Schema({
     // school id the student belongs to
     school_id: { type : Schema.Types.ObjectId, ref:'School', required: true },
 
-
     // Student status
     status: { type :String, enum:["active","delete"], default:"active"},
+
+    // Student School History
+    school_history: [{ type : Schema.Types.ObjectId, ref:'School'}],
 
     // Delete at for the student
     deleted_at : { type:Date, default:null}

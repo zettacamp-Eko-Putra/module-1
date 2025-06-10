@@ -4,33 +4,46 @@ const addressType =`
     street: String!,
     city: String!,
     province: String!,
-    postalCode: String!  
+    postal_code: String!  
 }`;
 
 const schoolType = `
+
+input AddressInput {
+  street: String!
+  city: String!
+  province: String!
+  postal_code: String!
+}
+
   type School {
     id: ID!
     name: String!
     address: [Address]
+    student: [ID]
     students: [Student]
     status:String!
     deleted_at:Date
   }
+
+  input SchoolInput{
+    id:ID
+    name:String!
+    address:[AddressInput]!}
      
 `;
 
 const SchoolQuery = `
     extend type Query {
-        getAllSchool: [School]
-        getSchoolById(id: ID!): School
+        GetAllSchool: [School]
+        GetSchoolById(id: ID!): School
     }
 `;
 
 const SchoolMutation = `
   extend type Mutation{
-    createSchool(
-      name:String!,
-      address:[Address]): Student!
+    CreateSchool(
+      schoolInput: SchoolInput!): School!
     }`
 
 // *************** EXPORT MODULE ***************

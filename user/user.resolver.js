@@ -26,16 +26,16 @@ async function CreateUser(_, {userInput}){
     }
 
     const createdUser = await User.create(userInput);
-    console.log("Data berhasil disimpan:", createdUser);
+    console.log("User has Created:", createdUser);
     return createdUser;
 }
 
 // *************** Update User
-async function UpdateUser(_, { id, ...updateData }) {
-  if (updateData.id) {
+async function UpdateUser(_, { id, userInput }) {
+  if (userInput.id) {
     throw new Error("Cannot update User ID");
   }
-  const updatedUser = await User.findByIdAndUpdate(id, updateData, { new: true });
+  const updatedUser = await User.findByIdAndUpdate(id, userInput, { new: true });
 
   if (!updatedUser) {
     throw new Error("User not found");
@@ -49,7 +49,7 @@ async function DeleteUser(_,{id}){
         id,
         { 
           status:"deleted",
-          deletedAt: new Date()
+          deleted_at: new Date()
         },
         { new:true }
       );

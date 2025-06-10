@@ -1,4 +1,6 @@
 // *************** TYPE DEFINITION : Student  ***************
+
+// *************** Student Type
 const studentType = `
 
 type Student{
@@ -8,6 +10,8 @@ type Student{
     email:String!
     date_of_birth:Date
     school_id:ID!
+    school:School
+    school_history:[School]
     status:String!
     deleted_at:String
     }
@@ -24,16 +28,25 @@ input StudentInput{
      
 `;
 
+// *************** Student Query
 const StudentQuery = `
     extend type Query {
-        students: [Student]
-        student(id: ID!): Student
+        GetAllStudent: [Student]
+        GetStudentById(id: ID!): Student
     }
 `;
+
+// *************** Student Mutation
 const StudentMutation =`
     extend type Mutation{
-        createStudent(
+        CreateStudent(
             studentInput: StudentInput!): Student!
+
+        UpdateStudent(
+            id:ID!,studentInput: StudentInput!): Student
+
+        DeleteStudent(
+            id: ID!): Student
     }
     `;
 
