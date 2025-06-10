@@ -18,10 +18,10 @@ async function GetSchoolById(_,{id}) {
 
 // *************** Create School
 async function CreateSchool(_,{schoolInput}){
-  const schoolTaken = School.baseModelName((school) => school.name === schoolInput.name)
-  if (!schoolTaken){
-    throw new Error("School name already exist")
-  }
+const schoolTaken = await School.findOne({ name: schoolInput.name });
+if (schoolTaken) {
+  throw new Error("School name already exists");
+}
 
   const createdSchool = await School.create(schoolInput);
   console.log("School has created", createdSchool);
@@ -42,7 +42,8 @@ async function UpdateSchool(_,{id,schoolInput}){
   return updatedSchool;
 }
 
-async function DeleteSchool(_,id){
+// *************** Delete School
+async function DeleteSchool(_,{id}){
   const deleteUser = await School.findByIdAndUpdate(
     id,
     {
@@ -57,6 +58,16 @@ async function DeleteSchool(_,id){
   return deleteUser
 }
 
+// *************** Get Student Data
+async function GetStudentData(parent){
+    if (!parent.student || parent.student.length ===0){
+        return [];
+      }
+      return await Student.find({ 
+        _id: {$in: parent.student},
+      status:'active' });
+}
+
 const schoolResolvers = {
   Query: {
     GetAllSchool,
@@ -68,14 +79,7 @@ const schoolResolvers = {
     DeleteSchool
   },
   School:{
-    students: async(parent) =>{
-      if (!parent.student || parent.student.length ===0){
-        return [];
-      }
-      return await Student.find({ 
-        _id: {$in: parent.student},
-      status:'active' });
-    }
+    students: GetStudentData
   }
 };
 
