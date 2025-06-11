@@ -59,13 +59,13 @@ async function DeleteSchool(_,{id}){
 }
 
 // *************** Get Student Data
-async function GetStudentData(parent){
+async function GetStudentData(parent,_,{loaders}){
     if (!parent.student || parent.student.length ===0){
         return [];
       }
-      return await Student.find({ 
-        _id: {$in: parent.student},
-      status:'active' });
+    const studentId = parent.student.map(id => id.toString());
+    const result = await loaders.student.loadMany(studentId);
+    return result.filter(student => student !==null)
 }
 
 const schoolResolvers = {

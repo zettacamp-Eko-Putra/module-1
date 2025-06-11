@@ -1,20 +1,18 @@
 // *************** IMPORT MODULE *************** 
 const dataLoader = require('dataloader');
-const Student = require('./student.models');
-const keyBy = require('lodash');
+const Student = require('./student.models.js');
+const keyBy = require('lodash/keyBy');
 
 async function StudentBatch(studentId){
-    const students = await Student.find({
-        _id: {
-            $in:studentId
-        }
-    });
-    const studentById = keyBy(students, '_id');
-    return studentId.map(studentId => studentById[studentId])
+    const students = await Student.find({ 
+        _id: { $in:studentId },
+        status:'active' });
+    const studentMap = keyBy(students, student => student._id.toString());
+    return studentId.map(id => studentMap[id.toString()] || null);
 }
 
-const studentLoader = () => {
+const CreateStudentLoader = () => {
     return new dataLoader(StudentBatch)
 }
 
-module.exports = studentLoader;
+module.exports = CreateStudentLoader;

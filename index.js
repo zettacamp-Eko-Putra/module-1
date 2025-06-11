@@ -8,7 +8,8 @@ const { schoolType, SchoolQuery, addressType, SchoolMutation } = require('./scho
 const { userResolvers } = require('./user/user.resolvers');
 const { studentResolvers } = require('./student/student.resolvers');
 const { schoolResolvers } = require('./school/school.resolvers');
-const schoolLoader = require('./school/school.loader');
+const CreateSchoolLoader = require('./school/school.loader');
+const CreateStudentLoader = require('./student/student.loader')
 
 // *************** Configuration ***************
 const app = express();
@@ -55,7 +56,8 @@ const server = new ApolloServer({
   resolvers,
   context: () =>({
     loaders: {
-      school: schoolLoader()
+      school: CreateSchoolLoader(),
+      student: CreateStudentLoader()
     }
   })
 });
