@@ -1,4 +1,4 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT MODULE *************** 
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const mongoose = require('mongoose');
@@ -8,6 +8,7 @@ const { schoolType, SchoolQuery, addressType, SchoolMutation } = require('./scho
 const { userResolvers } = require('./user/user.resolvers');
 const { studentResolvers } = require('./student/student.resolvers');
 const { schoolResolvers } = require('./school/school.resolvers');
+const schoolLoader = require('./school/school.loader');
 
 // *************** Configuration ***************
 const app = express();
@@ -52,6 +53,11 @@ const resolvers = {
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  context: () =>({
+    loaders: {
+      school: schoolLoader()
+    }
+  })
 });
 
 async function startServer() {

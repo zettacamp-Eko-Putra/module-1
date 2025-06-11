@@ -60,9 +60,11 @@ async function UpdateStudent(_, { id, studentInput }) {
     const newSchool = await School.findById(newSchoolId);
     if (!newSchool) throw new Error("New School Not Found");
 
-    const schoolHistorySet = new Set(student.school_history.map(id => id.toString()));
-    if (currentSchoolId && !schoolHistorySet.has(currentSchoolId)) {
-      schoolHistorySet.add(currentSchoolId);
+    const schoolHistorySet = new Set(
+      (student.school_history || []).map(id => id.toString())
+    );
+      if (!schoolHistorySet.has(newSchoolId)) {
+      schoolHistorySet.add(newSchoolId);
     }
 
 
@@ -106,13 +108,14 @@ async function DeleteStudent(_,{id}){
 }
 
 // *************** Get Current School 
-async function GetCurrentSchool(parent){
-  return await School.findById(parent.school_id)
+async function GetCurrentSchool(parent,_,{loaders}){
+  return await loaders.school.load(parent.school_id.toString());
 }
 
 // *************** Get School History
-async function GetSchoolHistory(parent) {
-  return await School.find({ _id: { $in: parent.school_history } });
+async function GetSchoolHistory(parent,_,{loaders}) {
+  const ids = parent.school_history.map(id => id.toString());
+  return await loaders.school.loadMany(ids);
 }
 
 const studentResolvers = {
