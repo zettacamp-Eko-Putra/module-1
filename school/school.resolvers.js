@@ -27,10 +27,10 @@ async function GetAllSchool(){
  * @returns {Promise<object>} - A promise that resolves to the school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
-async function GetSchoolById(parent,{id}) {
+async function GetSchoolById(parent,{_id}) {
 
    // *************** finding school based on id
-  const school = await School.findById(id)
+  const school = await School.findById(_id)
 
   // *************** creating if to showing message if the school cannot be found
     if(!school){
@@ -90,16 +90,16 @@ if (schoolTaken) {
  * @returns {Promise<object>} - A promise that resolves to the updated school object.
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
-async function UpdateSchool(parent,{id,school_input}){
+async function UpdateSchool(parent,{_id,school_input}){
   // *************** creating if to showing error message if the school tried to update their id
-  if (school_input.id){
+  if (school_input._id){
 
      // *************** error message if school tried to update their id
     throw new Error("Cannot update School ID");
   }
 
   // *************** finding school based on id and overwrite it with new data and saving it to database
-  const updatedSchool = await School.findByIdAndUpdate(id, school_input, { new:true });
+  const updatedSchool = await School.findByIdAndUpdate(_id, school_input, { new:true });
 
   // *************** creating if to showing error message if the school id cannot be found in database
   if(!updatedSchool){
@@ -124,11 +124,11 @@ async function UpdateSchool(parent,{id,school_input}){
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
-async function DeleteSchool(parent,{id}){
+async function DeleteSchool(parent,{_id}){
 
   // *************** finding school based on id and update the data
   const deleteSchool = await School.findByIdAndUpdate(
-    id,
+    _id,
     {
       // *************** changing status field to deleted
       status:"deleted",

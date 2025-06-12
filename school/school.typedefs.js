@@ -28,7 +28,7 @@ input SchoolAddressInput {
   }
 
   input SchoolInput{
-    id:ID
+    _id:ID
     school_legal_name: String!
     school_commercial_name: String!
     address:[SchoolAddressInput]!}
@@ -38,7 +38,7 @@ input SchoolAddressInput {
 const SchoolQuery = `
     extend type Query {
         GetAllSchool: [School]
-        GetSchoolById(id: ID!): School
+        GetSchoolById(_id: ID!): School
     }
 `;
 
@@ -48,10 +48,10 @@ const SchoolMutation = `
       school_input: SchoolInput!): School!
 
     UpdateSchool(
-      id:ID!,school_input: SchoolInput!): School
+      _id:ID!,school_input: SchoolInput!): School
 
     DeleteSchool(
-      id: ID!): School
+      _id: ID!): School
     }`
 
 // *************** EXPORT MODULE ***************
