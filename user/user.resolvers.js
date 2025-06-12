@@ -60,9 +60,6 @@ async function CreateUser(parent, { user_input }) {
   // *************** creating new user based on the userInput
   const createdUser = await User.create(user_input);
 
-  // *************** showing log message if the user already created
-  console.log("User has Created:", createdUser);
-
   // *************** returning new user data
   return createdUser;
 }

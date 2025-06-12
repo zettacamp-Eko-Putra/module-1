@@ -21,7 +21,7 @@ input StudentAddressInput{
     } 
 
 type Student{
-    id:ID!
+    _id:ID!
     first_name:String!
     last_name:String!
     email:String!
@@ -38,7 +38,7 @@ type Student{
     }
 
 input StudentInput{
-    id:ID
+    _id:ID
     first_name:String!
     last_name:String!
     email:String!
@@ -57,7 +57,7 @@ input StudentInput{
 const StudentQuery = `
     extend type Query {
         GetAllStudent: [Student]
-        GetStudentById(id: ID!): Student
+        GetStudentById(_id: ID!): Student
     }
 `;
 
@@ -68,10 +68,10 @@ const StudentMutation =`
             student_input: StudentInput!): Student!
 
         UpdateStudent(
-            id:ID!,student_input: StudentInput!): Student
+            _id:ID!,student_input: StudentInput!): Student
 
         DeleteStudent(
-            id: ID!): Student
+            _id: ID!): Student
     }
     `;
 

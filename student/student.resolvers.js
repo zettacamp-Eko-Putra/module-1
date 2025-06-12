@@ -29,10 +29,10 @@ async function GetAllStudent() {
  * @returns {Promise<object>} - A promise that resolves to the student object.
  * @throws {Error} - Throws an error if the student is not found.
  */
-async function GetStudentById(parent,{id}) {
+async function GetStudentById(parent,{_id}) {
 
    // *************** finding student based on id
-  const student = await Student.findById(id)
+  const student = await Student.findById(_id)
 
    // *************** creating if to showing message if the student cannot be found
     if (!student){
@@ -95,9 +95,6 @@ async function CreateStudent(parent, {student_input})
     $push: {student: createdStudent._id}
   });
 
-  // *************** showing message if the student has been created
-  console.log("Data berhasil disimpan", createdStudent);
-
   // *************** returning new student data
   return createdStudent;
 }
@@ -115,17 +112,17 @@ async function CreateStudent(parent, {student_input})
  * @returns {Promise<object>} - A promise that resolves to the updated student object.
  * @throws {Error} - Throws an error if attempting to update student ID or if student/school not found.
  */
-async function UpdateStudent(parent, { id, student_input }) {
+async function UpdateStudent(parent, { _id, student_input }) {
 
   // *************** creating if to showing error message if the student tried to update their id
-  if (studentInput.id) {
+  if (student_input._id) {
 
         // *************** error message if user tried to update their id
     throw new Error("Cannot update Student ID");
   }
 
   // *************** find user by id and adding it to student variable
-   const student = await Student.findById(id);
+   const student = await Student.findById(_id);
 
    // *************** creating if to showing error message if the student id cannot be found in database
   if (!student) {
@@ -135,7 +132,7 @@ async function UpdateStudent(parent, { id, student_input }) {
   }
 
   // *************** taking StudentInput and add it to newSchoolId variable
-  const newSchoolId = studentInput.school_id;
+  const newSchoolId = student_input.school_id;
 
   // *************** taking current student id
   const currentSchoolId = student.school_id ? student.school_id.toString() : null;
@@ -187,7 +184,7 @@ async function UpdateStudent(parent, { id, student_input }) {
   }
 
   // *************** updating the student data and save it to database
-  const updatedStudent = await Student.findByIdAndUpdate(id, studentInput, { new: true });
+  const updatedStudent = await Student.findByIdAndUpdate(_id, student_input, { new: true });
 
   // *************** returning the updated data
   return updatedStudent;
@@ -205,9 +202,9 @@ async function UpdateStudent(parent, { id, student_input }) {
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted student object.
  * @throws {Error} - Throws an error if the student is not found.
  */
-async function DeleteStudent(parent,id){
+async function DeleteStudent(parent,{_id}){
     const deleteStudent = await Student.findByIdAndUpdate(
-      id,
+      _id,
       {
         // *************** changing status field to deleted
         status :"deleted",
