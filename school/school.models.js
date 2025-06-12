@@ -8,7 +8,7 @@ const Schema = mongoose.Schema;
  * School Schema
  * Describes the structure of the School document in MongoDB.
  */
-const addressSchema = new Schema({
+const SchoolAddressSchema = new Schema({
     street: String,
     city: String,
     province: String,
@@ -24,7 +24,7 @@ const schoolSchema = new Schema({
     school_commercial_name : { type:String, required: true },
 
     // address for the school
-    address : [ addressSchema ],
+    address : [ SchoolAddressSchema ],
 
     // Student for the school
     student : [{ type:Schema.Types.ObjectId, ref:'Student' }],

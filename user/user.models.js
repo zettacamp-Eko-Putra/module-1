@@ -4,18 +4,22 @@ const Schema = mongoose.Schema;
 
 
 // *************** MODEL: User ***************
-
+// *************** MODEL Schema: User Address ***************
 const userAddressSchema = new Schema({
+    // Name of street user living
     street: String,
+
+     // Name of city user living
     city: String,
+
+     // Name of province user living
     province: String,
+
+     // Number of postal code user living
     postal_code: String
 })
 
-/**
- * User Schema
- * Describes the structure of the user document in MongoDB.
- */
+// *************** MODEL Schema: User ***************
  const userSchema = new Schema({
     // First name for the user
     first_name : { type:String, required:true },

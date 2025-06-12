@@ -1,6 +1,6 @@
 // *************** TYPE DEFINITION : School  ***************
 const addressType =`
-  type Address{
+  type SchoolAddress{
     street: String!,
     city: String!,
     province: String!,
@@ -9,7 +9,7 @@ const addressType =`
 
 const schoolType = `
 
-input AddressInput {
+input SchoolAddressInput {
   street: String!
   city: String!
   province: String!
@@ -20,7 +20,7 @@ input AddressInput {
     id: ID!
     school_legal_name: String!
     school_commercial_name: String!
-    address: [Address]
+    address: [SchoolAddress]
     student: [ID]
     students: [Student]
     status:String!
@@ -31,7 +31,7 @@ input AddressInput {
     id:ID
     school_legal_name: String!
     school_commercial_name: String!
-    address:[AddressInput]!}
+    address:[SchoolAddressInput]!}
      
 `;
 

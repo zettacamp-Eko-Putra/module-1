@@ -5,9 +5,16 @@ const { Schema } = mongoose;
 
 // *************** MODEL: Student Address ***************
 const studentAddressSchema = new Schema({
+     // Name of street student living
     street: String,
+
+     // Name of city student living
     city: String,
+
+     // Name of province student living
     province: String,
+
+     // Name of postal code student living
     postal_code: String
 })
 
