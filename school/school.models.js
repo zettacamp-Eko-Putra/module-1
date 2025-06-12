@@ -17,8 +17,11 @@ const addressSchema = new Schema({
 
 const schoolSchema = new Schema({
 
-    // name for the school
-    name : { type:String, required: true },
+    // the legal name for the school
+    school_legal_name : { type:String, required: true },
+
+    // the commercial name for the school
+    school_commercial_name : { type:String, required: true },
 
     // address for the school
     address : [ addressSchema ],

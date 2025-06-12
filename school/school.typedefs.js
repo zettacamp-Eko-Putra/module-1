@@ -18,7 +18,8 @@ input AddressInput {
 
   type School {
     id: ID!
-    name: String!
+    school_legal_name: String!
+    school_commercial_name: String!
     address: [Address]
     student: [ID]
     students: [Student]
@@ -28,7 +29,8 @@ input AddressInput {
 
   input SchoolInput{
     id:ID
-    name:String!
+    school_legal_name: String!
+    school_commercial_name: String!
     address:[AddressInput]!}
      
 `;
