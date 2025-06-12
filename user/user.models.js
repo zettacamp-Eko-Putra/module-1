@@ -27,20 +27,20 @@ const userAddressSchema = new Schema({
     civility : { type:String, enum:['Mr','Mrs'], default: 'Mr', required:true },
 
     // office_phone for the user
-    office_phone : { type:String, max:12 },
+    office_phone : { type:String, maxlength: 12 },
 
     // direct line for the user
-    direct_line : { type:String, max:12 },
+    direct_line : { type:String, maxlength: 12 },
 
     // Mobile phone for the user
-    mobile_phone : { type:String, max:12, required:true },
+    mobile_phone : { type:String, maxlength: 12, required:true },
 
     // Entity the user belong to
-    entity : { type:String, enum:['ADMTC','Academic','Company'] },
+    entity : { type:String, enum:['ADMTC','Academic','Company'], required:true },
 
     // User Address
     address: [userAddressSchema],
-    
+
     // email for the user
     email : { type:String, required:true, unique:true },
 

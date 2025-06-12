@@ -1,12 +1,33 @@
 // *************** TYPE DEFINITION: User ***************
 
+const userAddressType =`
+    type UserAddress{
+    street:String!
+    city:String!
+    province:String!
+    postal_code:String!
+    }`
+
 // *************** User Type
 const userType =`
+
+    input UserAddressInput{
+    street:String!
+    city:String!
+    province:String!
+    postal_code:String!
+    }
 
     type User {
         id:ID!
         first_name:String!
         last_name:String!
+        civility:String!
+        office_phone:String
+        direct_line:String
+        mobile_phone:String
+        entity:String!
+        address:[UserAddress]!
         email:String!
         password:String!
         role:String!
@@ -17,6 +38,12 @@ const userType =`
         id:ID
         first_name:String!
         last_name:String!
+        civility:String!
+        office_phone:String
+        direct_line:String
+        mobile_phone:String
+        entity:String!
+        address:[UserAddressInput]!
         email:String!
         password:String!
         role:String! 
@@ -49,4 +76,4 @@ extend type Mutation{
 `;
 
 // *************** EXPORT MODULE ***************
-module.exports = { userType, UserQuery, UserMutation };
+module.exports = { userType, UserQuery, UserMutation, userAddressType };
