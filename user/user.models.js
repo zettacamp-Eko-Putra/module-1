@@ -5,6 +5,13 @@ const Schema = mongoose.Schema;
 
 // *************** MODEL: User ***************
 
+const userAddressSchema = new Schema({
+    street: String,
+    city: String,
+    province: String,
+    postal_code: String
+})
+
 /**
  * User Schema
  * Describes the structure of the user document in MongoDB.
@@ -16,6 +23,24 @@ const Schema = mongoose.Schema;
     // Last name for the user
     last_name : { type:String, required:true },
 
+    // Civility for the user
+    civility : { type:String, enum:['Mr','Mrs'], default: 'Mr', required:true },
+
+    // office_phone for the user
+    office_phone : { type:String, max:12 },
+
+    // direct line for the user
+    direct_line : { type:String, max:12 },
+
+    // Mobile phone for the user
+    mobile_phone : { type:String, max:12, required:true },
+
+    // Entity the user belong to
+    entity : { type:String, enum:['ADMTC','Academic','Company'] },
+
+    // User Address
+    address: [userAddressSchema],
+    
     // email for the user
     email : { type:String, required:true, unique:true },
 
