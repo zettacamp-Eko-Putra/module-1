@@ -1,6 +1,6 @@
 // *************** IMPORT MODULE ***************
 const User = require("./user.models.js");
-const { ValidateUserInput } = require("./user.validator.js")
+const { ValidateUserInput } = require("./user.validator.js");
 
 // *************** LOGIC ***************
 /**
@@ -12,7 +12,7 @@ const { ValidateUserInput } = require("./user.validator.js")
  */
 async function GetAllUser() {
   // *************** find user data with status active
-  const activeUser = await User.find({ status: "active"})
+  const activeUser = await User.find({ status: "active" });
 
   // *************** returning user data with status active
   return activeUser;
@@ -52,7 +52,6 @@ async function GetUserById(parent, { _id }) {
  * @throws {Error} - Throws an error if the email is already taken.
  */
 async function CreateUser(parent, { user_input }) {
-
   // *************** validate user_input
   ValidateUserInput(user_input);
 
@@ -86,6 +85,9 @@ async function CreateUser(parent, { user_input }) {
  * @throws {Error} - Throws an error if the ID is being updated or if the user is not found.
  */
 async function UpdateUser(parent, { _id, user_input }) {
+  // *************** validate user_input
+  ValidateUserInput(user_input);
+
   // *************** creating if to showing error message if the user tried to update their id
   if (user_input._id) {
     // *************** error message if user tried to update their id

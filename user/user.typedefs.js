@@ -42,7 +42,7 @@ const userType = `
         civility:String!
         office_phone:String
         direct_line:String
-        mobile_phone:String
+        mobile_phone:String!
         entity:String!
         address:[UserAddressInput]!
         email:String!
