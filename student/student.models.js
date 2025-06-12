@@ -3,6 +3,14 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 
+// *************** MODEL: Student Address ***************
+const studentAddressSchema = new Schema({
+    street: String,
+    city: String,
+    province: String,
+    postal_code: String
+})
+
 // *************** MODEL: Student ***************
 
 /**
@@ -20,8 +28,19 @@ const studentSchema = new Schema({
     // email for the student
     email : { type:String, required: true, unique:true },
 
+    // Civility for the user
+    civility : { type:String, enum:['Mr','Mrs'], default: 'Mr', required:true },
+
     // date of birth for the student
-    date_of_birth : { type:Date },
+    date_of_birth : { type:Date, required:true },
+
+    // Postal code of birth for the student
+    postal_code_of_birth : { type:String, required:true },
+
+    // Mobile phone number for student
+    mobile_phone : { type:String, maxlength:12, required:true },
+
+    address: [ studentAddressSchema ],
 
     // school id the student belongs to
     school_id: { type : Schema.Types.ObjectId, ref:'School', required: true },

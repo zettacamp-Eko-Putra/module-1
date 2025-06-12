@@ -2,8 +2,8 @@
 const express = require('express');
 const { ApolloServer, gql } = require('apollo-server-express');
 const mongoose = require('mongoose');
-const { userType, UserQuery, UserMutation } = require('./user/user.typedefs');
-const { studentType, StudentQuery, StudentMutation } = require('./student/student.typedefs');
+const { userType, UserQuery, UserMutation, userAddressType } = require('./user/user.typedefs');
+const { studentType, StudentQuery, StudentMutation, studentAddressType } = require('./student/student.typedefs');
 const { schoolType, SchoolQuery, addressType, SchoolMutation } = require('./school/school.typedefs');
 const { userResolvers } = require('./user/user.resolvers');
 const { studentResolvers } = require('./student/student.resolvers');
@@ -26,9 +26,11 @@ const typeDefs = gql`
   ${userType}
   ${UserQuery}
   ${UserMutation}
+  ${userAddressType}
   ${studentType}
   ${StudentQuery}
   ${StudentMutation}
+  ${studentAddressType}
   ${schoolType}
   ${SchoolQuery}
   ${addressType}

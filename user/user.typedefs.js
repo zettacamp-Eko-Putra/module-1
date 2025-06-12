@@ -1,5 +1,6 @@
 // *************** TYPE DEFINITION: User ***************
 
+// *************** User address Type
 const userAddressType =`
     type UserAddress{
     street:String!
