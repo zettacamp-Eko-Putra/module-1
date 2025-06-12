@@ -1,24 +1,19 @@
-// *************** IMPORT MODULE *************** 
-const User =  require('./user.models.js');
-const users = [];
+// *************** IMPORT MODULE ***************
+const User = require("./user.models.js");
 
-
-// *************** LOGIC *************** 
-// *************** Get all User
+// *************** LOGIC ***************
 /**
  * Retrieves all users with active status from the database.
- * 
+ *
  * @async
  * @function GetAllUser
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
 async function GetAllUser() {
-
-  // returning user data with status active
-  return await User.find({ status:"active" });
+  // *************** returning user data with status active
+  return await User.find({ status: "active" });
 }
 
-// *************** Get User by Id
 /**
  * Fetches all users from the database whose status is set to "active".
  *
@@ -26,23 +21,20 @@ async function GetAllUser() {
  * @function GetAllUser
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
-async function GetUserById(_,{id}) {
+async function GetUserById(parent, { _id }) {
+  // *************** finding user based on id
+  const user = await User.findById(_id);
 
-  // finding user based on id
-  const user = await User.findById(id);
+  // *************** creating if to showing message if the user cannot be found
+  if (!user) {
+    // *************** error message if the user cannot be found in database
+    throw new Error("User Not Found");
+  }
 
-        // creating if to showing message if the user cannot be found
-        if (!user){
-
-          // error message if the user cannot be found in database
-          throw new Error("User Not Found")
-        }
-
-        // returning user data if user in database
-        return user;
+  // *************** returning user data if user in database
+  return user;
 }
 
-// *************** Create User
 /**
  * Creates a new user if the provided email is not already in use.
  *
@@ -55,29 +47,26 @@ async function GetUserById(_,{id}) {
  * @returns {Promise<object>} - A promise that resolves to the newly created user object.
  * @throws {Error} - Throws an error if the email is already taken.
  */
-async function CreateUser(_, {userInput}){
+async function CreateUser(parent, { user_input }) {
+  // *************** check if the email already taken by another user
+  const emailTaken = await User.findOne({ email: user_input.email });
 
-    // check if the email already taken by another user
-    const emailTaken = users.some((user) => user.email === userInput.email)
+  // *************** creating if to showing message if the email already taken by another user
+  if (emailTaken) {
+    // *************** error message if the email already taken
+    throw new Error("Email taken");
+  }
 
-    // creating if to showing message if the email already taken by another user
-    if (emailTaken){
+  // *************** creating new user based on the userInput
+  const createdUser = await User.create(user_input);
 
-      // error message if the email already taken
-      throw new Error('Email taken')
-    }
+  // *************** showing log message if the user already created
+  console.log("User has Created:", createdUser);
 
-    // creating new user based on the userInput
-    const createdUser = await User.create(userInput);
-
-    // showing log message if the user already created
-    console.log("User has Created:", createdUser);
-
-    // returning new user data
-    return createdUser;
+  // *************** returning new user data
+  return createdUser;
 }
 
-// *************** Update User
 /**
  * Updates an existing user's data based on the provided ID.
  * Prevents the user from modifying their own ID.
@@ -91,29 +80,28 @@ async function CreateUser(_, {userInput}){
  * @returns {Promise<object>} - A promise that resolves to the updated user object.
  * @throws {Error} - Throws an error if the ID is being updated or if the user is not found.
  */
-async function UpdateUser(_, { id, userInput }) {
-  // creating if to showing error message if the user tried to update their id
-  if (userInput.id) {
-
-    // error message if user tried to update their id
+async function UpdateUser(parent, { _id, user_input }) {
+  // *************** creating if to showing error message if the user tried to update their id
+  if (user_input._id) {
+    // *************** error message if user tried to update their id
     throw new Error("Cannot update User ID");
   }
 
-  // finding user based on id and overwrite it with new data and saving it to database
-  const updatedUser = await User.findByIdAndUpdate(id, userInput, { new: true });
+  // *************** finding user based on id and overwrite it with new data and saving it to database
+  const updatedUser = await User.findByIdAndUpdate(_id, user_input, {
+    new: true,
+  });
 
-  // creating if to showing error message if the user id cannot be found in database
+  // *************** creating if to showing error message if the user id cannot be found in database
   if (!updatedUser) {
-
-    // message if user id cannot be found in database
+    // *************** message if user id cannot be found in database
     throw new Error("User not found");
   }
 
-  // returning user updated data to user
+  // *************** returning user updated data to user
   return updatedUser;
 }
 
-// *************** Delete User
 /**
  * Soft deletes a user by updating their status to "deleted" and setting a deletion timestamp.
  *
@@ -125,50 +113,45 @@ async function UpdateUser(_, { id, userInput }) {
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted user object.
  * @throws {Error} - Throws an error if the user is not found.
  */
-async function DeleteUser(_,{id}){
-
-  // finding user based on id and update the data
+async function DeleteUser(parent, { _id }) {
+  // *************** finding user based on id and update the data
   const deleteUser = await User.findByIdAndUpdate(
-        id,
-        { 
-          // changing status field to deleted
-          status:"deleted",
+    _id,
+    {
+      // *************** changing status field to deleted
+      status: "deleted",
 
-          // adding timestamp to deleted_at field
-          deleted_at: new Date()
-        },
+      // *************** adding timestamp to deleted_at field
+      deleted_at: new Date(),
+    },
 
-        // overwrite the old data with new one
-        { new:true }
-      );
+    // *************** overwrite the old data with new one
+    { new: true }
+  );
 
-      // creating if to showing error message if user id cannot be found in database
-      if (!deleteUser){
+  // *************** creating if to showing error message if user id cannot be found in database
+  if (!deleteUser) {
+    // *************** message if the user id cannot be found in database
+    throw new Error("User not found");
+  }
 
-        // message if the user id cannot be found in database
-        throw new Error("User not found");
-      } 
-
-      // returning user deleted data to user
-      return deleteUser
+  // *************** returning user deleted data to user
+  return deleteUser;
 }
-
-
 
 const userResolvers = {
-  // *************** QUERY *************** 
+  // *************** QUERY ***************
   Query: {
     GetAllUser,
-    GetUserById
+    GetUserById,
   },
 
-  // *************** MUTATION *************** 
+  // *************** MUTATION ***************
   Mutation: {
-  CreateUser,
-  UpdateUser,
-  DeleteUser
-}
-
+    CreateUser,
+    UpdateUser,
+    DeleteUser,
+  },
 };
 
 // *************** EXPORT MODULE ***************

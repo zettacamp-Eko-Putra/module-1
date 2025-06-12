@@ -1,16 +1,16 @@
 // *************** TYPE DEFINITION: User ***************
 
 // *************** User address Type
-const userAddressType =`
+const userAddressType = `
     type UserAddress{
     street:String!
     city:String!
     province:String!
     postal_code:String!
-    }`
+    }`;
 
 // *************** User Type
-const userType =`
+const userType = `
 
     input UserAddressInput{
     street:String!
@@ -20,7 +20,7 @@ const userType =`
     }
 
     type User {
-        id:ID!
+        _id:ID!
         first_name:String!
         last_name:String!
         civility:String!
@@ -36,7 +36,7 @@ const userType =`
         deleted_at:Date
     }
     input UserInput{
-        id:ID
+        _id:ID
         first_name:String!
         last_name:String!
         civility:String!
@@ -58,21 +58,21 @@ const UserQuery = `
     extend type Query {
 
         GetAllUser: [User]
-        GetUserById(id: ID!): User
+        GetUserById(_id: ID!): User
     }
 `;
 
 // *************** User Mutation
-const UserMutation =`
+const UserMutation = `
 extend type Mutation{
     CreateUser(
-        userInput: UserInput!): User!    
+        user_input: UserInput!): User!    
     
     UpdateUser(
-        id:ID!,userInput: UserInput!): User
+        _id:ID!,user_input: UserInput!): User
         
     DeleteUser(
-        id: ID!): User
+        _id: ID!): User
     }
 `;
 

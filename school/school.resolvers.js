@@ -3,7 +3,6 @@ const School =  require('./school.models.js');
 const Student = require('../student/student.models.js')
 
 
-// *************** Get All School
 /**
  * Retrieves all school documents with status set to "active".
  *
@@ -13,10 +12,10 @@ const Student = require('../student/student.models.js')
  */
 async function GetAllSchool(){
 
-  // returning school data with status active
+  // *************** returning school data with status active
   return await School.find({ status:"active" })
 }
-// *************** Get School By Id
+
 /**
  * Retrieves a school by its unique ID.
  *
@@ -28,23 +27,22 @@ async function GetAllSchool(){
  * @returns {Promise<object>} - A promise that resolves to the school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
-async function GetSchoolById(_,{id}) {
+async function GetSchoolById(parent,{id}) {
 
-   // finding school based on id
+   // *************** finding school based on id
   const school = await School.findById(id)
 
-  // creating if to showing message if the school cannot be found
+  // *************** creating if to showing message if the school cannot be found
     if(!school){
 
-      // error message if the user cannot be found in database
+      // *************** error message if the user cannot be found in database
       throw new Error("School not found")
     }
 
-    // returning user data if user in database
+    // *************** returning user data if user in database
     return school;
 }
 
-// *************** Create School
 /**
  * Creates a new school if the name is not already taken.
  *
@@ -57,29 +55,29 @@ async function GetSchoolById(_,{id}) {
  * @returns {Promise<object>} - A promise that resolves to the newly created school object.
  * @throws {Error} - Throws an error if a school with the same name already exists.
  */
-async function CreateSchool(_,{schoolInput}){
+async function CreateSchool(parent,{school_input}){
 
-  // check if the school name already taken by another school
-const schoolTaken = await School.findOne({ school_legal_name: schoolInput.school_legal_name });
+  // *************** check if the school name already taken by another school
+const schoolTaken = await School.findOne({ school_legal_name: school_input.school_legal_name });
 
- // creating if to showing message if the name already taken by another school
+ // *************** creating if to showing message if the name already taken by another school
 if (schoolTaken) {
 
-    // error message if the name already taken
+    // *************** error message if the name already taken
   throw new Error("School name already exists");
 }
 
-// creating new school based on the schoolInput
-  const createdSchool = await School.create(schoolInput);
+// *************** creating new school based on the schoolInput
+  const createdSchool = await School.create(school_input);
 
-  // showing log message if the school already created
+  // *************** showing log message if the school already created
   console.log("School has created", createdSchool);
 
-  // returning new school data
+  // *************** returning new school data
   return createdSchool;
 }
 
-// *************** Update School
+
 /**
  * Updates an existing school by ID with the provided input data.
  *
@@ -92,29 +90,29 @@ if (schoolTaken) {
  * @returns {Promise<object>} - A promise that resolves to the updated school object.
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
-async function UpdateSchool(_,{id,schoolInput}){
-  // creating if to showing error message if the school tried to update their id
-  if (schoolInput.id){
+async function UpdateSchool(parent,{id,school_input}){
+  // *************** creating if to showing error message if the school tried to update their id
+  if (school_input.id){
 
-     // error message if school tried to update their id
+     // *************** error message if school tried to update their id
     throw new Error("Cannot update School ID");
   }
 
-  // finding school based on id and overwrite it with new data and saving it to database
-  const updatedSchool = await School.findByIdAndUpdate(id, schoolInput, { new:true });
+  // *************** finding school based on id and overwrite it with new data and saving it to database
+  const updatedSchool = await School.findByIdAndUpdate(id, school_input, { new:true });
 
-  // creating if to showing error message if the school id cannot be found in database
+  // *************** creating if to showing error message if the school id cannot be found in database
   if(!updatedSchool){
 
-    // message if school id cannot be found in database
+    // *************** message if school id cannot be found in database
     throw new Error("School not Found");
   }
 
-  // returning school updated data to user
+  // *************** returning school updated data to user
   return updatedSchool;
 }
 
-// *************** Delete School
+
 /**
  * Soft deletes a school by setting its status to "deleted" and recording the deletion timestamp.
  *
@@ -126,35 +124,34 @@ async function UpdateSchool(_,{id,schoolInput}){
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
-async function DeleteSchool(_,{id}){
+async function DeleteSchool(parent,{id}){
 
-  // finding school based on id and update the data
+  // *************** finding school based on id and update the data
   const deleteSchool = await School.findByIdAndUpdate(
     id,
     {
-      // changing status field to deleted
+      // *************** changing status field to deleted
       status:"deleted",
 
-      // adding timestamp to deleted_at field
+      // *************** adding timestamp to deleted_at field
       deleted_at: new Date()
     },
 
-    // overwrite the old data with new one
+    // *************** overwrite the old data with new one
     {new: true}
   );
 
-    // creating if to showing error message if school id cannot be found in database
+    // *************** creating if to showing error message if school id cannot be found in database
   if (!deleteSchool){
 
-    // message if the user id cannot be found in database
+    // *************** message if the user id cannot be found in database
     throw new Error("School not found")
   }
 
-   // returning school deleted data to user
+   // *************** returning school deleted data to user
   return deleteSchool
 }
 
-// *************** Get Student Data
 /**
  * Retrieves student data associated with a school using DataLoader.
  *
@@ -166,22 +163,22 @@ async function DeleteSchool(_,{id}){
  * @param {object} context.loaders - DataLoader object from context.
  * @returns {Promise<Array>} - An array of student documents.
  */
-async function GetStudentData(parent,_,{loaders}){
+async function GetStudentData(parent,args,{loaders}){
 
-  // creating if to check if the school student array empty
+  // *************** creating if to check if the school student array empty
     if (!parent.student || parent.student.length ===0){
 
-      // retuning value if student array empty
+      // *************** retuning value if student array empty
         return [];
       }
 
-    // using student loaders to mapping student data based on student id
+    // *************** using student loaders to mapping student data based on student id
     const studentId = parent.student.map(id => id.toString());
 
-    // taking student data using data loader
+    // *************** taking student data using data loader
     const result = await loaders.student.loadMany(studentId);
 
-    // retuning the result and filter it not to showing null value
+    // *************** retuning the result and filter it not to showing null value
     return result.filter(student => student !==null)
 }
 

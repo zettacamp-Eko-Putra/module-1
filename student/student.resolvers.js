@@ -5,7 +5,6 @@ const mongoose = require('mongoose');
 
 
 // *************** LOGIC *************** 
-// *************** Get All student
 /**
  * Retrieves all students whose status is set to "active".
  *
@@ -15,11 +14,10 @@ const mongoose = require('mongoose');
  */
 async function GetAllStudent() {
 
-  // returning student data that has status "active"
+  // *************** returning student data that has status "active"
   return await Student.find({ status : "active"})
 }
 
-// *************** Get student By Id
 /**
  * Retrieves a student by their unique ID.
  *
@@ -31,23 +29,22 @@ async function GetAllStudent() {
  * @returns {Promise<object>} - A promise that resolves to the student object.
  * @throws {Error} - Throws an error if the student is not found.
  */
-async function GetStudentById(_,{id}) {
+async function GetStudentById(parent,{id}) {
 
-   // finding student based on id
+   // *************** finding student based on id
   const student = await Student.findById(id)
 
-   // creating if to showing message if the student cannot be found
+   // *************** creating if to showing message if the student cannot be found
     if (!student){
 
-      // error message if the student cannot be found in database
+      // *************** error message if the student cannot be found in database
       throw new Error("Student Not Found")
     }
 
-    // returning student data if student in database
+    // *************** returning student data if student in database
     return student;
 }
 
-// *************** Create Student
 /**
  * Creates a new student and associates them with a school.
  *
@@ -60,52 +57,51 @@ async function GetStudentById(_,{id}) {
  * @returns {Promise<object>} - A promise that resolves to the newly created student object.
  * @throws {Error} - Throws an error if the school is not found.
  */
-async function CreateStudent(_, {studentInput}) 
+async function CreateStudent(parent, {student_input}) 
 {
 
-  // changing input school_id to object type
-  const schoolId = mongoose.Types.ObjectId(studentInput.school_id);
+  // *************** changing input school_id to object type
+  const schoolId = mongoose.Types.ObjectId(student_input.school_id);
 
-  // finding school data in database based on id
+  // *************** finding school data in database based on id
   const schoolExist = await School.findById(schoolId);
 
-  // creating if to showing message if school id cannot be found
+  // *************** creating if to showing message if school id cannot be found
     if (!schoolExist){
 
-      // error message if the school id cannot be found in database
+      // *************** error message if the school id cannot be found in database
       throw new Error ("School not found");
     }
 
-    // changing student input data and adding it to studentData
+    // *************** changing student input data and adding it to studentData
  const studentData = {
 
-    // all student input data
-    ...studentInput,
+    // *************** all student input data
+    ...student_input,
 
-    // adding school history array with schoolId
+    // *************** adding school history array with schoolId
     school_history: [schoolId],
 
-    // adding school_id with schoolId
+    // *************** adding school_id with schoolId
     school_id: schoolId
   };
 
-  // creating new student based on the studentData
+  // *************** creating new student based on the studentData
   const createdStudent = await Student.create(studentData);
   
 
-  // adding student id to school collection
+  // *************** adding student id to school collection
   await School.findByIdAndUpdate(schoolId, {
     $push: {student: createdStudent._id}
   });
 
-  // showing message if the student has been created
+  // *************** showing message if the student has been created
   console.log("Data berhasil disimpan", createdStudent);
 
-  // returning new student data
+  // *************** returning new student data
   return createdStudent;
 }
 
-// *************** Update Student
 /**
  * Updates an existing student's information, including handling changes to their associated school.
  *
@@ -119,86 +115,85 @@ async function CreateStudent(_, {studentInput})
  * @returns {Promise<object>} - A promise that resolves to the updated student object.
  * @throws {Error} - Throws an error if attempting to update student ID or if student/school not found.
  */
-async function UpdateStudent(_, { id, studentInput }) {
+async function UpdateStudent(parent, { id, student_input }) {
 
-  // creating if to showing error message if the student tried to update their id
+  // *************** creating if to showing error message if the student tried to update their id
   if (studentInput.id) {
 
-        // error message if user tried to update their id
+        // *************** error message if user tried to update their id
     throw new Error("Cannot update Student ID");
   }
 
-  // find user by id and adding it to student variable
+  // *************** find user by id and adding it to student variable
    const student = await Student.findById(id);
 
-   // creating if to showing error message if the student id cannot be found in database
+   // *************** creating if to showing error message if the student id cannot be found in database
   if (!student) {
 
-        // message if student id cannot be found in database
+    // *************** message if student id cannot be found in database
     throw new Error("Student not found");
   }
 
-  // taking StudentInput and add it to newSchoolId variable
+  // *************** taking StudentInput and add it to newSchoolId variable
   const newSchoolId = studentInput.school_id;
 
-  // taking current student id
+  // *************** taking current student id
   const currentSchoolId = student.school_id ? student.school_id.toString() : null;
 
 
-  // creating if to check if the current school id is different with new school id input
+  // *************** creating if to check if the current school id is different with new school id input
   if (newSchoolId && newSchoolId !== currentSchoolId) {
 
-    // finding new school id in the database
+    // *************** finding new school id in the database
     const newSchool = await School.findById(newSchoolId);
 
-    // showing error message if the new school id cannot be found
+    // *************** showing error message if the new school id cannot be found
     if (!newSchool) throw new Error("New School Not Found");
 
-  // creating set to avoid duplicate data
+  // *************** creating set to avoid duplicate data
     const schoolHistorySet = new Set(
       (student.school_history || []).map(id => id.toString())
     );
 
-    // creating if to check if the new school data already in school_history 
+    // *************** creating if to check if the new school data already in school_history 
       if (!schoolHistorySet.has(newSchoolId)) {
       schoolHistorySet.add(newSchoolId);
     }
 
-    // update school history with the new school history
+    // *************** update school history with the new school history
     studentInput.school_history = Array.from(schoolHistorySet);
 
-    // creating if to update data form old school
+    // *************** creating if to update data form old school
     if (currentSchoolId) {
 
-      // finding old school data based on database
+      // *************** finding old school data based on database
       await School.findByIdAndUpdate(currentSchoolId, {
 
-        // pull student data form old school
+        // *************** pull student data form old school
         $pull: { student: student._id }
       });
     }
 
-    // finding data of the new school
+    // *************** finding data of the new school
     await School.findByIdAndUpdate(newSchoolId, {
 
-      // pushing student data to new school
+      // *************** pushing student data to new school
       $addToSet: { student: student._id }
     });
   } else {
 
-    // if there's no change use the old school_history data
+    // *************** if there's no change use the old school_history data
     studentInput.school_history = student.school_history;
   }
 
-  // updating the student data and save it to database
+  // *************** updating the student data and save it to database
   const updatedStudent = await Student.findByIdAndUpdate(id, studentInput, { new: true });
 
-  // returning the updated data
+  // *************** returning the updated data
   return updatedStudent;
 }
 
 
-// *************** Delete Student
 /**
  * Soft deletes a student by setting their status to "deleted" and recording the deletion timestamp.
  *
@@ -210,33 +205,32 @@ async function UpdateStudent(_, { id, studentInput }) {
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted student object.
  * @throws {Error} - Throws an error if the student is not found.
  */
-async function DeleteStudent(_,{id}){
+async function DeleteStudent(parent,id){
     const deleteStudent = await Student.findByIdAndUpdate(
       id,
       {
-        // changing status field to deleted
+        // *************** changing status field to deleted
         status :"deleted",
 
-        // adding timestamp to deleted_at field
+        // *************** adding timestamp to deleted_at field
         deleted_at: new Date()
       },
 
-      // overwrite the old data with new one
+      // *************** overwrite the old data with new one
       {new:true}
     );
 
-    // creating if to showing error message if student id cannot be found in database
+    // *************** creating if to showing error message if student id cannot be found in database
     if (!deleteStudent){
 
-       // message if the student id cannot be found in database
+       // *************** message if the student id cannot be found in database
       throw new Error("Student Not Found");
     }
 
-    // returning student deleted data to user
+    // *************** returning student deleted data to user
     return deleteStudent
 }
 
-// *************** Get Current School 
 /**
  * Retrieves the current school information for a student using DataLoader.
  *
@@ -249,13 +243,12 @@ async function DeleteStudent(_,{id}){
  * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
  * @returns {Promise<object>} - A promise that resolves to the school object associated with the student.
  */
-async function GetCurrentSchool(parent,_,{loaders}){
+async function GetCurrentSchool(parent,args,{loaders}){
 
-  // using school loaders to mapping school data based on school id
+  // *************** using school loaders to mapping school data based on school id
   return await loaders.school.load(parent.school_id.toString());
 }
 
-// *************** Get School History
 /**
  * Retrieves the full school history for a student using DataLoader.
  *
@@ -268,12 +261,12 @@ async function GetCurrentSchool(parent,_,{loaders}){
  * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
  * @returns {Promise<object[]>} - A promise that resolves to an array of school objects from the student's history.
  */
-async function GetSchoolHistory(parent,_,{loaders}) {
+async function GetSchoolHistory(parent,args,{loaders}) {
 
-    // using school loaders to mapping school data based on school id
+    // *************** using school loaders to mapping school data based on school id
   const ids = parent.school_history.map(id => id.toString());
 
-  // returning school data
+  // *************** returning school data
   return await loaders.school.loadMany(ids);
 }
 

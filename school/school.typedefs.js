@@ -17,7 +17,7 @@ input SchoolAddressInput {
 }
 
   type School {
-    id: ID!
+    _id: ID!
     school_legal_name: String!
     school_commercial_name: String!
     address: [SchoolAddress]
@@ -45,10 +45,10 @@ const SchoolQuery = `
 const SchoolMutation = `
   extend type Mutation{
     CreateSchool(
-      schoolInput: SchoolInput!): School!
+      school_input: SchoolInput!): School!
 
     UpdateSchool(
-      id:ID!,schoolInput: SchoolInput!): School
+      id:ID!,school_input: SchoolInput!): School
 
     DeleteSchool(
       id: ID!): School

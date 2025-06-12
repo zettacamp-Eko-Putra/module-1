@@ -65,10 +65,10 @@ const StudentQuery = `
 const StudentMutation =`
     extend type Mutation{
         CreateStudent(
-            studentInput: StudentInput!): Student!
+            student_input: StudentInput!): Student!
 
         UpdateStudent(
-            id:ID!,studentInput: StudentInput!): Student
+            id:ID!,student_input: StudentInput!): Student
 
         DeleteStudent(
             id: ID!): Student
