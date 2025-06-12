@@ -10,8 +10,11 @@ const User = require("./user.models.js");
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
 async function GetAllUser() {
+  // *************** find user data with status active
+  const activeUser = await User.find({ status: "active"})
+
   // *************** returning user data with status active
-  return await User.find({ status: "active" });
+  return activeUser;
 }
 
 /**

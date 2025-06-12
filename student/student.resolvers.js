@@ -13,9 +13,11 @@ const mongoose = require('mongoose');
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active student objects.
  */
 async function GetAllStudent() {
+   // *************** find student data with status active
+  const activeStudent = await Student.find({ status : "active"});
 
   // *************** returning student data that has status "active"
-  return await Student.find({ status : "active"})
+  return activeStudent;
 }
 
 /**
@@ -158,7 +160,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
     }
 
     // *************** update school history with the new school history
-    studentInput.school_history = Array.from(schoolHistorySet);
+    student_input.school_history = Array.from(schoolHistorySet);
 
     // *************** creating if to update data form old school
     if (currentSchoolId) {
@@ -243,7 +245,9 @@ async function DeleteStudent(parent,{_id}){
 async function GetCurrentSchool(parent,args,{loaders}){
 
   // *************** using school loaders to mapping school data based on school id
-  return await loaders.school.load(parent.school_id.toString());
+  const result = await loaders.school.load(parent.school_id.toString());
+
+  return result;
 }
 
 /**
@@ -263,8 +267,11 @@ async function GetSchoolHistory(parent,args,{loaders}) {
     // *************** using school loaders to mapping school data based on school id
   const ids = parent.school_history.map(id => id.toString());
 
+  // *************** load school data from dataloader
+  const result = await loaders.school.loadMany(ids);
+
   // *************** returning school data
-  return await loaders.school.loadMany(ids);
+  return result;
 }
 
 const studentResolvers = {

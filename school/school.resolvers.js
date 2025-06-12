@@ -11,9 +11,11 @@ const Student = require('../student/student.models.js')
  * @returns {Promise<object[]>} - A promise that resolves to an array of active school objects.
  */
 async function GetAllSchool(){
+  // *************** find school data with status active
+  const activeSchool = await School.find({ status:"active" });
 
   // *************** returning school data with status active
-  return await School.find({ status:"active" })
+  return activeSchool;
 }
 
 /**
@@ -178,8 +180,10 @@ async function GetStudentData(parent,args,{loaders}){
     // *************** taking student data using data loader
     const result = await loaders.student.loadMany(studentId);
 
+    const filterResult = result.filter(student => student !==null);
+
     // *************** retuning the result and filter it not to showing null value
-    return result.filter(student => student !==null)
+    return filterResult;
 }
 
 const schoolResolvers = {
