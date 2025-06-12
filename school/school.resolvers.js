@@ -72,9 +72,6 @@ if (schoolTaken) {
 // *************** creating new school based on the schoolInput
   const createdSchool = await School.create(school_input);
 
-  // *************** showing log message if the school already created
-  console.log("School has created", createdSchool);
-
   // *************** returning new school data
   return createdSchool;
 }
@@ -165,7 +162,9 @@ async function DeleteSchool(parent,{_id}){
  * @param {object} context.loaders - DataLoader object from context.
  * @returns {Promise<Array>} - An array of student documents.
  */
-async function GetStudentData(parent,args,{loaders}){
+async function GetStudentData(parent, args, ctx){
+
+  const {loaders} = ctx;
 
   // *************** creating if to check if the school student array empty
     if (!parent.student || parent.student.length ===0){

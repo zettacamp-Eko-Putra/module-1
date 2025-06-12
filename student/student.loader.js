@@ -34,7 +34,13 @@ async function StudentBatch(studentId){
     return result;
 }
 
-// *************** Adding Loader
+/**
+ * Membuat instance DataLoader untuk mengambil data student secara efisien menggunakan fungsi batch.
+ * DataLoader membantu mengurangi jumlah query ke database dengan melakukan batching dan caching.
+ *
+ * @function CreateStudentLoader
+ * @returns {DataLoader<string|import('mongoose').Types.ObjectId, Object|null>} - Instance DataLoader untuk student.
+ */
 const CreateStudentLoader = () => {
     // *************** creating dataloader using batch SchoolBatch
     const loader = new dataLoader(StudentBatch);

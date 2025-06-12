@@ -242,7 +242,9 @@ async function DeleteStudent(parent,{_id}){
  * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
  * @returns {Promise<object>} - A promise that resolves to the school object associated with the student.
  */
-async function GetCurrentSchool(parent,args,{loaders}){
+async function GetCurrentSchool(parent, args, ctx){
+
+  const { loaders } = ctx;
 
   // *************** using school loaders to mapping school data based on school id
   const result = await loaders.school.load(parent.school_id.toString());
@@ -262,7 +264,9 @@ async function GetCurrentSchool(parent,args,{loaders}){
  * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
  * @returns {Promise<object[]>} - A promise that resolves to an array of school objects from the student's history.
  */
-async function GetSchoolHistory(parent,args,{loaders}) {
+async function GetSchoolHistory(parent, args, ctx) {
+
+  const { loaders } = ctx;
 
     // *************** using school loaders to mapping school data based on school id
   const ids = parent.school_history.map(id => id.toString());
