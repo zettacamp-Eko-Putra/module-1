@@ -64,27 +64,53 @@ const server = new ApolloServer({
   })
 });
 
-async function startServer() {
+// *************** Function to start server 
+/**
+ * Initializes and starts the GraphQL server.
+ *
+ * - Starts the Apollo Server.
+ * - Applies middleware to the Express app.
+ * - Connects to MongoDB.
+ * - Sets up a basic route at '/'.
+ * - Listens on the specified port.
+ *
+ * @async
+ * @function StartServer
+ * @returns {Promise<void>} - A Promise that resolves when the server is successfully started.
+ * @throws {Error} - Logs error if the server fails to start.
+ */
+async function StartServer() {
   try {
+    // running Apollo server asynchronous 
     await server.start();
+
+    // connect apollo server to express as middleware
     server.applyMiddleware({ app, path: '/graphql' });
 
-    await mongoose.connect('mongodb://localhost:27017/module', {
+    // connect mongoose to mongoDB
+    await mongoose.connect('mongodb://localhost:27017/module', 
+      {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
+    // message if the connection is success
     console.log('✅ MongoDB connected');
 
+    // adding endpoint to testing the server
     app.get('/', (req, res) => {
       res.send('Server is running');
     });
 
+    // adding message if the server running 
     app.listen(port, () => {
       console.log(`🚀 Server ready at http://localhost:${port}${server.graphqlPath}`);
     });
-  } catch (error) {
+  } 
+  // showing error message if cannot connect to the server
+  catch (error) {
     console.error('Error starting server:', error);
   }
 }
 
-startServer();
+// calling function to start the server
+StartServer();
