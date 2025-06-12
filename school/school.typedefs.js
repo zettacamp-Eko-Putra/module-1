@@ -1,5 +1,5 @@
 // *************** TYPE DEFINITION : School  ***************
-const addressType =`
+const SchoolAddressType =`
   type SchoolAddress{
     street: String!,
     city: String!,
@@ -55,4 +55,4 @@ const SchoolMutation = `
     }`
 
 // *************** EXPORT MODULE ***************
-module.exports = { schoolType,SchoolQuery, SchoolMutation, addressType };
+module.exports = { schoolType,SchoolQuery, SchoolMutation, SchoolAddressType };

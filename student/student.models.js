@@ -20,10 +20,6 @@ const studentAddressSchema = new Schema({
 
 // *************** MODEL: Student ***************
 
-/**
- * Student Schema
- * Describes the structure of the student document in MongoDB.
- */
 const studentSchema = new Schema({
 
     // First name for the student

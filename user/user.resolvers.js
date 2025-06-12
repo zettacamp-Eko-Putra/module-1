@@ -1,6 +1,6 @@
 // *************** IMPORT MODULE *************** 
 const User =  require('./user.models.js');
-const Users = [];
+const users = [];
 
 
 // *************** LOGIC *************** 
@@ -20,7 +20,7 @@ async function GetUserById(_,{id}) {
 
 // *************** Create User
 async function CreateUser(_, {userInput}){
-    const emailTaken = Users.some((user) => user.email === userInput.email)
+    const emailTaken = users.some((user) => user.email === userInput.email)
     if (emailTaken){
       throw new Error('Email taken')
     }
