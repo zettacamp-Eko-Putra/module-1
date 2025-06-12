@@ -1,5 +1,6 @@
 // *************** IMPORT MODULE ***************
 const User = require("./user.models.js");
+const { ValidateUserInput } = require("./user.validator.js")
 
 // *************** LOGIC ***************
 /**
@@ -51,6 +52,10 @@ async function GetUserById(parent, { _id }) {
  * @throws {Error} - Throws an error if the email is already taken.
  */
 async function CreateUser(parent, { user_input }) {
+
+  // *************** validate user_input
+  ValidateUserInput(user_input);
+
   // *************** check if the email already taken by another user
   const emailTaken = await User.findOne({ email: user_input.email });
 
