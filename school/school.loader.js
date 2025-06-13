@@ -29,7 +29,7 @@ async function SchoolBatch(schoolIds) {
   // *************** sort school data and giving null if the data is empty
   const result = schoolIds.map((id) => schoolMap[id.toString()] || null);
 
-  // *************** return data to user
+  // *************** return data to caller
   return result;
 }
 
