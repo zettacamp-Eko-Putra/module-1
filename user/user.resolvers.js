@@ -1,8 +1,9 @@
 // *************** IMPORT MODULE ***************
 const User = require("./user.models.js");
+
+// *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require("./user.validator.js");
 
-// *************** LOGIC ***************
 /**
  * Retrieves all users with active status from the database.
  *

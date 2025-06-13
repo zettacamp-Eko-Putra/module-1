@@ -2,9 +2,10 @@
 const Student = require("./student.models.js");
 const School = require("../school/school.models.js");
 const mongoose = require("mongoose");
+
+// *************** IMPORT VALIDATOR ***************
 const { ValidateStudentInput } = require("./student.validator.js");
 
-// *************** LOGIC ***************
 /**
  * Retrieves all students whose status is set to "active".
  *
@@ -235,6 +236,7 @@ async function DeleteStudent(parent, { _id }) {
  * @returns {Promise<object>} - A promise that resolves to the school object associated with the student.
  */
 async function GetCurrentSchool(parent, args, ctx) {
+  // *************** adding loaders to ctx
   const { loaders } = ctx;
 
   // *************** using school loaders to mapping school data based on school id
@@ -256,6 +258,7 @@ async function GetCurrentSchool(parent, args, ctx) {
  * @returns {Promise<object[]>} - A promise that resolves to an array of school objects from the student's history.
  */
 async function GetSchoolHistory(parent, args, ctx) {
+  // *************** adding loaders to ctx
   const { loaders } = ctx;
 
   // *************** using school loaders to mapping school data based on school id

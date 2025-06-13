@@ -1,7 +1,8 @@
 // *************** IMPORT MODULE ***************
 const School = require("./school.models.js");
-const Student = require("../student/student.models.js");
 
+// *************** IMPORT VALIDATOR ***************
+const { ValidateSchoolInput } = require("./school.validator.js");
 /**
  * Retrieves all school documents with status set to "active".
  *
@@ -162,6 +163,7 @@ async function DeleteSchool(parent, { _id }) {
  * @returns {Promise<Array>} - An array of student documents.
  */
 async function GetStudentData(parent, args, ctx) {
+  // *************** adding loaders to ctx
   const { loaders } = ctx;
 
   // *************** creating if to check if the school student array empty
