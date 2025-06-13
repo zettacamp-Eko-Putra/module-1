@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 
-// *************** MODEL: Student Address ***************
+// *************** MODEL Schema: Student Address
 const studentAddressSchema = new Schema({
      // Name of street student living
     street: String,
@@ -18,7 +18,7 @@ const studentAddressSchema = new Schema({
     postal_code: String
 })
 
-// *************** MODEL: Student ***************
+// *************** MODEL Schema: Student ***************
 
 const studentSchema = new Schema({
 
