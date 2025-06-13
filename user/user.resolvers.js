@@ -13,7 +13,7 @@ const { ValidateUserInput } = require("./user.validator.js");
  */
 async function GetAllUsers() {
   // *************** find user data with status active
-  const activeUser = await UserModel.find({ status: "active" });
+  const activeUser = await UserModel.find({ status: "active" }).lean();
 
   // *************** returning user data with status active
   return activeUser;

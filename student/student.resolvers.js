@@ -17,7 +17,7 @@ const { ValidateStudentInput } = require("./student.validator.js");
  */
 async function GetAllStudents() {
   // *************** find student data with status active
-  const activeStudent = await StudentModel.find({ status: "active" });
+  const activeStudent = await StudentModel.find({ status: "active" }).lean();
 
   // *************** returning student data that has status "active"
   return activeStudent;
