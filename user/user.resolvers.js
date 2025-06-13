@@ -1,5 +1,5 @@
 // *************** IMPORT MODULE ***************
-const User = require("./user.models.js");
+const UserModel = require("./user.models.js");
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require("./user.validator.js");
