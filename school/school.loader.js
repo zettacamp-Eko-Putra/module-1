@@ -1,7 +1,9 @@
-// *************** IMPORT MODULE *************** 
-const DataLoader = require('dataloader');
-const School = require('./school.models.js');
-const keyBy = require('lodash/keyBy');
+// *************** IMPORT LIBRARY ***************
+const keyBy = require("lodash/keyBy");
+const DataLoader = require("dataloader");
+
+// *************** IMPORT MODULE ***************
+const School = require("./school.models.js");
 
 /**
  * Batch function to load multiple schools by their IDs.
@@ -13,25 +15,22 @@ const keyBy = require('lodash/keyBy');
  * @param {Array<string|import('mongoose').Types.ObjectId>} schoolId - An array of school IDs to fetch.
  * @returns {Promise<Array<Object|null>>} - An array of school documents in the same order as the input IDs, or `null` for IDs not found.
  */
-async function SchoolBatch(schoolId){
-    // *************** find school data
-    const schools = await School.find({ 
+async function SchoolBatch(schoolIds) {
+  // *************** find school data
+  const schools = await School.find({
+    // *************** find active school by id
+    _id: { $in: schoolIds },
+    status: "active",
+  }).lean();
 
-        // *************** find school data based on id
-        _id: { $in: schoolId },
+  // *************** change array to object key base on school id
+  const schoolMap = keyBy(schools, (school) => school._id.toString());
 
-        // *************** find school data based on status :active
-        status: "active" 
-        });
+  // *************** sort school data and giving null if the data is empty
+  const result = schoolIds.map((id) => schoolMap[id.toString()] || null);
 
-    // *************** change array to object key base on school id    
-    const schoolMap = keyBy(schools, school => school._id.toString());
-    
-    // *************** sort school data and giving null if the data is empty
-    const result = schoolId.map(id => schoolMap[id.toString()]) || null;
-
-    // *************** return data to user
-    return result;
+  // *************** return data to user
+  return result;
 }
 
 /**
@@ -40,13 +39,13 @@ async function SchoolBatch(schoolId){
  * @function CreateSchoolLoader
  * @returns {DataLoader<string|import('mongoose').Types.ObjectId, Object|null>} - A DataLoader instance for schools.
  */
-function CreateSchoolLoader(){
-    // *************** creating dataloader using batch SchoolBatch
-    const loader = new DataLoader(SchoolBatch);
+function CreateSchoolLoader() {
+  // *************** creating dataloader using batch SchoolBatch
+  const loader = new DataLoader(SchoolBatch);
 
-    // *************** return loader to user
-    return loader;
+  // *************** return loader to the caller
+  return loader;
 }
 
-// *************** EXPORT MODULE *************** 
+// *************** EXPORT MODULE ***************
 module.exports = CreateSchoolLoader;

@@ -2,23 +2,22 @@
 
 // *************** Student address type
 const studentAddressType =`
-    type StudentAddress{
+type StudentAddress{
     street:String!
     city:String!
     province:String!
     postal_code:String!
-    }    
+}    
 `
 
 // *************** Student Type
 const studentType = `
-
 input StudentAddressInput{
     street:String!
     city:String!
     province:String!
     postal_code:String!
-    } 
+} 
 
 type Student{
     _id:ID!
@@ -35,7 +34,7 @@ type Student{
     school_history:[School]
     status:String!
     deleted_at:String
-    }
+}
 
 input StudentInput{
     _id:ID
@@ -49,31 +48,37 @@ input StudentInput{
     date_of_birth:Date
     school_id:ID!
     deleted_at:String
-    }
+}
      
 `;
 
 // *************** Student Query
-const StudentQuery = `
-    extend type Query {
-        GetAllStudent: [Student]
-        GetStudentById(_id: ID!): Student
-    }
+const studentQuery = `
+extend type Query {
+    GetAllStudents: [Student]
+    GetStudentById(_id: ID!): Student
+}
 `;
 
 // *************** Student Mutation
-const StudentMutation =`
-    extend type Mutation{
-        CreateStudent(
-            student_input: StudentInput!): Student!
+const studentMutation =`
+extend type Mutation{
+    CreateStudent(
+        student_input: StudentInput!): Student!
 
-        UpdateStudent(
-            _id:ID!,student_input: StudentInput!): Student
+    UpdateStudent(
+        _id:ID!,student_input: StudentInput!): Student
 
-        DeleteStudent(
-            _id: ID!): Student
-    }
-    `;
+    DeleteStudent(
+        _id: ID!): Student
+}
+`;
 
+const studentTypeDefs =`
+    ${ studentType }
+    ${ studentQuery }
+    ${ studentMutation }
+    ${ studentAddressType }
+`
 // *************** EXPORT MODULE ***************
-module.exports = { studentType, StudentQuery, StudentMutation, studentAddressType };
+module.exports = studentTypeDefs;

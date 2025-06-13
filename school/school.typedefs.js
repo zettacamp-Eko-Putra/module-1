@@ -1,14 +1,14 @@
 // *************** TYPE DEFINITION : School  ***************
-const SchoolAddressType =`
-  type SchoolAddress{
-    street: String!,
-    city: String!,
-    province: String!,
-    postal_code: String!  
-}`;
+const schoolAddressType = `
+type SchoolAddress{
+  street: String!
+  city: String!
+  province: String!
+  postal_code: String!  
+}
+`;
 
 const schoolType = `
-
 input SchoolAddressInput {
   street: String!
   city: String!
@@ -16,43 +16,51 @@ input SchoolAddressInput {
   postal_code: String!
 }
 
-  type School {
-    _id: ID!
-    school_legal_name: String!
-    school_commercial_name: String!
-    address: [SchoolAddress]
-    student: [ID]
-    students: [Student]
-    status:String!
-    deleted_at:Date
-  }
+type School {
+  _id: ID!
+  school_legal_name: String!
+  school_commercial_name: String!
+  address: [SchoolAddress]
+  student: [ID]
+  students: [Student]
+  status:String!
+  deleted_at:Date
+}
 
-  input SchoolInput{
-    _id:ID
-    school_legal_name: String!
-    school_commercial_name: String!
-    address:[SchoolAddressInput]!}
-     
+input SchoolInput{
+  _id:ID
+  school_legal_name: String!
+  school_commercial_name: String!
+  address:[SchoolAddressInput]!
+}   
 `;
 
-const SchoolQuery = `
-    extend type Query {
-        GetAllSchool: [School]
-        GetSchoolById(_id: ID!): School
-    }
+const schoolQuery = `
+extend type Query {
+  GetAllSchools: [School]
+  GetSchoolById(_id: ID!): School
+}
 `;
 
-const SchoolMutation = `
-  extend type Mutation{
-    CreateSchool(
-      school_input: SchoolInput!): School!
+const schoolMutation = `
+extend type Mutation{
+  CreateSchool(
+    school_input: SchoolInput!): School!
 
-    UpdateSchool(
-      _id:ID!,school_input: SchoolInput!): School
+  UpdateSchool(
+    _id:ID!,school_input: SchoolInput!): School
 
-    DeleteSchool(
-      _id: ID!): School
-    }`
+  DeleteSchool(
+    _id: ID!): School
+}
+`;
+
+const schoolTypeDefs = `
+    ${schoolType}
+    ${schoolAddressType}
+    ${schoolQuery}
+    ${schoolMutation}
+`;
 
 // *************** EXPORT MODULE ***************
-module.exports = { schoolType,SchoolQuery, SchoolMutation, SchoolAddressType };
+module.exports = schoolTypeDefs;

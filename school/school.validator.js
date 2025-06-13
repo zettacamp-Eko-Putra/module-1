@@ -23,7 +23,7 @@ function ValidateSchoolInput(school_input) {
     typeof school_input.school_legal_name !== "string"
   ) {
     // *************** error message if the input not valid
-    error.push("school legal name is required and must be string");
+    error.push('school legal name is required and must be string');
   }
 
   // *************** validate school school_commercial_name
@@ -32,7 +32,7 @@ function ValidateSchoolInput(school_input) {
     typeof school_input.school_commercial_name !== "string"
   ) {
     // *************** error message if the input not valid
-    error.push("school commercial name is required and must be string");
+    error.push('school commercial name is required and must be string');
   }
 
   // *************** validate school address
@@ -41,7 +41,7 @@ function ValidateSchoolInput(school_input) {
     school_input.address.length === 0
   ) {
     // *************** error message if the input not valid
-    error.push("Address is required.");
+    error.push('Address is required.');
   } else {
     // *************** validate each address array
     school_input.address.forEach((addr, idx) => {
@@ -54,7 +54,7 @@ function ValidateSchoolInput(school_input) {
 
   // *************** checking if there's error message
   if (error.length > 0) {
-    throw new Error(error.join(" "));
+    throw new Error(error.join(' '));
   }
 }
 

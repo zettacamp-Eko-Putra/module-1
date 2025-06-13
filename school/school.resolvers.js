@@ -1,18 +1,19 @@
 // *************** IMPORT MODULE ***************
-const School = require("./school.models.js");
+const SchoolModel = require("./school.models.js");
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateSchoolInput } = require("./school.validator.js");
+
 /**
  * Retrieves all school documents with status set to "active".
  *
  * @async
- * @function GetAllSchool
+ * @function GetAllSchools
  * @returns {Promise<object[]>} - A promise that resolves to an array of active school objects.
  */
-async function GetAllSchool() {
+async function GetAllSchools() {
   // *************** find school data with status active
-  const activeSchool = await School.find({ status: "active" });
+  const activeSchool = await SchoolModel.find({ status: "active" }).lean();
 
   // *************** returning school data with status active
   return activeSchool;
@@ -25,13 +26,13 @@ async function GetAllSchool() {
  * @function GetSchoolById
  * @param {object} _ - Unused parent argument.
  * @param {object} args - The arguments object.
- * @param {string} args.id - The ID of the school to retrieve.
+ * @param {string} _id - The ID of the school to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
 async function GetSchoolById(parent, { _id }) {
   // *************** finding school based on id
-  const school = await School.findById(_id);
+  const school = await SchoolModel.findById(_id).lean();
 
   // *************** creating if to showing message if the school cannot be found
   if (!school) {
@@ -50,8 +51,8 @@ async function GetSchoolById(parent, { _id }) {
  * @function CreateSchool
  * @param {object} _ - Unused parent argument.
  * @param {object} args - The arguments object.
- * @param {object} args.schoolInput - The input object containing school data.
- * @param {string} args.schoolInput.name - The name of the school.
+ * @param {object} school_input - The input object containing school data.
+ * @param {string} school_input.name - The name of the school.
  * @returns {Promise<object>} - A promise that resolves to the newly created school object.
  * @throws {Error} - Throws an error if a school with the same name already exists.
  */
@@ -60,18 +61,21 @@ async function CreateSchool(parent, { school_input }) {
   ValidateSchoolInput(school_input);
 
   // *************** check if the school name already taken by another school
-  const schoolTaken = await School.findOne({
-    school_legal_name: school_input.school_legal_name,
+  const isSchoolNameAlreadyExist = await SchoolModel.exists({
+    status: "active",
+    school_legal_name: {
+      $regex: `^${school_input.school_legal_name.trim()}$`,
+      $options: "i",
+    },
   });
 
-  // *************** creating if to showing message if the name already taken by another school
-  if (schoolTaken) {
-    // *************** error message if the name already taken
+  // *************** showing error message if the name already taken by another school
+  if (isSchoolNameAlreadyExist) {
     throw new Error("School name already exists");
   }
 
   // *************** creating new school based on the schoolInput
-  const createdSchool = await School.create(school_input);
+  const createdSchool = await SchoolModel.create(school_input);
 
   // *************** returning new school data
   return createdSchool;
@@ -84,8 +88,8 @@ async function CreateSchool(parent, { school_input }) {
  * @function UpdateSchool
  * @param {object} _ - Unused parent argument.
  * @param {object} args - The arguments object.
- * @param {string} args.id - The ID of the school to be updated.
- * @param {object} args.schoolInput - The input object containing updated school data.
+ * @param {string} _id - The ID of the school to be updated.
+ * @param {object} school_input - The input object containing updated school data.
  * @returns {Promise<object>} - A promise that resolves to the updated school object.
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
@@ -100,13 +104,12 @@ async function UpdateSchool(parent, { _id, school_input }) {
   }
 
   // *************** finding school based on id and overwrite it with new data and saving it to database
-  const updatedSchool = await School.findByIdAndUpdate(_id, school_input, {
+  const updatedSchool = await SchoolModel.findByIdAndUpdate(_id, school_input, {
     new: true,
   });
 
-  // *************** creating if to showing error message if the school id cannot be found in database
+  // ***************  showing error message if the school id cannot be found in database
   if (!updatedSchool) {
-    // *************** message if school id cannot be found in database
     throw new Error("School not Found");
   }
 
@@ -121,23 +124,21 @@ async function UpdateSchool(parent, { _id, school_input }) {
  * @function DeleteSchool
  * @param {object} _ - Unused parent argument.
  * @param {object} args - The arguments object.
- * @param {string} args.id - The ID of the school to be soft-deleted.
+ * @param {string} _id - The ID of the school to be soft-deleted.
  * @returns {Promise<object>} - A promise that resolves to the soft-deleted school object.
  * @throws {Error} - Throws an error if the school is not found.
  */
 async function DeleteSchool(parent, { _id }) {
   // *************** finding school based on id and update the data
-  const deleteSchool = await School.findByIdAndUpdate(
+  const deleteSchool = await SchoolModel.findByIdAndUpdate(
     _id,
     {
-      // *************** changing status field to deleted
+      // *************** changing status field to deleted and adding timestamp
       status: "deleted",
-
-      // *************** adding timestamp to deleted_at field
       deleted_at: new Date(),
     },
 
-    // *************** overwrite the old data with new one
+    // *************** Update the Data
     { new: true }
   );
 
@@ -172,11 +173,8 @@ async function GetStudentData(parent, args, ctx) {
     return [];
   }
 
-  // *************** using student loaders to mapping student data based on student id
-  const studentId = parent.student.map((id) => id.toString());
-
   // *************** taking student data using data loader
-  const result = await loaders.student.loadMany(studentId);
+  const result = await loaders.student.loadMany(parent.student);
 
   const filterResult = result.filter((student) => student !== null);
 
@@ -186,7 +184,7 @@ async function GetStudentData(parent, args, ctx) {
 
 const schoolResolvers = {
   Query: {
-    GetAllSchool,
+    GetAllSchools,
     GetSchoolById,
   },
   Mutation: {
@@ -200,4 +198,4 @@ const schoolResolvers = {
 };
 
 // *************** EXPORT MODULE ***************
-module.exports = { schoolResolvers };
+module.exports = schoolResolvers;

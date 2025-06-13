@@ -65,7 +65,7 @@ const userSchema = new Schema({
   status: { type: String, enum: ["active", "deleted"], default: "active" },
 
   // Delete At for the user
-  deleted_at: { type: Date, default: null },
+  deleted_at: { type: Date },
 });
 
 // *************** EXPORT MODULE ***************

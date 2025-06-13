@@ -1,8 +1,9 @@
-// *************** IMPORT MODULE *************** 
-const dataLoader = require('dataloader');
-const Student = require('./student.models.js');
-const keyBy = require('lodash/keyBy');
+// *************** IMPORT MODULE ***************
+const Student = require("./student.models.js");
 
+// *************** IMPORT LIBRARY ***************
+const dataLoader = require("dataloader");
+const keyBy = require("lodash/keyBy");
 
 /**
  * Batch function for loading multiple students by their IDs using DataLoader.
@@ -14,24 +15,22 @@ const keyBy = require('lodash/keyBy');
  * @param {Array<string|ObjectId>} studentId - An array of student IDs to fetch.
  * @returns {Promise<Array<Object|null>>} - An array of student documents in the same order as input IDs, or `null` if not found.
  */
-async function StudentBatch(studentId){
+async function StudentBatch(studentIds) {
+  // *************** find student data
+  const students = await Student.find({
+    // *************** find active student data based on id
+    _id: { $in: studentIds },
+    status: "active",
+  }).lean();
 
-    // *************** find student data
-    const students = await Student.find({ 
-        // *************** find student data based on id
-        _id: { $in:studentId },
+  // *************** create map from student id
+  const studentMap = keyBy(students, (student) => student._id.toString());
 
-        // *************** find student data based on id
-        status:'active' });
+  // *************** insert null to if the student empty
+  const result = studentIds.map((id) => studentMap[id.toString()] || null);
 
-        // *************** create map from student id
-    const studentMap = keyBy(students, student => student._id.toString());
-    
-    // *************** insert null to if the student empty
-    const result = studentId.map(id => studentMap[id.toString()] || null);
-
-    // *************** return the data to user
-    return result;
+  // *************** return the data to user
+  return result;
 }
 
 /**
@@ -42,12 +41,12 @@ async function StudentBatch(studentId){
  * @returns {DataLoader<string|import('mongoose').Types.ObjectId, Object|null>} - Instance DataLoader untuk student.
  */
 const CreateStudentLoader = () => {
-    // *************** creating dataloader using batch SchoolBatch
-    const loader = new dataLoader(StudentBatch);
+  // *************** creating dataloader using batch SchoolBatch
+  const loader = new dataLoader(StudentBatch);
 
-    // *************** return loader to user
-    return loader;
-}
+  // *************** return loader to user
+  return loader;
+};
 
-// *************** EXPORT MODULE *************** 
+// *************** EXPORT MODULE ***************
 module.exports = CreateStudentLoader;

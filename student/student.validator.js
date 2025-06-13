@@ -18,7 +18,6 @@
  *
  * @throws {Error} Throws an error if any validation rule fails, with a message listing all issues.
  */
-
 function ValidateStudentInput(student_input) {
   // *************** Variable to contain error
   const error = [];
@@ -29,13 +28,13 @@ function ValidateStudentInput(student_input) {
     typeof student_input.first_name !== "string"
   ) {
     // *************** error message if the input not valid
-    error.push("first name is required and must be string");
+    error.push('first name is required and must be string');
   }
 
   // *************** validate student last_name
   if (!student_input.last_name || typeof student_input.last_name !== "string") {
     // *************** error message if the input not valid
-    error.push("last name is required and must be string");
+    error.push('last name is required and must be string');
   }
 
   // *************** validate student civility
@@ -51,13 +50,13 @@ function ValidateStudentInput(student_input) {
     typeof student_input.postal_code_of_birth !== "string"
   ) {
     // *************** error message if the input not valid
-    error.push("postal code of birth is required and must be string");
+    error.push('postal code of birth is required and must be string');
   }
 
   // *************** validate user mobile_phone
   if (!student_input.mobile_phone || student_input.mobile_phone.length > 12) {
     // *************** error message if the input not valid
-    error.push("Mobile phone is required and must not exceed 12 characters.");
+    error.push('Mobile phone is required and must not exceed 12 characters.');
   }
 
   // *************** validate student address
@@ -66,7 +65,7 @@ function ValidateStudentInput(student_input) {
     student_input.address.length === 0
   ) {
     // *************** error message if the input not valid
-    error.push("Address is required.");
+    error.push('Address is required.');
   } else {
     // *************** validate each address array
     student_input.address.forEach((addr, idx) => {
@@ -82,26 +81,26 @@ function ValidateStudentInput(student_input) {
     const date = new Date(student_input.date_of_birth);
     if (isNaN(date.getTime())) {
       // *************** error message if the input not valid
-      error.push("Date of birth must be a valid date.");
+      error.push('Date of birth must be a valid date.');
     }
   }
 
   // *************** validate school_id
   if (!student_input.school_id || typeof student_input.school_id !== "string") {
     // *************** error message if the input not valid
-    error.push("School ID is required and must be a string.");
+    error.push('School ID is required and must be a string.');
   }
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!student_input.email || !emailRegex.test(student_input.email)) {
     // *************** error message if the input not valid
-    error.push("A valid email is required.");
+    error.push('A valid email is required.');
   }
 
   // *************** checking if there's error message
   if (error.length > 0) {
-    throw new Error(error.join(" "));
+    throw new Error(error.join(' '));
   }
 }
 
