@@ -1,5 +1,5 @@
 // *************** IMPORT LIBRARY ***************
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // *************** MODEL Schema: User Address
@@ -28,8 +28,8 @@ const userSchema = new Schema({
   // Civility for the user
   civility: {
     type: String,
-    enum: ["Mr", "Mrs"],
-    default: "Mr",
+    enum: ['Mr', 'Mrs'],
+    default: 'Mr',
     required: true,
   },
 
@@ -45,7 +45,7 @@ const userSchema = new Schema({
   // Entity the user belong to
   entity: {
     type: String,
-    enum: ["ADMTC", "Academic", "Company"],
+    enum: ['ADMTC', 'Academic', 'Company'],
     required: true,
   },
 
@@ -62,7 +62,7 @@ const userSchema = new Schema({
   role: { type: String, required: true },
 
   // Status for the User
-  status: { type: String, enum: ["active", "deleted"], default: "active" },
+  status: { type: String, enum: ['active', 'deleted'], default: 'active' },
 
   // Delete At for the user
   deleted_at: { type: Date },

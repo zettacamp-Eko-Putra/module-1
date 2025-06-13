@@ -1,8 +1,8 @@
 // *************** IMPORT MODULE ***************
-const UserModel = require("./user.models.js");
+const UserModel = require('./user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
-const { ValidateUserInput } = require("./user.validator.js");
+const { ValidateUserInput } = require('./user.validator.js');
 
 /**
  * Retrieves all users with active status from the database.
@@ -13,7 +13,7 @@ const { ValidateUserInput } = require("./user.validator.js");
  */
 async function GetAllUsers() {
   // *************** find user data with status active
-  const activeUser = await UserModel.find({ status: "active" }).lean();
+  const activeUser = await UserModel.find({ status: 'active' }).lean();
 
   // *************** returning user data with status active
   return activeUser;
@@ -40,7 +40,7 @@ async function GetUserById(parent, { _id }) {
 
   // *************** showing message if the user cannot be found
   if (!user) {
-    throw new Error("User Not Found");
+    throw new Error('User Not Found');
   }
 
   // *************** returning user data if user in database
@@ -70,7 +70,7 @@ async function CreateUser(parent, { user_input }) {
 
   // *************** showing message if the email already taken by another user
   if (isEmailAlreadyExist) {
-    throw new Error("Email taken");
+    throw new Error('Email taken');
   }
 
   // *************** creating new user based on the userInput
@@ -99,7 +99,7 @@ async function UpdateUser(parent, { _id, user_input }) {
 
   // *************** showing error message if the user tried to update their id
   if (user_input._id) {
-    throw new Error("Cannot update User ID");
+    throw new Error('Cannot update User ID');
   }
 
   // *************** finding user based on id and overwrite it with new data and saving it to database
@@ -107,10 +107,9 @@ async function UpdateUser(parent, { _id, user_input }) {
     new: true,
   });
 
-  // *************** creating if to showing error message if the user id cannot be found in database
+  // *************** showing error message if the user id cannot be found in database
   if (!updatedUser) {
-    // *************** message if user id cannot be found in database
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 
   // *************** returning user updated data to user
@@ -134,7 +133,7 @@ async function DeleteUser(parent, { _id }) {
     _id,
     {
       // *************** changing status field to deleted and adding timestamp
-      status: "deleted",
+      status: 'deleted',
       deleted_at: new Date(),
     },
 
@@ -144,7 +143,7 @@ async function DeleteUser(parent, { _id }) {
 
   // *************** showing error message if user id cannot be found in database
   if (!deleteUser) {
-    throw new Error("User not found");
+    throw new Error('User not found');
   }
 
   // *************** returning user deleted data to user

@@ -25,29 +25,29 @@ function ValidateStudentInput(student_input) {
   // *************** validate student first_name
   if (
     !student_input.first_name ||
-    typeof student_input.first_name !== "string"
+    typeof student_input.first_name !== 'string'
   ) {
     // *************** error message if the input not valid
     error.push('first name is required and must be string');
   }
 
   // *************** validate student last_name
-  if (!student_input.last_name || typeof student_input.last_name !== "string") {
+  if (!student_input.last_name || typeof student_input.last_name !== 'string') {
     // *************** error message if the input not valid
     error.push('last name is required and must be string');
   }
 
   // *************** validate student civility
-  const civilities = ["Mr", "Mrs"];
+  const civilities = ['Mr', 'Mrs'];
   if (!student_input.civility || !civilities.includes(student_input.civility)) {
     // *************** error message if the input not valid
-    error.push(`Civility must be one of: ${civilities.join(", ")}`);
+    error.push(`Civility must be one of: ${civilities.join(', ')}`);
   }
 
   // *************** validate student postal_code_of_birth
   if (
     !student_input.postal_code_of_birth ||
-    typeof student_input.postal_code_of_birth !== "string"
+    typeof student_input.postal_code_of_birth !== 'string'
   ) {
     // *************** error message if the input not valid
     error.push('postal code of birth is required and must be string');
@@ -86,7 +86,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  if (!student_input.school_id || typeof student_input.school_id !== "string") {
+  if (!student_input.school_id || typeof student_input.school_id !== 'string') {
     // *************** error message if the input not valid
     error.push('School ID is required and must be a string.');
   }

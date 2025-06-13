@@ -20,7 +20,7 @@ function ValidateSchoolInput(school_input) {
   // *************** validate school school_legal_name
   if (
     !school_input.school_legal_name ||
-    typeof school_input.school_legal_name !== "string"
+    typeof school_input.school_legal_name !== 'string'
   ) {
     // *************** error message if the input not valid
     error.push('school legal name is required and must be string');
@@ -29,7 +29,7 @@ function ValidateSchoolInput(school_input) {
   // *************** validate school school_commercial_name
   if (
     !school_input.school_commercial_name ||
-    typeof school_input.school_commercial_name !== "string"
+    typeof school_input.school_commercial_name !== 'string'
   ) {
     // *************** error message if the input not valid
     error.push('school commercial name is required and must be string');

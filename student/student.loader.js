@@ -1,9 +1,9 @@
 // *************** IMPORT MODULE ***************
-const StudentModel = require("./student.models.js");
+const StudentModel = require('./student.models.js');
 
 // *************** IMPORT LIBRARY ***************
-const dataLoader = require("dataloader");
-const keyBy = require("lodash/keyBy");
+const dataLoader = require('dataloader');
+const keyBy = require('lodash/keyBy');
 
 /**
  * Batch function for loading multiple students by their IDs using DataLoader.
@@ -20,7 +20,7 @@ async function StudentBatch(studentIds) {
   const students = await StudentModel.find({
     // *************** find active student data based on id
     _id: { $in: studentIds },
-    status: "active",
+    status: 'active',
   }).lean();
 
   // *************** create map from student id

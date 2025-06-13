@@ -1,20 +1,20 @@
 // *************** IMPORT CORE ***************
-require("dotenv").config();
+require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
-const UserTypeDefs = require("./user/user.typedefs");
-const StudentTypeDefs = require("./student/student.typedefs");
-const SchoolTypeDefs = require("./school/school.typedefs");
-const UserResolvers = require("./user/user.resolvers");
-const StudentResolvers = require("./student/student.resolvers");
-const SchoolResolvers = require("./school/school.resolvers");
-const CreateSchoolLoader = require("./school/school.loader");
-const CreateStudentLoader = require("./student/student.loader");
+const UserTypeDefs = require('./user/user.typedefs');
+const StudentTypeDefs = require('./student/student.typedefs');
+const SchoolTypeDefs = require('./school/school.typedefs');
+const UserResolvers = require('./user/user.resolvers');
+const StudentResolvers = require('./student/student.resolvers');
+const SchoolResolvers = require('./school/school.resolvers');
+const CreateSchoolLoader = require('./school/school.loader');
+const CreateStudentLoader = require('./student/student.loader');
 
 // *************** IMPORT LIBRARY ***************
-const express = require("express");
-const { ApolloServer, gql } = require("apollo-server-express");
-const mongoose = require("mongoose");
+const express = require('express');
+const { ApolloServer, gql } = require('apollo-server-express');
+const mongoose = require('mongoose');
 
 // *************** Configuration
 const app = express();
@@ -62,7 +62,7 @@ async function StartServer() {
     await server.start();
 
     // *************** connect apollo server to express as middleware
-    server.applyMiddleware({ app, path: "/graphql" });
+    server.applyMiddleware({ app, path: '/graphql' });
 
     // *************** connect mongoose to mongoDB
     await mongoose.connect(process.env.MONGODB_URL, {
@@ -70,11 +70,11 @@ async function StartServer() {
       useUnifiedTopology: true,
     });
     // *************** message if the connection is success
-    console.log("✅ MongoDB connected");
+    console.log('✅ MongoDB connected');
 
     // *************** adding endpoint to testing the server
-    app.get("/", (req, res) => {
-      res.send("Server is running");
+    app.get('/', (req, res) => {
+      res.send('Server is running');
     });
 
     // *************** adding message if the server running
@@ -85,7 +85,7 @@ async function StartServer() {
     });
   } catch (error) {
     // *************** showing error message if cannot connect to the server
-    console.error("Error starting server:", error);
+    console.error('Error starting server:', error);
   }
 }
 

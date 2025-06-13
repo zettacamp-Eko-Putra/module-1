@@ -1,5 +1,5 @@
 // *************** IMPORT LIBRARY ***************
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // *************** MODEL Schema: Student Address
@@ -32,8 +32,8 @@ const studentSchema = new Schema({
   // Civility for the student
   civility: {
     type: String,
-    enum: ["Mr", "Mrs"],
-    default: "Mr",
+    enum: ['Mr', 'Mrs'],
+    default: 'Mr',
     required: true,
   },
 

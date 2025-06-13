@@ -1,12 +1,12 @@
 // *************** IMPORT MODULE ***************
-const StudentModel = require("./student.models.js");
-const SchoolModel = require("../school/school.models.js");
+const StudentModel = require('./student.models.js');
+const SchoolModel = require('../school/school.models.js');
 
 // *************** IMPORT LIBRARY ***************
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 
 // *************** IMPORT VALIDATOR ***************
-const { ValidateStudentInput } = require("./student.validator.js");
+const { ValidateStudentInput } = require('./student.validator.js');
 
 /**
  * Retrieves all students whose status is set to "active".
@@ -17,7 +17,7 @@ const { ValidateStudentInput } = require("./student.validator.js");
  */
 async function GetAllStudents() {
   // *************** find student data with status active
-  const activeStudent = await StudentModel.find({ status: "active" }).lean();
+  const activeStudent = await StudentModel.find({ status: 'active' }).lean();
 
   // *************** returning student data that has status "active"
   return activeStudent;
@@ -40,7 +40,7 @@ async function GetStudentById(parent, { _id }) {
 
   // *************** showing message if the student cannot be found
   if (!student) {
-    throw new Error("Student Not Found");
+    throw new Error('Student Not Found');
   }
 
   // *************** returning student data if student in database
@@ -71,7 +71,7 @@ async function CreateStudent(parent, { student_input }) {
 
   // *************** showing message if school id cannot be found
   if (!IsSchoolExist) {
-    throw new Error("School not found");
+    throw new Error('School not found');
   }
 
   // *************** changing student input data and adding it to studentData
@@ -117,7 +117,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
 
   // ***************showing error message if the student tried to update their id
   if (student_input._id) {
-    throw new Error("Cannot update Student ID");
+    throw new Error('Cannot update Student ID');
   }
 
   // *************** find user by id and adding it to student variable
@@ -125,7 +125,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
 
   // ***************showing error message if the student id cannot be found in database
   if (!student) {
-    throw new Error("Student not found");
+    throw new Error('Student not found');
   }
 
   // *************** taking StudentInput and add it to newSchoolId variable
@@ -142,7 +142,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
     const newSchool = await SchoolModel.findById(newSchoolId);
 
     // *************** showing error message if the new school id cannot be found
-    if (!newSchool) throw new Error("New School Not Found");
+    if (!newSchool) throw new Error('New School Not Found');
 
     // *************** creating set to avoid duplicate data
     const schoolHistorySet = new Set(
@@ -205,7 +205,7 @@ async function DeleteStudent(parent, { _id }) {
     _id,
     {
       // *************** changing status field to deleted and adding timstamp
-      status: "deleted",
+      status: 'deleted',
       deleted_at: new Date(),
     },
 
@@ -213,10 +213,9 @@ async function DeleteStudent(parent, { _id }) {
     { new: true }
   );
 
-  // *************** creating if to showing error message if student id cannot be found in database
+  // *************** showing error message if student id cannot be found in database
   if (!deleteStudent) {
-    // *************** message if the student id cannot be found in database
-    throw new Error("Student Not Found");
+    throw new Error('Student Not Found');
   }
 
   // *************** returning student deleted data to user

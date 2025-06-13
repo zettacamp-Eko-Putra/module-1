@@ -1,5 +1,5 @@
 // *************** IMPORT LIBRARY ***************
-const mongoose = require("mongoose");
+const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // *************** MODEL Schema: School Address
@@ -29,10 +29,10 @@ const schoolSchema = new Schema({
   address: [SchoolAddressSchema],
 
   // Student for the school
-  student: [{ type: Schema.Types.ObjectId, ref: "Student" }],
+  student: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
 
   // School status
-  status: { type: String, enum: ["active", "delete"], default: "active" },
+  status: { type: String, enum: ['active', 'delete'], default: 'active' },
 
   // delete at for the school
   deleted_at: { type: Date },

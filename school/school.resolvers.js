@@ -1,8 +1,8 @@
 // *************** IMPORT MODULE ***************
-const SchoolModel = require("./school.models.js");
+const SchoolModel = require('./school.models.js');
 
 // *************** IMPORT VALIDATOR ***************
-const { ValidateSchoolInput } = require("./school.validator.js");
+const { ValidateSchoolInput } = require('./school.validator.js');
 
 /**
  * Retrieves all school documents with status set to "active".
@@ -13,7 +13,7 @@ const { ValidateSchoolInput } = require("./school.validator.js");
  */
 async function GetAllSchools() {
   // *************** find school data with status active
-  const activeSchool = await SchoolModel.find({ status: "active" }).lean();
+  const activeSchool = await SchoolModel.find({ status: 'active' }).lean();
 
   // *************** returning school data with status active
   return activeSchool;
@@ -34,9 +34,8 @@ async function GetSchoolById(parent, { _id }) {
   // *************** finding school based on id
   const school = await SchoolModel.findById(_id).lean();
 
-  // *************** creating if to showing message if the school cannot be found
+  // *************** showing message if the school cannot be found
   if (!school) {
-    // *************** error message if the user cannot be found in database
     throw new Error('School not found');
   }
 
@@ -62,10 +61,10 @@ async function CreateSchool(parent, { school_input }) {
 
   // *************** check if the school name already taken by another school
   const isSchoolNameAlreadyExist = await SchoolModel.exists({
-    status: "active",
+    status: 'active',
     school_legal_name: {
       $regex: `^${school_input.school_legal_name.trim()}$`,
-      $options: "i",
+      $options: 'i',
     },
   });
 

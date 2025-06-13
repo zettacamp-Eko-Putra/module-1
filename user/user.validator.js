@@ -25,23 +25,23 @@ function ValidateUserInput(user_input) {
   const error = [];
 
   // *************** validate user first_name
-  if (!user_input.first_name || typeof user_input.first_name !== "string") {
+  if (!user_input.first_name || typeof user_input.first_name !== 'string') {
     // *************** error message if the input not valid
     error.push('first name is required and must be string');
   }
 
   // *************** validate user last_name
-  if (!user_input.last_name || typeof user_input.last_name !== "string") {
+  if (!user_input.last_name || typeof user_input.last_name !== 'string') {
     // *************** error message if the input not valid
     error.push('last name is required and must be string');
   }
 
   // *************** set value of civilities
-  const civilities = ["Mr", "Mrs"];
+  const civilities = ['Mr', 'Mrs'];
   // *************** validate user civility
   if (!user_input.civility || !civilities.includes(user_input.civility)) {
     // *************** error message if the input not valid
-    error.push(`Civility must be one of: ${civilities.join(", ")}`);
+    error.push(`Civility must be one of: ${civilities.join(', ')}`);
   }
 
   // *************** validate user office_phone
@@ -63,11 +63,11 @@ function ValidateUserInput(user_input) {
   }
 
   // *************** set value of entity
-  const entities = ["ADMTC", "Academic", "Company"];
+  const entities = ['ADMTC', 'Academic', 'Company'];
   // *************** validate user entitiy
   if (!user_input.entity || !entities.includes(user_input.entity)) {
     // *************** error message if the input not valid
-    error.push(`Entity must be one of: ${entities.join(", ")}`);
+    error.push(`Entity must be one of: ${entities.join(', ')}`);
   }
 
   // *************** validate user address
@@ -98,7 +98,7 @@ function ValidateUserInput(user_input) {
   }
 
   // *************** validate user role
-  if (!user_input.role || typeof user_input.role !== "string") {
+  if (!user_input.role || typeof user_input.role !== 'string') {
     // *************** error message if the input not valid
     error.push('Role is required.');
   }
