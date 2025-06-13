@@ -1,14 +1,14 @@
 // *************** TYPE DEFINITION : Student  ***************
 
 // *************** Student address type
-const studentAddressType =`
+const studentAddressType = `
 type StudentAddress{
     street:String!
     city:String!
     province:String!
     postal_code:String!
 }    
-`
+`;
 
 // *************** Student Type
 const studentType = `
@@ -61,7 +61,7 @@ extend type Query {
 `;
 
 // *************** Student Mutation
-const studentMutation =`
+const studentMutation = `
 extend type Mutation{
     CreateStudent(
         student_input: StudentInput!): Student!
@@ -74,11 +74,11 @@ extend type Mutation{
 }
 `;
 
-const studentTypeDefs =`
-    ${ studentType }
-    ${ studentQuery }
-    ${ studentMutation }
-    ${ studentAddressType }
-`
+const studentTypeDefs = `
+    ${studentType}
+    ${studentQuery}
+    ${studentMutation}
+    ${studentAddressType}
+`;
 // *************** EXPORT MODULE ***************
 module.exports = studentTypeDefs;

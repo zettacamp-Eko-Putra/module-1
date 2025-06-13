@@ -1,9 +1,9 @@
 // *************** IMPORT LIBRARY ***************
-const keyBy = require("lodash/keyBy");
-const DataLoader = require("dataloader");
+const keyBy = require('lodash/keyBy');
+const DataLoader = require('dataloader');
 
 // *************** IMPORT MODULE ***************
-const SchoolModel = require("./school.models.js");
+const SchoolModel = require('./school.models.js');
 
 /**
  * Batch function to load multiple schools by their IDs.
@@ -20,7 +20,7 @@ async function SchoolBatch(schoolIds) {
   const schools = await SchoolModel.find({
     // *************** find active school by id
     _id: { $in: schoolIds },
-    status: "active",
+    status: 'active',
   }).lean();
 
   // *************** change array to object key base on school id

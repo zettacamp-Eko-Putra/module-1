@@ -31,8 +31,13 @@ const baseTypeDefs = gql`
 `;
 
 const server = new ApolloServer({
+  // *************** Taking import from each type def
   typeDefs: [UserTypeDefs, StudentTypeDefs, SchoolTypeDefs, baseTypeDefs],
+
+  // *************** Taking import from each resolver
   resolvers: [UserResolvers, StudentResolvers, SchoolResolvers],
+
+  // *************** Taking import from each loaders
   context: () => ({
     loaders: {
       school: CreateSchoolLoader(),

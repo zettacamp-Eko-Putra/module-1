@@ -50,13 +50,13 @@ const studentSchema = new Schema({
   address: [studentAddressSchema],
 
   // school id the student belongs to
-  school_id: { type: Schema.Types.ObjectId, ref: "School", required: true },
+  school_id: { type: Schema.Types.ObjectId, ref: 'School', required: true },
 
   // Student status
-  status: { type: String, enum: ["active", "delete"], default: "active" },
+  status: { type: String, enum: ['active', 'delete'], default: 'active' },
 
   // Student School History
-  school_history: [{ type: Schema.Types.ObjectId, ref: "School" }],
+  school_history: [{ type: Schema.Types.ObjectId, ref: 'School' }],
 
   // Delete at for the student
   deleted_at: { type: Date },
@@ -64,4 +64,3 @@ const studentSchema = new Schema({
 
 // *************** EXPORT MODULE ***************
 module.exports = mongoose.model('Student', studentSchema);
-

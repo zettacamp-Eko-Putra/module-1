@@ -132,7 +132,7 @@ async function DeleteSchool(parent, { _id }) {
     _id,
     {
       // *************** changing status field to deleted and adding timestamp
-      status: "deleted",
+      status: 'deleted',
       deleted_at: new Date(),
     },
 
