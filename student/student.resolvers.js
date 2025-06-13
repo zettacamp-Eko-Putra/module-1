@@ -261,11 +261,8 @@ async function GetSchoolHistory(parent, args, ctx) {
   // *************** adding loaders to ctx
   const { loaders } = ctx;
 
-  // *************** using school loaders to mapping school data based on school id
-  const ids = parent.school_history.map((id) => id.toString());
-
   // *************** load school data from dataloader
-  const result = await loaders.school.loadMany(ids);
+  const result = await loaders.school.loadMany(parent.school_history);
 
   // *************** returning school data
   return result;
