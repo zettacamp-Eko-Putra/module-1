@@ -25,19 +25,23 @@ function ValidateStudentInput(student_input) {
 
   // *************** validate student first_name
   if (
-    !student_input.first_name || typeof student_input.first_name !== "string"
+    !student_input.first_name ||
+    typeof student_input.first_name !== "string"
   ) {
+    // *************** error message if the input not valid
     error.push("first name is required and must be string");
   }
 
   // *************** validate student last_name
   if (!student_input.last_name || typeof student_input.last_name !== "string") {
+    // *************** error message if the input not valid
     error.push("last name is required and must be string");
   }
 
   // *************** validate student civility
   const civilities = ["Mr", "Mrs"];
   if (!student_input.civility || !civilities.includes(student_input.civility)) {
+    // *************** error message if the input not valid
     error.push(`Civility must be one of: ${civilities.join(", ")}`);
   }
 
@@ -46,11 +50,13 @@ function ValidateStudentInput(student_input) {
     !student_input.postal_code_of_birth ||
     typeof student_input.postal_code_of_birth !== "string"
   ) {
+    // *************** error message if the input not valid
     error.push("postal code of birth is required and must be string");
   }
 
   // *************** validate user mobile_phone
   if (!student_input.mobile_phone || student_input.mobile_phone.length > 12) {
+    // *************** error message if the input not valid
     error.push("Mobile phone is required and must not exceed 12 characters.");
   }
 
@@ -59,10 +65,13 @@ function ValidateStudentInput(student_input) {
     !Array.isArray(student_input.address) ||
     student_input.address.length === 0
   ) {
-    error.push("At least one address is required.");
+    // *************** error message if the input not valid
+    error.push("Address is required.");
   } else {
+    // *************** validate each address array
     student_input.address.forEach((addr, idx) => {
       if (!addr.street || !addr.city || !addr.province || !addr.postal_code) {
+        // *************** error message if the input not valid
         error.push(`Address at index ${idx} is missing required fields.`);
       }
     });
@@ -72,18 +81,21 @@ function ValidateStudentInput(student_input) {
   if (student_input.date_of_birth) {
     const date = new Date(student_input.date_of_birth);
     if (isNaN(date.getTime())) {
+      // *************** error message if the input not valid
       error.push("Date of birth must be a valid date.");
     }
   }
 
   // *************** validate school_id
   if (!student_input.school_id || typeof student_input.school_id !== "string") {
+    // *************** error message if the input not valid
     error.push("School ID is required and must be a string.");
   }
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!student_input.email || !emailRegex.test(student_input.email)) {
+    // *************** error message if the input not valid
     error.push("A valid email is required.");
   }
 

@@ -19,13 +19,19 @@ function ValidateSchoolInput(school_input) {
 
   // *************** validate school school_legal_name
   if (
-    !school_input.school_legal_name || typeof school_input.school_legal_name !== "string"
+    !school_input.school_legal_name ||
+    typeof school_input.school_legal_name !== "string"
   ) {
+    // *************** error message if the input not valid
     error.push("school legal name is required and must be string");
   }
 
   // *************** validate school school_commercial_name
-  if (!school_input.school_commercial_name || typeof school_input.school_commercial_name !== "string") {
+  if (
+    !school_input.school_commercial_name ||
+    typeof school_input.school_commercial_name !== "string"
+  ) {
+    // *************** error message if the input not valid
     error.push("school commercial name is required and must be string");
   }
 
@@ -34,10 +40,13 @@ function ValidateSchoolInput(school_input) {
     !Array.isArray(school_input.address) ||
     school_input.address.length === 0
   ) {
-    error.push("At least one address is required.");
+    // *************** error message if the input not valid
+    error.push("Address is required.");
   } else {
+    // *************** validate each address array
     school_input.address.forEach((addr, idx) => {
       if (!addr.street || !addr.city || !addr.province || !addr.postal_code) {
+        // *************** error message if the input not valid
         error.push(`Address at index ${idx} is missing required fields.`);
       }
     });

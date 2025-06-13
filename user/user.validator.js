@@ -26,47 +26,59 @@ function ValidateUserInput(user_input) {
 
   // *************** validate user first_name
   if (!user_input.first_name || typeof user_input.first_name !== "string") {
+    // *************** error message if the input not valid
     error.push("first name is required and must be string");
   }
 
   // *************** validate user last_name
   if (!user_input.last_name || typeof user_input.last_name !== "string") {
+    // *************** error message if the input not valid
     error.push("last name is required and must be string");
   }
 
-  // *************** validate user civility
+  // *************** set value of civilities
   const civilities = ["Mr", "Mrs"];
+  // *************** validate user civility
   if (!user_input.civility || !civilities.includes(user_input.civility)) {
+    // *************** error message if the input not valid
     error.push(`Civility must be one of: ${civilities.join(", ")}`);
   }
 
   // *************** validate user office_phone
   if (user_input.office_phone && user_input.office_phone.length > 12) {
+    // *************** error message if the input not valid
     error.push("Office phone cannot exceed 12 characters.");
   }
 
   // *************** validate user direct_line
   if (user_input.direct_line && user_input.direct_line.length > 12) {
+    // *************** error message if the input not valid
     error.push("Direct line cannot exceed 12 characters.");
   }
 
   // *************** validate user mobile_phone
   if (!user_input.mobile_phone || user_input.mobile_phone.length > 12) {
+    // *************** error message if the input not valid
     error.push("Mobile phone is required and must not exceed 12 characters.");
   }
 
-  // *************** validate user entitiy
+  // *************** set value of entity
   const entities = ["ADMTC", "Academic", "Company"];
+  // *************** validate user entitiy
   if (!user_input.entity || !entities.includes(user_input.entity)) {
-    error.push("Entity must be one of: ADMTC, Academic, Company.");
+    // *************** error message if the input not valid
+    error.push(`Entity must be one of: ${entities.join(", ")}`);
   }
 
   // *************** validate user address
   if (!Array.isArray(user_input.address) || user_input.address.length === 0) {
-    error.push("At least one address is required.");
+    // *************** error message if the input not valid
+    error.push("Address is required.");
   } else {
+    // *************** validate each address array
     user_input.address.forEach((addr, idx) => {
       if (!addr.street || !addr.city || !addr.province || !addr.postal_code) {
+        // *************** error message if the input not valid
         error.push(`Address at index ${idx} is missing required fields.`);
       }
     });
@@ -75,16 +87,19 @@ function ValidateUserInput(user_input) {
   // *************** validate user email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!user_input.email || !emailRegex.test(user_input.email)) {
+    // *************** error message if the input not valid
     error.push("A valid email is required.");
   }
 
   // *************** validate user password
   if (!user_input.password || user_input.password.length < 6) {
+    // *************** error message if the input not valid
     error.push("Password is required and must be at least 6 characters.");
   }
 
   // *************** validate user role
   if (!user_input.role || typeof user_input.role !== "string") {
+    // *************** error message if the input not valid
     error.push("Role is required.");
   }
 
