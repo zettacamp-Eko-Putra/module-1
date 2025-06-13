@@ -13,22 +13,30 @@ const { ValidateUserInput } = require("./user.validator.js");
  */
 async function GetAllUsers() {
   // *************** find user data with status active
-  const activeUser = await User.find({ status: "active" });
+  const activeUser = await UserModel.find({ status: "active" });
 
   // *************** returning user data with status active
   return activeUser;
 }
 
 /**
- * Fetches all users from the database whose status is set to "active".
+ * Retrieves a user document by its unique ID.
+ *
+ * This function searches for a user in the database using the provided `_id`.
+ * If the user is not found, it throws an error.
  *
  * @async
- * @function GetAllUser
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
+ * @function GetUserById
+ * @param {object} parent - Unused GraphQL parent resolver parameter.
+ * @param {object} args - The arguments object.
+ * @param {string} _id - The ID of the user to retrieve.
+ * @returns {Promise<object>} - A promise that resolves to the user object.
+ * @throws {Error} - Throws an error if the user is not found.
  */
+
 async function GetUserById(parent, { _id }) {
   // *************** finding user based on id
-  const user = await User.findById(_id).lean();
+  const user = await UserModel.findById(_id).lean();
 
   // *************** creating if to showing message if the user cannot be found
   if (!user) {
@@ -57,7 +65,9 @@ async function CreateUser(parent, { user_input }) {
   ValidateUserInput(user_input);
 
   // *************** check if the email already taken by another user
-  const isEmailAlreadyExist = await User.exists({ email: user_input.email });
+  const isEmailAlreadyExist = await UserModel.exists({
+    email: user_input.email,
+  });
 
   // *************** creating if to showing message if the email already taken by another user
   if (isEmailAlreadyExist) {
@@ -66,7 +76,7 @@ async function CreateUser(parent, { user_input }) {
   }
 
   // *************** creating new user based on the userInput
-  const createdUser = await User.create(user_input);
+  const createdUser = await UserModel.create(user_input);
 
   // *************** returning new user data
   return createdUser;
@@ -96,7 +106,7 @@ async function UpdateUser(parent, { _id, user_input }) {
   }
 
   // *************** finding user based on id and overwrite it with new data and saving it to database
-  const updatedUser = await User.findByIdAndUpdate(_id, user_input, {
+  const updatedUser = await UserModel.findByIdAndUpdate(_id, user_input, {
     new: true,
   });
 
@@ -123,7 +133,7 @@ async function UpdateUser(parent, { _id, user_input }) {
  */
 async function DeleteUser(parent, { _id }) {
   // *************** finding user based on id and update the data
-  const deleteUser = await User.findByIdAndUpdate(
+  const deleteUser = await UserModel.findByIdAndUpdate(
     _id,
     {
       // *************** changing status field to deleted and adding timestamp
