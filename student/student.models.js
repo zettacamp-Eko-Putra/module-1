@@ -1,4 +1,4 @@
-// *************** IMPORT MODULE ***************
+// *************** IMPORT LIBRARY ***************
 const mongoose = require("mongoose");
 const { Schema } = mongoose;
 
@@ -63,5 +63,5 @@ const studentSchema = new Schema({
 });
 
 // *************** EXPORT MODULE ***************
-const Student = mongoose.model("Student", studentSchema);
-module.exports = Student;
+module.exports = mongoose.model('Student', studentSchema);
+

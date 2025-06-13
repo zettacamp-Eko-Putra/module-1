@@ -1,5 +1,5 @@
 // *************** IMPORT MODULE ***************
-const Student = require("./student.models.js");
+const StudentModel = require("./student.models.js");
 
 // *************** IMPORT LIBRARY ***************
 const dataLoader = require("dataloader");
@@ -17,7 +17,7 @@ const keyBy = require("lodash/keyBy");
  */
 async function StudentBatch(studentIds) {
   // *************** find student data
-  const students = await Student.find({
+  const students = await StudentModel.find({
     // *************** find active student data based on id
     _id: { $in: studentIds },
     status: "active",

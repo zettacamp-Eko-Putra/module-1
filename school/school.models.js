@@ -39,5 +39,4 @@ const schoolSchema = new Schema({
 });
 
 // *************** EXPORT MODULE ***************
-const School = mongoose.model("School", schoolSchema, "school");
-module.exports = School;
+module.exports = mongoose.model('School', schoolSchema, 'school');

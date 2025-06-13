@@ -3,7 +3,7 @@ const keyBy = require("lodash/keyBy");
 const DataLoader = require("dataloader");
 
 // *************** IMPORT MODULE ***************
-const School = require("./school.models.js");
+const SchoolModel = require("./school.models.js");
 
 /**
  * Batch function to load multiple schools by their IDs.
@@ -12,12 +12,12 @@ const School = require("./school.models.js");
  *
  * @async
  * @function SchoolBatch
- * @param {Array<string|import('mongoose').Types.ObjectId>} schoolId - An array of school IDs to fetch.
+ * @param {Array<string|import('mongoose').Types.ObjectId>} schoolIds - An array of school IDs to fetch.
  * @returns {Promise<Array<Object|null>>} - An array of school documents in the same order as the input IDs, or `null` for IDs not found.
  */
 async function SchoolBatch(schoolIds) {
   // *************** find school data
-  const schools = await School.find({
+  const schools = await SchoolModel.find({
     // *************** find active school by id
     _id: { $in: schoolIds },
     status: "active",
