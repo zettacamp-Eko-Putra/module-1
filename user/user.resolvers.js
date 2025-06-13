@@ -38,9 +38,8 @@ async function GetUserById(parent, { _id }) {
   // *************** finding user based on id
   const user = await UserModel.findById(_id).lean();
 
-  // *************** creating if to showing message if the user cannot be found
+  // *************** showing message if the user cannot be found
   if (!user) {
-    // *************** error message if the user cannot be found in database
     throw new Error("User Not Found");
   }
 
@@ -69,9 +68,8 @@ async function CreateUser(parent, { user_input }) {
     email: user_input.email,
   });
 
-  // *************** creating if to showing message if the email already taken by another user
+  // *************** showing message if the email already taken by another user
   if (isEmailAlreadyExist) {
-    // *************** error message if the email already taken
     throw new Error("Email taken");
   }
 
@@ -99,9 +97,8 @@ async function UpdateUser(parent, { _id, user_input }) {
   // *************** validate user_input
   ValidateUserInput(user_input);
 
-  // *************** creating if to showing error message if the user tried to update their id
+  // *************** showing error message if the user tried to update their id
   if (user_input._id) {
-    // *************** error message if user tried to update their id
     throw new Error("Cannot update User ID");
   }
 
@@ -145,9 +142,8 @@ async function DeleteUser(parent, { _id }) {
     { new: true }
   );
 
-  // *************** creating if to showing error message if user id cannot be found in database
+  // *************** showing error message if user id cannot be found in database
   if (!deleteUser) {
-    // *************** message if the user id cannot be found in database
     throw new Error("User not found");
   }
 

@@ -37,7 +37,7 @@ async function GetSchoolById(parent, { _id }) {
   // *************** creating if to showing message if the school cannot be found
   if (!school) {
     // *************** error message if the user cannot be found in database
-    throw new Error("School not found");
+    throw new Error('School not found');
   }
 
   // *************** returning user data if user in database
@@ -71,7 +71,7 @@ async function CreateSchool(parent, { school_input }) {
 
   // *************** showing error message if the name already taken by another school
   if (isSchoolNameAlreadyExist) {
-    throw new Error("School name already exists");
+    throw new Error('School name already exists');
   }
 
   // *************** creating new school based on the schoolInput
@@ -97,10 +97,9 @@ async function UpdateSchool(parent, { _id, school_input }) {
   // *************** validate school_input
   ValidateSchoolInput(school_input);
 
-  // *************** creating if to showing error message if the school tried to update their id
+  // *************** showing error message if the school tried to update their id
   if (school_input._id) {
-    // *************** error message if school tried to update their id
-    throw new Error("Cannot update School ID");
+    throw new Error('Cannot update School ID');
   }
 
   // *************** finding school based on id and overwrite it with new data and saving it to database
@@ -110,7 +109,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
 
   // ***************  showing error message if the school id cannot be found in database
   if (!updatedSchool) {
-    throw new Error("School not Found");
+    throw new Error('School not Found');
   }
 
   // *************** returning school updated data to user
@@ -144,8 +143,7 @@ async function DeleteSchool(parent, { _id }) {
 
   // *************** creating if to showing error message if school id cannot be found in database
   if (!deleteSchool) {
-    // *************** message if the user id cannot be found in database
-    throw new Error("School not found");
+    throw new Error('School not found');
   }
 
   // *************** returning school deleted data to user

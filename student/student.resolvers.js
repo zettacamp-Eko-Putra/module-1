@@ -216,7 +216,7 @@ async function DeleteStudent(parent, { _id }) {
   // *************** creating if to showing error message if student id cannot be found in database
   if (!deleteStudent) {
     // *************** message if the student id cannot be found in database
-    throw new Error('Student Not Found');
+    throw new Error("Student Not Found");
   }
 
   // *************** returning student deleted data to user
