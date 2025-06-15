@@ -1,4 +1,6 @@
 // *************** TYPE DEFINITION : School  ***************
+
+// *************** School address type
 const schoolAddressType = `
 type SchoolAddress{
   street: String!
@@ -6,16 +8,17 @@ type SchoolAddress{
   province: String!
   postal_code: String!  
 }
-`;
 
-const schoolType = `
 input SchoolAddressInput {
   street: String!
   city: String!
   province: String!
   postal_code: String!
 }
+`;
 
+// *************** School type
+const schoolType = `
 type School {
   _id: ID!
   school_legal_name: String!
@@ -56,8 +59,8 @@ extend type Mutation{
 `;
 
 const schoolTypeDefs = `
-    ${schoolType}
     ${schoolAddressType}
+    ${schoolType}
     ${schoolQuery}
     ${schoolMutation}
 `;

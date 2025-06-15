@@ -1,7 +1,15 @@
 // *************** TYPE DEFINITION: User ***************
+
 // *************** User address Type
 const userAddressType = `
 type UserAddress{
+    street:String!
+    city:String!
+    province:String!
+    postal_code:String!
+}
+
+input UserAddressInput{
     street:String!
     city:String!
     province:String!
@@ -11,13 +19,6 @@ type UserAddress{
 
 // *************** User Type
 const userType = `
-input UserAddressInput{
-    street:String!
-    city:String!
-    province:String!
-    postal_code:String!
-}
-
 type User {
     _id:ID!
     first_name:String!
@@ -34,6 +35,7 @@ type User {
     status:String!
     deleted_at:Date
 }
+
 input UserInput{
     _id:ID
     first_name:String!
