@@ -65,7 +65,10 @@ async function CreateUser(parent, { user_input }) {
 
   // *************** check if the email already taken by another user
   const isEmailAlreadyExist = await UserModel.exists({
-    email: user_input.email,
+    email: {
+      $regex: `^${user_input.email.trim()}$`,
+      $options: 'i',
+    },
   });
 
   // *************** showing message if the email already taken by another user
