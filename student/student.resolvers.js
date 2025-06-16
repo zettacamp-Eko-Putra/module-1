@@ -141,8 +141,9 @@ async function UpdateStudent(parent, { _id, student_input }) {
     // *************** finding new school id in the database
     const newSchool = await SchoolModel.findById(newSchoolId);
 
-    // *************** showing error message if the new school id cannot be found
-    if (!newSchool) throw new Error('New School Not Found');
+    // *************** showing error message if the new school id cannot be found or already deleted
+    if (!newSchool || newSchool.status === `deleted`)
+      throw new Error('New School Not Found or already deleted');
 
     // *************** creating set to avoid duplicate data
     const schoolHistorySet = new Set(
