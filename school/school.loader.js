@@ -1,21 +1,34 @@
 // *************** IMPORT LIBRARY ***************
 const keyBy = require('lodash/keyBy');
 const DataLoader = require('dataloader');
+const { Types } = require('mongoose');
 
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
 
 /**
  * Batch function to load multiple schools by their IDs.
- * Only returns schools with status "active". If a school ID is not found or inactive,
- * the corresponding result will be `null`.
+ * Validates that all provided IDs are valid MongoDB ObjectIds.
+ * Only returns schools with status "active". If a school ID is invalid, not found, or inactive,
+ * the corresponding result in the returned array will be `null`.
  *
  * @async
  * @function SchoolBatch
  * @param {Array<string|import('mongoose').Types.ObjectId>} schoolIds - An array of school IDs to fetch.
- * @returns {Promise<Array<Object|null>>} - An array of school documents in the same order as the input IDs, or `null` for IDs not found.
+ * @throws {Error} Throws an error if any provided school ID is not a valid MongoDB ObjectId.
+ * @returns {Promise<Array<Object|null>>} - A Promise that resolves to an array of school documents.
+ * The order of the results matches the order of the input IDs.
+ * If a school is not found or inactive, the corresponding entry will be `null`.
  */
 async function SchoolBatch(schoolIds) {
+  // *************** validate all schoolIDs
+  const validateSchoolIds = schoolIds.filter(
+    (ids) => !Types.ObjectId.isValid(ids)
+  );
+  if (validateSchoolIds.length > 0) {
+    throw new Error(`Invalid school IDs: ${validateSchoolIds.join(', ')}`);
+  }
+
   // *************** find school data
   const schools = await SchoolModel.find({
     // *************** find active school by id
