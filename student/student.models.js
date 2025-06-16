@@ -53,7 +53,7 @@ const studentSchema = new Schema({
   school_id: { type: Schema.Types.ObjectId, ref: 'School', required: true },
 
   // Student status
-  status: { type: String, enum: ['active', 'delete'], default: 'active' },
+  status: { type: String, enum: ['active', 'deleted'], default: 'active' },
 
   // Student School History
   school_history: [{ type: Schema.Types.ObjectId, ref: 'School' }],

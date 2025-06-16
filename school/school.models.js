@@ -32,7 +32,7 @@ const schoolSchema = new Schema({
   student: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
 
   // School status
-  status: { type: String, enum: ['active', 'delete'], default: 'active' },
+  status: { type: String, enum: ['active', 'deleted'], default: 'active' },
 
   // delete at for the school
   deleted_at: { type: Date },
