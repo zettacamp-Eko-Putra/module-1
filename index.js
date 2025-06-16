@@ -19,6 +19,8 @@ const mongoose = require('mongoose');
 // *************** Configuration
 const app = express();
 const port = process.env.PORT;
+const dbName = process.env.DB_NAME;
+const host = process.env.HOST;
 const baseTypeDefs = gql`
   scalar Date
 
@@ -70,7 +72,7 @@ async function StartServer() {
     server.applyMiddleware({ app, path: '/graphql' });
 
     // *************** connect mongoose to mongoDB
-    await mongoose.connect(process.env.MONGODB_URL, {
+    await mongoose.connect(`mongodb://${host}/${dbName}`, {
       useNewUrlParser: true,
       useUnifiedTopology: true,
     });
