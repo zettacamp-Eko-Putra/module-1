@@ -8,6 +8,8 @@ const SchoolTypeDefs = require('./school/school.typedefs');
 const UserResolvers = require('./user/user.resolvers');
 const StudentResolvers = require('./student/student.resolvers');
 const SchoolResolvers = require('./school/school.resolvers');
+
+// *************** LOADER ***************
 const CreateSchoolLoader = require('./school/school.loader');
 const CreateStudentLoader = require('./student/student.loader');
 
