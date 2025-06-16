@@ -68,10 +68,21 @@ function ValidateStudentInput(student_input) {
     error.push('Address is required.');
   } else {
     // *************** validate each address array
-    student_input.address.forEach((addr, idx) => {
-      if (!addr.street || !addr.city || !addr.province || !addr.postal_code) {
-        // *************** error message if the input not valid
-        error.push(`Address at index ${idx} is missing required fields.`);
+    student_input.address.forEach((addr) => {
+      const invalidAddressComponent = [];
+
+      if (typeof addr.street !== 'string')
+        invalidAddressComponent.push('street');
+      if (typeof addr.city !== 'string') invalidAddressComponent.push('city');
+      if (typeof addr.province !== 'string')
+        invalidAddressComponent.push('province');
+      if (typeof addr.postal_code !== 'string')
+        invalidAddressComponent.push('postal_code');
+
+      if (invalidAddressComponent.length > 0) {
+        error.push(
+          `Address at ${invalidAddressComponent.join(', ')} not valid`
+        );
       }
     });
   }
