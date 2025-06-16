@@ -1,9 +1,10 @@
-// *************** IMPORT MODULE ***************
-const StudentModel = require('./student.models.js');
-
 // *************** IMPORT LIBRARY ***************
 const dataLoader = require('dataloader');
 const keyBy = require('lodash/keyBy');
+const { Types } = require('mongoose');
+
+// *************** IMPORT MODULE ***************
+const StudentModel = require('./student.models.js');
 
 /**
  * Batch function for loading multiple students by their IDs using DataLoader.
@@ -16,6 +17,14 @@ const keyBy = require('lodash/keyBy');
  * @returns {Promise<Array<Object|null>>} - An array of student documents in the same order as input IDs, or `null` if not found.
  */
 async function StudentBatch(studentIds) {
+  // *************** validate all studentIDs
+  const validateStudentIds = studentIds.filter(
+    (ids) => !Types.ObjectId.isValid(ids)
+  );
+  if (validateStudentIds.length > 0) {
+    throw new Error(`Invalid student IDs: ${validateStudentIds.join(', ')}`);
+  }
+
   // *************** find student data
   const students = await StudentModel.find({
     // *************** find active student data based on id
