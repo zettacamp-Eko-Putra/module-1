@@ -12,7 +12,6 @@
  *
  * @throws {Error} Throws an error if any validation rule fails, with a message listing all validation issues.
  */
-
 function ValidateSchoolInput(school_input) {
   // *************** Variable to contain error
   const error = [];
