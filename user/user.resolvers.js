@@ -4,6 +4,9 @@ const UserModel = require('./user.models.js');
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require('./user.validator.js');
 
+// *************** IMPORT LIBRARY ***************
+const { Types } = require('mongoose');
+
 /**
  * Retrieves all users with active status from the database.
  *
@@ -35,6 +38,11 @@ async function GetAllUsers() {
  */
 
 async function GetUserById(parent, { _id }) {
+  // *************** validate user_input
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid User ID`);
+  }
+
   // *************** finding user based on id
   const user = await UserModel.findById(_id).lean();
 
@@ -98,6 +106,11 @@ async function CreateUser(parent, { user_input }) {
  */
 async function UpdateUser(parent, { _id, user_input }) {
   // *************** validate user_input
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid User ID`);
+  }
+
+  // *************** validate user_input
   ValidateUserInput(user_input);
 
   // *************** showing error message if the user tried to update their id
@@ -106,9 +119,11 @@ async function UpdateUser(parent, { _id, user_input }) {
   }
 
   // *************** finding user based on id and overwrite it with new data and saving it to database
-  const updatedUser = await UserModel.findByIdAndUpdate(_id, user_input, {
-    new: true,
-  });
+  const updatedUser = await UserModel.findByIdAndUpdate(
+    _id,
+    { $set: user_input },
+    { new: true }
+  );
 
   // *************** showing error message if the user id cannot be found in database
   if (!updatedUser) {
@@ -131,6 +146,11 @@ async function UpdateUser(parent, { _id, user_input }) {
  * @throws {Error} - Throws an error if the user is not found.
  */
 async function DeleteUser(parent, { _id }) {
+  // *************** validate user_input
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid User ID`);
+  }
+
   // *************** checking if the user already deleted
   const isUserAlreadyDeleted = await UserModel.findOne({
     _id,

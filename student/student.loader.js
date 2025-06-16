@@ -21,7 +21,7 @@ async function StudentBatch(studentIds) {
   const validateStudentIds = studentIds.filter(
     (ids) => !Types.ObjectId.isValid(ids)
   );
-  if (validateStudentIds.length > 0) {
+  if (validateStudentIds.length) {
     throw new Error(`Invalid student IDs: ${validateStudentIds.join(', ')}`);
   }
 
@@ -43,11 +43,11 @@ async function StudentBatch(studentIds) {
 }
 
 /**
- * Membuat instance DataLoader untuk mengambil data student secara efisien menggunakan fungsi batch.
- * DataLoader membantu mengurangi jumlah query ke database dengan melakukan batching dan caching.
+ * Creates a DataLoader instance for batching and caching student data requests.
+ * Uses the StudentBatch function to fetch multiple student records by their IDs efficiently.
  *
  * @function CreateStudentLoader
- * @returns {DataLoader<string|import('mongoose').Types.ObjectId, Object|null>} - Instance DataLoader untuk student.
+ * @returns {import('dataloader')} - A DataLoader instance configured to use the StudentBatch function.
  */
 const CreateStudentLoader = () => {
   // *************** creating dataloader using batch SchoolBatch

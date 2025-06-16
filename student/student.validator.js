@@ -60,10 +60,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate student address
-  if (
-    !Array.isArray(student_input.address) ||
-    student_input.address.length === 0
-  ) {
+  if (!Array.isArray(student_input.address) || !student_input.address.length) {
     // *************** error message if the input not valid
     error.push('Address is required.');
   } else {
@@ -83,7 +80,7 @@ function ValidateStudentInput(student_input) {
       )
         invalidAddressComponent.push('postal_code');
 
-      if (invalidAddressComponent.length > 0) {
+      if (invalidAddressComponent.length) {
         error.push(
           `Address at ${invalidAddressComponent.join(', ')} not valid`
         );
@@ -114,7 +111,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** checking if there's error message
-  if (error.length > 0) {
+  if (error.length) {
     throw new Error(error.join(' '));
   }
 }

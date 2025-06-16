@@ -71,7 +71,7 @@ function ValidateUserInput(user_input) {
   }
 
   // *************** validate user address
-  if (!Array.isArray(user_input.address) || user_input.address.length === 0) {
+  if (!Array.isArray(user_input.address) || !user_input.address.length) {
     // *************** error message if the input not valid
     error.push('Address is required.');
   } else {
@@ -91,7 +91,7 @@ function ValidateUserInput(user_input) {
       )
         invalidAddressComponent.push('postal_code');
 
-      if (invalidAddressComponent.length > 0) {
+      if (invalidAddressComponent.length) {
         error.push(
           `Address at ${invalidAddressComponent.join(', ')} not valid`
         );
@@ -119,7 +119,7 @@ function ValidateUserInput(user_input) {
   }
 
   // *************** checking if there's error message
-  if (error.length > 0) {
+  if (error.length) {
     throw new Error(error.join(' '));
   }
 }

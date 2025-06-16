@@ -4,6 +4,7 @@ const SchoolModel = require('../school/school.models.js');
 
 // *************** IMPORT LIBRARY ***************
 const mongoose = require('mongoose');
+const { Types } = require('mongoose');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateStudentInput } = require('./student.validator.js');
@@ -35,6 +36,11 @@ async function GetAllStudents() {
  * @throws {Error} - Throws an error if the student is not found.
  */
 async function GetStudentById(parent, { _id }) {
+  // *************** Validating student ID
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid Student ID`);
+  }
+
   // *************** finding student based on id
   const student = await StudentModel.findById(_id).lean();
 
@@ -112,6 +118,11 @@ async function CreateStudent(parent, { student_input }) {
  * @throws {Error} - Throws an error if attempting to update student ID or if student/school not found.
  */
 async function UpdateStudent(parent, { _id, student_input }) {
+  // *************** Validating student ID
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid Student ID`);
+  }
+
   // *************** validate student_input
   ValidateStudentInput(student_input);
 
@@ -180,10 +191,8 @@ async function UpdateStudent(parent, { _id, student_input }) {
   // *************** updating the student data and save it to database
   const updatedStudent = await StudentModel.findByIdAndUpdate(
     _id,
-    student_input,
-    {
-      new: true,
-    }
+    { $set: student_input },
+    { new: true }
   );
 
   // *************** returning the updated data
@@ -202,6 +211,11 @@ async function UpdateStudent(parent, { _id, student_input }) {
  * @throws {Error} - Throws an error if the student is not found.
  */
 async function DeleteStudent(parent, { _id }) {
+  // *************** Validating student ID
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid Student ID`);
+  }
+
   // *************** checking if the student already deleted
   const isStudentAlreadyDeleted = await StudentModel.findOne({
     _id,

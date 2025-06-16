@@ -25,7 +25,7 @@ async function SchoolBatch(schoolIds) {
   const validateSchoolIds = schoolIds.filter(
     (ids) => !Types.ObjectId.isValid(ids)
   );
-  if (validateSchoolIds.length > 0) {
+  if (validateSchoolIds.length) {
     throw new Error(`Invalid school IDs: ${validateSchoolIds.join(', ')}`);
   }
 

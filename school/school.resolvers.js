@@ -1,3 +1,6 @@
+// *************** IMPORT LIBRARY ***************
+const { Types } = require('mongoose');
+
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
 
@@ -31,6 +34,11 @@ async function GetAllSchools() {
  * @throws {Error} - Throws an error if the school is not found.
  */
 async function GetSchoolById(parent, { _id }) {
+  // *************** Validating school id
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid School ID`);
+  }
+
   // *************** finding school based on id
   const school = await SchoolModel.findById(_id).lean();
 
@@ -93,6 +101,11 @@ async function CreateSchool(parent, { school_input }) {
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
 async function UpdateSchool(parent, { _id, school_input }) {
+  // *************** Validating school id
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid School ID`);
+  }
+
   // *************** validate school_input
   ValidateSchoolInput(school_input);
 
@@ -102,9 +115,11 @@ async function UpdateSchool(parent, { _id, school_input }) {
   }
 
   // *************** finding school based on id and overwrite it with new data and saving it to database
-  const updatedSchool = await SchoolModel.findByIdAndUpdate(_id, school_input, {
-    new: true,
-  });
+  const updatedSchool = await SchoolModel.findByIdAndUpdate(
+    _id,
+    { $set: school_input },
+    { new: true }
+  );
 
   // ***************  showing error message if the school id cannot be found in database
   if (!updatedSchool) {
@@ -127,6 +142,11 @@ async function UpdateSchool(parent, { _id, school_input }) {
  * @throws {Error} - Throws an error if the school is not found.
  */
 async function DeleteSchool(parent, { _id }) {
+  // *************** checking if the school id is valid
+  if (!Types.ObjectId.isValid(_id)) {
+    throw new Error(`Invalid School ID`);
+  }
+
   // *************** checking if the school already deleted
   const isSchoolAlreadyDeleted = await SchoolModel.findOne({
     _id,
@@ -176,7 +196,7 @@ async function GetStudentData(parent, args, ctx) {
   const { loaders } = ctx;
 
   // *************** creating if to check if the school student array empty
-  if (!parent.student || parent.student.length === 0) {
+  if (!parent.student || !parent.student.length) {
     // *************** retuning value if student array empty
     return [];
   }
