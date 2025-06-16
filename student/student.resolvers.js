@@ -201,7 +201,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
  * @throws {Error} - Throws an error if the student is not found.
  */
 async function DeleteStudent(parent, { _id }) {
-  const deleteStudent = await Student.findByIdAndUpdate(
+  const deleteStudent = await StudentModel.findByIdAndUpdate(
     _id,
     {
       // *************** changing status field to deleted and adding timstamp
