@@ -47,12 +47,16 @@ function ValidateSchoolInput(school_input) {
     school_input.address.forEach((addr) => {
       const invalidAddressComponent = [];
 
-      if (typeof addr.street !== 'string')
+      if (typeof addr.street !== 'string' || addr.street.trim() === '')
         invalidAddressComponent.push('street');
-      if (typeof addr.city !== 'string') invalidAddressComponent.push('city');
-      if (typeof addr.province !== 'string')
+      if (typeof addr.city !== 'string' || addr.city.trim() === '')
+        invalidAddressComponent.push('city');
+      if (typeof addr.province !== 'string' || addr.province.trim() === '')
         invalidAddressComponent.push('province');
-      if (typeof addr.postal_code !== 'string')
+      if (
+        typeof addr.postal_code !== 'string' ||
+        addr.postal_code.trim() === ''
+      )
         invalidAddressComponent.push('postal_code');
 
       if (invalidAddressComponent.length > 0) {
