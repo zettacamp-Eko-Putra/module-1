@@ -127,6 +127,17 @@ async function UpdateSchool(parent, { _id, school_input }) {
  * @throws {Error} - Throws an error if the school is not found.
  */
 async function DeleteSchool(parent, { _id }) {
+  // *************** checking if the school already deleted
+  const isSchoolAlreadyDeleted = await SchoolModel.findOne({
+    _id,
+    status: { $ne: 'deleted' },
+  });
+
+  // *************** showing error message if school already deleted
+  if (!isSchoolAlreadyDeleted) {
+    throw new Error('School already deleted');
+  }
+
   // *************** finding school based on id and update the data
   const deleteSchool = await SchoolModel.findByIdAndUpdate(
     _id,

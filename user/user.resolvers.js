@@ -131,6 +131,17 @@ async function UpdateUser(parent, { _id, user_input }) {
  * @throws {Error} - Throws an error if the user is not found.
  */
 async function DeleteUser(parent, { _id }) {
+  // *************** checking if the user already deleted
+  const isUserAlreadyDeleted = await UserModel.findOne({
+    _id,
+    status: { $ne: 'deleted' },
+  });
+
+  // *************** showing error message if user already deleted
+  if (!isUserAlreadyDeleted) {
+    throw new Error('User already deleted');
+  }
+
   // *************** finding user based on id and update the data
   const deleteUser = await UserModel.findByIdAndUpdate(
     _id,

@@ -201,6 +201,18 @@ async function UpdateStudent(parent, { _id, student_input }) {
  * @throws {Error} - Throws an error if the student is not found.
  */
 async function DeleteStudent(parent, { _id }) {
+  // *************** checking if the student already deleted
+  const isStudentAlreadyDeleted = await StudentModel.findOne({
+    _id,
+    status: { $ne: 'deleted' },
+  });
+
+  // *************** showing error message if student already deleted
+  if (!isStudentAlreadyDeleted) {
+    throw new Error('Student already deleted');
+  }
+
+  // *************** finding student based on id and update the data
   const deleteStudent = await StudentModel.findByIdAndUpdate(
     _id,
     {
