@@ -220,7 +220,7 @@ async function DeleteStudent(parent, { _id }) {
   }
 
   // *************** checking if the student already deleted
-  const isStudentAlreadyDeleted = await StudentModel.findOne({
+  const isStudentAlreadyDeleted = await StudentModel.exists({
     _id,
     status: { $ne: 'deleted' },
   });
