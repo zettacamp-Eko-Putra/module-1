@@ -148,7 +148,7 @@ async function DeleteSchool(parent, { _id }) {
   }
 
   // *************** checking if the school already deleted
-  const isSchoolAlreadyDeleted = await SchoolModel.findOne({
+  const isSchoolAlreadyDeleted = await SchoolModel.exists({
     _id,
     status: { $ne: 'deleted' },
   });

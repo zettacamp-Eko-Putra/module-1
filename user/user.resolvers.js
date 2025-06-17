@@ -152,7 +152,7 @@ async function DeleteUser(parent, { _id }) {
   }
 
   // *************** checking if the user already deleted
-  const isUserAlreadyDeleted = await UserModel.findOne({
+  const isUserAlreadyDeleted = await UserModel.exists({
     _id,
     status: { $ne: 'deleted' },
   });

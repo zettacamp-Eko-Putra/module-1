@@ -18,11 +18,11 @@ const StudentModel = require('./student.models.js');
  */
 async function StudentBatch(studentIds) {
   // *************** validate all studentIDs
-  const validateStudentIds = studentIds.filter(
+  const invalidStudentId = studentIds.filter(
     (ids) => !Types.ObjectId.isValid(ids)
   );
-  if (validateStudentIds.length) {
-    throw new Error(`Invalid student IDs: ${validateStudentIds.join(', ')}`);
+  if (invalidStudentId.length) {
+    throw new Error(`Invalid student IDs: ${invalidStudentId.join(', ')}`);
   }
 
   // *************** find student data
@@ -33,10 +33,10 @@ async function StudentBatch(studentIds) {
   }).lean();
 
   // *************** create map from student id
-  const studentMap = keyBy(students, (student) => student._id.toString());
+  const studentMap = keyBy(students, (student) => String(student._id));
 
   // *************** insert null to if the student empty
-  const result = studentIds.map((id) => studentMap[id.toString()] || null);
+  const result = studentIds.map((id) => studentMap[String(id)] || null);
 
   // *************** return the data to user
   return result;

@@ -73,7 +73,9 @@ async function CreateStudent(parent, { student_input }) {
   const schoolId = mongoose.Types.ObjectId(student_input.school_id);
 
   // *************** finding school data in database based on id
-  const IsSchoolExist = await SchoolModel.findById(schoolId);
+  const IsSchoolExist = await SchoolModel.exists({
+    _id: schoolId,
+  });
 
   // *************** showing message if school id cannot be found
   if (!IsSchoolExist) {
@@ -96,9 +98,10 @@ async function CreateStudent(parent, { student_input }) {
   const createdStudent = await StudentModel.create(studentData);
 
   // *************** adding student id to school collection
-  await SchoolModel.findByIdAndUpdate(schoolId, {
-    $push: { student: createdStudent._id },
-  });
+  await SchoolModel.updateOne(
+    { _id: schoolId },
+    { $push: { student: createdStudent._id } }
+  );
 
   // *************** returning new student data
   return createdStudent;
@@ -143,9 +146,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
   const newSchoolId = student_input.school_id;
 
   // *************** taking current student id
-  const currentSchoolId = student.school_id
-    ? student.school_id.toString()
-    : null;
+  const currentSchoolId = student.school_id ? String(student.school_id) : null;
 
   // *************** creating if to check if the current school id is different with new school id input
   if (newSchoolId && newSchoolId !== currentSchoolId) {
@@ -158,7 +159,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
 
     // *************** creating set to avoid duplicate data
     const schoolHistorySet = new Set(
-      (student.school_history || []).map((id) => id.toString())
+      (student.school_history || []).map((id) => String(id))
     );
 
     // *************** creating if to check if the new school data already in school_history
@@ -172,17 +173,19 @@ async function UpdateStudent(parent, { _id, student_input }) {
     // *************** creating if to update data form old school
     if (currentSchoolId) {
       // *************** finding old school data based on database
-      await SchoolModel.findByIdAndUpdate(currentSchoolId, {
+      await SchoolModel.updateOne(
         // *************** pull student data form old school
-        $pull: { student: student._id },
-      });
+        { _id: currentSchoolId },
+        { $pull: { student: student._id } }
+      );
     }
 
     // *************** finding data of the new school
-    await SchoolModel.findByIdAndUpdate(newSchoolId, {
+    await SchoolModel.updateOne(
       // *************** pushing student data to new school
-      $addToSet: { student: student._id },
-    });
+      { _id: Types.ObjectId(newSchoolId) },
+      { $addToSet: { student: student._id } }
+    );
   } else {
     // *************** if there's no change use the old school_history data
     student_input.school_history = student.school_history;
@@ -266,7 +269,7 @@ async function GetCurrentSchool(parent, args, ctx) {
   const { loaders } = ctx;
 
   // *************** using school loaders to mapping school data based on school id
-  const result = await loaders.school.load(parent.school_id.toString());
+  const result = await loaders.school.load(String(parent.school_id));
 
   return result;
 }

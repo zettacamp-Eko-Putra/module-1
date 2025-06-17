@@ -22,11 +22,11 @@ const SchoolModel = require('./school.models.js');
  */
 async function SchoolBatch(schoolIds) {
   // *************** validate all schoolIDs
-  const validateSchoolIds = schoolIds.filter(
+  const invalidSchoolId = schoolIds.filter(
     (ids) => !Types.ObjectId.isValid(ids)
   );
-  if (validateSchoolIds.length) {
-    throw new Error(`Invalid school IDs: ${validateSchoolIds.join(', ')}`);
+  if (invalidSchoolId.length) {
+    throw new Error(`Invalid school IDs: ${invalidSchoolId.join(', ')}`);
   }
 
   // *************** find school data
@@ -37,10 +37,10 @@ async function SchoolBatch(schoolIds) {
   }).lean();
 
   // *************** change array to object key base on school id
-  const schoolMap = keyBy(schools, (school) => school._id.toString());
+  const schoolMap = keyBy(schools, (school) => String(school._id));
 
   // *************** sort school data and giving null if the data is empty
-  const result = schoolIds.map((id) => schoolMap[id.toString()] || null);
+  const result = schoolIds.map((id) => schoolMap[String(id)] || null);
 
   // *************** return data to caller
   return result;
