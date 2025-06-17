@@ -73,12 +73,12 @@ async function CreateStudent(parent, { student_input }) {
   const schoolId = mongoose.Types.ObjectId(student_input.school_id);
 
   // *************** finding school data in database based on id
-  const IsSchoolExist = await SchoolModel.exists({
+  const isSchoolExist = await SchoolModel.exists({
     _id: schoolId,
   });
 
   // *************** showing message if school id cannot be found
-  if (!IsSchoolExist) {
+  if (!isSchoolExist) {
     throw new Error('School not found');
   }
 
