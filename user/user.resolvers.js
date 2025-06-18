@@ -21,11 +21,16 @@ const { ValidateUserInput } = require('./user.validator.js');
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
 async function GetAllUsers() {
-  // *************** find user data with status active
-  const activeUser = await UserModel.find({ status: 'active' }).lean();
+  try {
+    // *************** find user data with status active
+    const activeUser = await UserModel.find({ status: 'active' }).lean();
 
-  // *************** returning user data with status active
-  return activeUser;
+    // *************** returning user data with status active
+    return activeUser;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
 }
 
 // *************** Get user by id function
@@ -80,39 +85,44 @@ async function GetUserById(parent, { _id }) {
  * @throws {Error} - Throws an error if the email is already taken.
  */
 async function CreateUser(parent, { user_input }) {
-  // *************** validate user_input
-  await ValidateUserInput(user_input);
+  try {
+    // *************** validate user_input
+    await ValidateUserInput(user_input);
 
-  // *************** check if the email already taken by another user
-  const isEmailAlreadyExist = await UserModel.exists({
-    email: user_input.email.trim().lowerCase(),
-  });
+    // *************** check if the email already taken by another user
+    const isEmailAlreadyExist = await UserModel.exists({
+      email: user_input.email.trim().toLowerCase(),
+    });
 
-  // *************** showing message if the email already taken by another user
-  if (isEmailAlreadyExist) {
-    throw new ApolloError('Email taken');
+    // *************** showing message if the email already taken by another user
+    if (isEmailAlreadyExist) {
+      throw new ApolloError('Email taken');
+    }
+
+    // *************** breakdown user input
+    const userData = {
+      first_name: user_input.first_name,
+      last_name: user_input.last_name,
+      civility: user_input.civility,
+      office_phone: user_input.office_phone,
+      direct_line: user_input.direct_line,
+      mobile_phone: user_input.mobile_phone,
+      entity: user_input.entity,
+      address: user_input.address,
+      email: user_input.email,
+      password: user_input.password,
+      role: user_input.role,
+    };
+
+    // *************** creating new user based on the userInput
+    const createdUser = await UserModel.create(userData);
+
+    // *************** returning new user data
+    return createdUser;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** breakdown user input
-  const userData = {
-    first_name: user_input.first_name,
-    last_name: user_input.last_name,
-    civility: user_input.civility,
-    office_phone: user_input.office_phone,
-    direct_line: user_input.direct_line,
-    mobile_phone: user_input.mobile_phone,
-    entity: user_input.entity,
-    address: user_input.address,
-    email: user_input.email,
-    password: user_input.password,
-    role: user_input.role,
-  };
-
-  // *************** creating new user based on the userInput
-  const createdUser = await UserModel.create(userData);
-
-  // *************** returning new user data
-  return createdUser;
 }
 
 // *************** Update user function
@@ -130,46 +140,51 @@ async function CreateUser(parent, { user_input }) {
  * @throws {Error} - Throws an error if the ID is being updated or if the user is not found.
  */
 async function UpdateUser(parent, { _id, user_input }) {
-  // *************** showing error message if the user tried to update their id
-  if (user_input._id) {
-    throw new ApolloError('Cannot update User ID');
+  try {
+    // *************** showing error message if the user tried to update their id
+    if (user_input._id) {
+      throw new ApolloError('Cannot update User ID');
+    }
+
+    // *************** validate Id
+    await ValidateIdMongoose(_id);
+
+    // *************** validate user_input
+    await ValidateUserInput(user_input);
+
+    // *************** breakdown user input
+    const userData = {
+      first_name: user_input.first_name,
+      last_name: user_input.last_name,
+      civility: user_input.civility,
+      office_phone: user_input.office_phone,
+      direct_line: user_input.direct_line,
+      mobile_phone: user_input.mobile_phone,
+      entity: user_input.entity,
+      address: user_input.address,
+      email: user_input.email,
+      password: user_input.password,
+      role: user_input.role,
+    };
+
+    // *************** finding user based on id and overwrite it with new data and saving it to database
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      _id,
+      { $set: userData },
+      { new: true }
+    );
+
+    // *************** showing error message if the user id cannot be found in database
+    if (!updatedUser) {
+      throw new ApolloError('User not found');
+    }
+
+    // *************** returning user updated data to user
+    return updatedUser;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** validate Id
-  await ValidateIdMongoose(_id);
-
-  // *************** validate user_input
-  await ValidateUserInput(user_input);
-
-  // *************** breakdown user input
-  const userData = {
-    first_name: user_input.first_name,
-    last_name: user_input.last_name,
-    civility: user_input.civility,
-    office_phone: user_input.office_phone,
-    direct_line: user_input.direct_line,
-    mobile_phone: user_input.mobile_phone,
-    entity: user_input.entity,
-    address: user_input.address,
-    email: user_input.email,
-    password: user_input.password,
-    role: user_input.role,
-  };
-
-  // *************** finding user based on id and overwrite it with new data and saving it to database
-  const updatedUser = await UserModel.findByIdAndUpdate(
-    _id,
-    { $set: userData },
-    { new: true }
-  );
-
-  // *************** showing error message if the user id cannot be found in database
-  if (!updatedUser) {
-    throw new ApolloError('User not found');
-  }
-
-  // *************** returning user updated data to user
-  return updatedUser;
 }
 
 // *************** Delete User function
@@ -185,26 +200,31 @@ async function UpdateUser(parent, { _id, user_input }) {
  * @throws {Error} - Throws an error if the user is not found.
  */
 async function DeleteUser(parent, { _id }) {
-  // *************** validate Id
-  await ValidateIdMongoose(_id);
+  try {
+    // *************** validate Id
+    await ValidateIdMongoose(_id);
 
-  // *************** finding user based on id and update the data
-  const deleteUser = await UserModel.findOneAndUpdate(
-    { _id, status: { $ne: `deleted` } },
-    {
-      // *************** changing status field to deleted and adding timestamp
-      status: 'deleted',
-      deleted_at: new Date(),
+    // *************** finding user based on id and update the data
+    const deleteUser = await UserModel.findOneAndUpdate(
+      { _id, status: { $ne: `deleted` } },
+      {
+        // *************** changing status field to deleted and adding timestamp
+        status: 'deleted',
+        deleted_at: new Date(),
+      }
+    );
+
+    // *************** showing error message if user id cannot be found in database
+    if (!deleteUser) {
+      throw new ApolloError('User already deleted');
     }
-  );
 
-  // *************** showing error message if user id cannot be found in database
-  if (!deleteUser) {
-    throw new ApolloError('User already deleted');
+    // *************** returning user deleted data to user
+    return deleteUser;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** returning user deleted data to user
-  return deleteUser;
 }
 
 const userResolvers = {
