@@ -1,6 +1,7 @@
 // *************** IMPORT LIBRARY ***************
 const mongoose = require('mongoose');
 const { Types } = require('mongoose');
+const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const StudentModel = require('./student.models.js');
@@ -51,7 +52,7 @@ async function GetStudentById(parent, { _id }) {
 
   // *************** showing message if the student cannot be found
   if (!student) {
-    throw new Error('Student Not Found');
+    throw new ApolloError('Student Not Found');
   }
 
   // *************** returning student data if student in database
@@ -87,7 +88,7 @@ async function CreateStudent(parent, { student_input }) {
 
   // *************** showing message if school id cannot be found
   if (!isSchoolExist) {
-    throw new Error('School not found');
+    throw new ApolloError('School not found');
   }
 
   // *************** changing student input data and adding it to studentData
@@ -134,7 +135,7 @@ async function CreateStudent(parent, { student_input }) {
 async function UpdateStudent(parent, { _id, student_input }) {
   // ***************showing error message if the student tried to update their id
   if (student_input._id) {
-    throw new Error('Cannot update Student ID');
+    throw new ApolloError('Cannot update Student ID');
   }
 
   // *************** Validating student ID
@@ -148,7 +149,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
 
   // ***************showing error message if the student id cannot be found in database
   if (!student) {
-    throw new Error('Student not found');
+    throw new ApolloError('Student not found');
   }
 
   // *************** taking StudentInput and add it to newSchoolId variable

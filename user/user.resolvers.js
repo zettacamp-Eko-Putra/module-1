@@ -85,15 +85,12 @@ async function CreateUser(parent, { user_input }) {
 
   // *************** check if the email already taken by another user
   const isEmailAlreadyExist = await UserModel.exists({
-    email: {
-      $regex: `^${user_input.email.trim()}$`,
-      $options: 'i',
-    },
+    email: user_input.email.trim().lowerCase(),
   });
 
   // *************** showing message if the email already taken by another user
   if (isEmailAlreadyExist) {
-    throw new Error('Email taken');
+    throw new ApolloError('Email taken');
   }
 
   // *************** breakdown user input
@@ -135,7 +132,7 @@ async function CreateUser(parent, { user_input }) {
 async function UpdateUser(parent, { _id, user_input }) {
   // *************** showing error message if the user tried to update their id
   if (user_input._id) {
-    throw new Error('Cannot update User ID');
+    throw new ApolloError('Cannot update User ID');
   }
 
   // *************** validate Id
@@ -168,7 +165,7 @@ async function UpdateUser(parent, { _id, user_input }) {
 
   // *************** showing error message if the user id cannot be found in database
   if (!updatedUser) {
-    throw new Error('User not found');
+    throw new ApolloError('User not found');
   }
 
   // *************** returning user updated data to user
@@ -203,7 +200,7 @@ async function DeleteUser(parent, { _id }) {
 
   // *************** showing error message if user id cannot be found in database
   if (!deleteUser) {
-    throw new Error('User already deleted');
+    throw new ApolloError('User already deleted');
   }
 
   // *************** returning user deleted data to user

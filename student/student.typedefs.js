@@ -26,7 +26,6 @@ const studentTypeDefs = `
         mobile_phone:String!
         address:[StudentAddress]!
         date_of_birth:Date
-        school_id:ID!
         school:School
         school_history:[School]
         status:String!
