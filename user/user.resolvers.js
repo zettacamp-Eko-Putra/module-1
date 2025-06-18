@@ -11,7 +11,6 @@ const ValidateIdMongoose = require(`../utilities/id_validator.js`);
 const { ValidateUserInput } = require('./user.validator.js');
 
 // *************** QUERY ***************
-
 // *************** Get all user function
 /**
  * Retrieves all users with active status from the database.
@@ -70,7 +69,6 @@ async function GetUserById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-
 // *************** Create user function
 /**
  * Creates a new user if the provided email is not already in use.
