@@ -14,7 +14,6 @@ const ValidateIdMongoose = require(`../utilities/id_validator.js`);
 const { ValidateStudentInput } = require('./student.validator.js');
 
 // *************** QUERY ***************
-
 // *************** Get all student function
 /**
  * Retrieves all students whose status is set to "active".
@@ -70,7 +69,6 @@ async function GetStudentById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-
 // *************** Create student function
 /**
  * Creates a new student and associates them with a school.
@@ -288,7 +286,6 @@ async function DeleteStudent(parent, { _id }) {
 }
 
 // *************** LOADER ***************
-
 // *************** Get current school using loader function
 /**
  * Retrieves the current school information for a student using DataLoader.

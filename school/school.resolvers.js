@@ -9,7 +9,6 @@ const { ValidateSchoolInput } = require('./school.validator.js');
 const { ApolloError } = require('apollo-server');
 
 // *************** QUERY ***************
-
 // *************** Get All School function
 /**
  * Retrieves all school documents with status set to "active".
@@ -65,7 +64,6 @@ async function GetSchoolById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-
 // *************** Create school function
 /**
  * Creates a new school if the name is not already taken.
@@ -216,7 +214,6 @@ async function DeleteSchool(parent, { _id }) {
 }
 
 // *************** LOADER ***************
-
 // *************** Get student data using loader function
 /**
  * Retrieves student data associated with a school using DataLoader.
