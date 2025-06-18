@@ -28,8 +28,8 @@ const schoolSchema = new Schema({
   // address for the school
   address: [SchoolAddressSchema],
 
-  // Student for the school
-  student: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
+  // Students associated with the school
+  students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
 
   // School status
   status: { type: String, enum: ['active', 'deleted'], default: 'active' },

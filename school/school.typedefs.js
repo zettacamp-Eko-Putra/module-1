@@ -21,14 +21,12 @@ const schoolTypeDefs = `
         school_legal_name: String!
         school_commercial_name: String!
         address: [SchoolAddress]
-        student: [ID]
         students: [Student]
         status:String!
         deleted_at:Date
     }
 
     input SchoolInput{
-        _id:ID
         school_legal_name: String!
         school_commercial_name: String!
         address:[SchoolAddressInput]!

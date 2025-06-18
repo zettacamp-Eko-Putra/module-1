@@ -34,7 +34,6 @@ const studentTypeDefs = `
     }
 
     input StudentInput{
-        _id:ID
         first_name:String!
         last_name:String!
         email:String!
@@ -44,7 +43,6 @@ const studentTypeDefs = `
         address:[StudentAddressInput]!
         date_of_birth:Date
         school_id:ID!
-        deleted_at:String
     }
 
     extend type Query {

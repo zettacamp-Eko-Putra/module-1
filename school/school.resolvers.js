@@ -1,12 +1,16 @@
-// *************** IMPORT LIBRARY ***************
-const { Types } = require('mongoose');
-
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
 
+// *************** IMPORT UTILITIES ***************
+const ValidateIdMongoose = require(`../utilities/id_validator.js`);
+
 // *************** IMPORT VALIDATOR ***************
 const { ValidateSchoolInput } = require('./school.validator.js');
+const { ApolloError } = require('apollo-server');
 
+// *************** QUERY ***************
+
+// *************** Get All School function
 /**
  * Retrieves all school documents with status set to "active".
  *
@@ -22,6 +26,7 @@ async function GetAllSchools() {
   return activeSchool;
 }
 
+// *************** Get School by Id function
 /**
  * Retrieves a school by its unique ID.
  *
@@ -35,9 +40,7 @@ async function GetAllSchools() {
  */
 async function GetSchoolById(parent, { _id }) {
   // *************** Validating school id
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid School ID`);
-  }
+  ValidateIdMongoose(_id);
 
   // *************** finding school based on id
   const school = await SchoolModel.findById(_id).lean();
@@ -51,6 +54,9 @@ async function GetSchoolById(parent, { _id }) {
   return school;
 }
 
+// *************** MUTATION ***************
+
+// *************** Create school function
 /**
  * Creates a new school if the name is not already taken.
  *
@@ -65,7 +71,7 @@ async function GetSchoolById(parent, { _id }) {
  */
 async function CreateSchool(parent, { school_input }) {
   // *************** validate school_input
-  ValidateSchoolInput(school_input);
+  await ValidateSchoolInput(school_input);
 
   // *************** check if the school name already taken by another school
   const isSchoolNameAlreadyExist = await SchoolModel.exists({
@@ -78,16 +84,23 @@ async function CreateSchool(parent, { school_input }) {
 
   // *************** showing error message if the name already taken by another school
   if (isSchoolNameAlreadyExist) {
-    throw new Error('School name already exists');
+    throw new ApolloError('School name already exists');
   }
+  // *************** breakdown the school input
+  const schoolData = {
+    school_commercial_name: school_input.school_commercial_name,
+    school_legal_name: school_input.school_legal_name,
+    address: school_input.address,
+  };
 
   // *************** creating new school based on the schoolInput
-  const createdSchool = await SchoolModel.create(school_input);
+  const createdSchool = await SchoolModel.create(schoolData);
 
   // *************** returning new school data
   return createdSchool;
 }
 
+// *************** Update School function
 /**
  * Updates an existing school by ID with the provided input data.
  *
@@ -101,23 +114,28 @@ async function CreateSchool(parent, { school_input }) {
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
 async function UpdateSchool(parent, { _id, school_input }) {
-  // *************** Validating school id
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid School ID`);
-  }
-
-  // *************** validate school_input
-  ValidateSchoolInput(school_input);
-
   // *************** showing error message if the school tried to update their id
   if (school_input._id) {
-    throw new Error('Cannot update School ID');
+    throw new ApolloError('Cannot update School ID');
   }
+
+  // *************** Validating school id
+  await ValidateIdMongoose(_id);
+
+  // *************** validate school_input
+  await ValidateSchoolInput(school_input);
+
+  // *************** breakdown school input
+  const schoolData = {
+    school_commercial_name: school_input.school_commercial_name,
+    school_legal_name: school_input.school_legal_name,
+    address: school_input.address,
+  };
 
   // *************** finding school based on id and overwrite it with new data and saving it to database
   const updatedSchool = await SchoolModel.findByIdAndUpdate(
     _id,
-    { $set: school_input },
+    { $set: schoolData },
     { new: true }
   );
 
@@ -130,6 +148,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
   return updatedSchool;
 }
 
+// *************** Delete school function
 /**
  * Soft deletes a school by setting its status to "deleted" and recording the deletion timestamp.
  *
@@ -143,43 +162,30 @@ async function UpdateSchool(parent, { _id, school_input }) {
  */
 async function DeleteSchool(parent, { _id }) {
   // *************** checking if the school id is valid
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid School ID`);
-  }
+  await ValidateIdMongoose(_id);
 
-  // *************** checking if the school already deleted
-  const isSchoolAlreadyDeleted = await SchoolModel.exists({
-    _id,
-    status: { $ne: 'deleted' },
-  });
-
-  // *************** showing error message if school already deleted
-  if (!isSchoolAlreadyDeleted) {
-    throw new Error('School already deleted');
-  }
-
-  // *************** finding school based on id and update the data
-  const deleteSchool = await SchoolModel.findByIdAndUpdate(
-    _id,
+  // *************** finding school and update the data
+  const deleteSchool = await SchoolModel.findOneAndUpdate(
+    { _id, status: { $ne: 'deleted' } },
     {
       // *************** changing status field to deleted and adding timestamp
       status: 'deleted',
       deleted_at: new Date(),
-    },
-
-    // *************** Update the Data
-    { new: true }
+    }
   );
 
-  // *************** creating if to showing error message if school id cannot be found in database
+  // *************** showing error message if school already deleted
   if (!deleteSchool) {
-    throw new Error('School not found');
+    throw new ApolloError('School already deleted');
   }
 
   // *************** returning school deleted data to user
   return deleteSchool;
 }
 
+// *************** LOADER ***************
+
+// *************** Get student data using loader function
 /**
  * Retrieves student data associated with a school using DataLoader.
  *
@@ -196,13 +202,13 @@ async function GetStudentData(parent, args, ctx) {
   const { loaders } = ctx;
 
   // *************** creating if to check if the school student array empty
-  if (!parent.student || !parent.student.length) {
+  if (!parent.students || !parent.students.length) {
     // *************** retuning value if student array empty
     return [];
   }
 
   // *************** taking student data using data loader
-  const result = await loaders.student.loadMany(parent.student);
+  const result = await loaders.students.loadMany(parent.students);
 
   const filterResult = result.filter((student) => student !== null);
 

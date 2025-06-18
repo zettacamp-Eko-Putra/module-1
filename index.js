@@ -45,7 +45,7 @@ const server = new ApolloServer({
   context: () => ({
     loaders: {
       school: CreateSchoolLoader(),
-      student: CreateStudentLoader(),
+      students: CreateStudentLoader(),
     },
   }),
 });
@@ -79,7 +79,7 @@ async function StartServer() {
       useUnifiedTopology: true,
     });
     // *************** message if the connection is success
-    console.log('✅ MongoDB connected');
+    console.log('MongoDB connected');
 
     // *************** adding endpoint to testing the server
     app.get('/', (req, res) => {
@@ -89,7 +89,7 @@ async function StartServer() {
     // *************** adding message if the server running
     app.listen(port, () => {
       console.log(
-        `🚀 Server ready at http://localhost:${port}${server.graphqlPath}`
+        `Server running at http://localhost:${port}${server.graphqlPath}`
       );
     });
   } catch (error) {

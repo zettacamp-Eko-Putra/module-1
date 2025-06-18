@@ -27,14 +27,12 @@ const userTypeDefs = `
         entity:String!
         address:[UserAddress]!
         email:String!
-        password:String!
         role:String!
         status:String!
         deleted_at:Date
     }
 
     input UserInput{
-        _id:ID
         first_name:String!
         last_name:String!
         civility:String!

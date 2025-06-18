@@ -1,12 +1,18 @@
+// *************** IMPORT LIBRARY ***************
+const { ApolloError } = require('apollo-server');
+
 // *************** IMPORT MODULE ***************
 const UserModel = require('./user.models.js');
+
+// *************** IMPORT UTILITIES ***************
+const ValidateIdMongoose = require(`../utilities/id_validator.js`);
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require('./user.validator.js');
 
-// *************** IMPORT LIBRARY ***************
-const { Types } = require('mongoose');
+// *************** QUERY ***************
 
+// *************** Get all user function
 /**
  * Retrieves all users with active status from the database.
  *
@@ -22,6 +28,7 @@ async function GetAllUsers() {
   return activeUser;
 }
 
+// *************** Get user by id function
 /**
  * Retrieves a user document by its unique ID.
  *
@@ -36,25 +43,30 @@ async function GetAllUsers() {
  * @returns {Promise<object>} - A promise that resolves to the user object.
  * @throws {Error} - Throws an error if the user is not found.
  */
-
 async function GetUserById(parent, { _id }) {
-  // *************** validate user_input
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid User ID`);
+  try {
+    // *************** validate Id
+    ValidateIdMongoose(_id);
+
+    // *************** finding user based on id
+    const user = await UserModel.findById(_id).lean();
+
+    // *************** showing message if the user cannot be found
+    if (!user) {
+      throw new ApolloError(`User Not Found`);
+    }
+
+    // *************** returning user data if user in database
+    return user;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** finding user based on id
-  const user = await UserModel.findById(_id).lean();
-
-  // *************** showing message if the user cannot be found
-  if (!user) {
-    throw new Error('User Not Found');
-  }
-
-  // *************** returning user data if user in database
-  return user;
 }
 
+// *************** MUTATION ***************
+
+// *************** Create user function
 /**
  * Creates a new user if the provided email is not already in use.
  *
@@ -69,7 +81,7 @@ async function GetUserById(parent, { _id }) {
  */
 async function CreateUser(parent, { user_input }) {
   // *************** validate user_input
-  ValidateUserInput(user_input);
+  await ValidateUserInput(user_input);
 
   // *************** check if the email already taken by another user
   const isEmailAlreadyExist = await UserModel.exists({
@@ -84,13 +96,29 @@ async function CreateUser(parent, { user_input }) {
     throw new Error('Email taken');
   }
 
+  // *************** breakdown user input
+  const userData = {
+    first_name: user_input.first_name,
+    last_name: user_input.last_name,
+    civility: user_input.civility,
+    office_phone: user_input.office_phone,
+    direct_line: user_input.direct_line,
+    mobile_phone: user_input.mobile_phone,
+    entity: user_input.entity,
+    address: user_input.address,
+    email: user_input.email,
+    password: user_input.password,
+    role: user_input.role,
+  };
+
   // *************** creating new user based on the userInput
-  const createdUser = await UserModel.create(user_input);
+  const createdUser = await UserModel.create(userData);
 
   // *************** returning new user data
   return createdUser;
 }
 
+// *************** Update user function
 /**
  * Updates an existing user's data based on the provided ID.
  * Prevents the user from modifying their own ID.
@@ -105,23 +133,36 @@ async function CreateUser(parent, { user_input }) {
  * @throws {Error} - Throws an error if the ID is being updated or if the user is not found.
  */
 async function UpdateUser(parent, { _id, user_input }) {
-  // *************** validate user_input
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid User ID`);
-  }
-
-  // *************** validate user_input
-  ValidateUserInput(user_input);
-
   // *************** showing error message if the user tried to update their id
   if (user_input._id) {
     throw new Error('Cannot update User ID');
   }
 
+  // *************** validate Id
+  await ValidateIdMongoose(_id);
+
+  // *************** validate user_input
+  await ValidateUserInput(user_input);
+
+  // *************** breakdown user input
+  const userData = {
+    first_name: user_input.first_name,
+    last_name: user_input.last_name,
+    civility: user_input.civility,
+    office_phone: user_input.office_phone,
+    direct_line: user_input.direct_line,
+    mobile_phone: user_input.mobile_phone,
+    entity: user_input.entity,
+    address: user_input.address,
+    email: user_input.email,
+    password: user_input.password,
+    role: user_input.role,
+  };
+
   // *************** finding user based on id and overwrite it with new data and saving it to database
   const updatedUser = await UserModel.findByIdAndUpdate(
     _id,
-    { $set: user_input },
+    { $set: userData },
     { new: true }
   );
 
@@ -134,6 +175,7 @@ async function UpdateUser(parent, { _id, user_input }) {
   return updatedUser;
 }
 
+// *************** Delete User function
 /**
  * Soft deletes a user by updating their status to "deleted" and setting a deletion timestamp.
  *
@@ -146,38 +188,22 @@ async function UpdateUser(parent, { _id, user_input }) {
  * @throws {Error} - Throws an error if the user is not found.
  */
 async function DeleteUser(parent, { _id }) {
-  // *************** validate user_input
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid User ID`);
-  }
-
-  // *************** checking if the user already deleted
-  const isUserAlreadyDeleted = await UserModel.exists({
-    _id,
-    status: { $ne: 'deleted' },
-  });
-
-  // *************** showing error message if user already deleted
-  if (!isUserAlreadyDeleted) {
-    throw new Error('User already deleted');
-  }
+  // *************** validate Id
+  await ValidateIdMongoose(_id);
 
   // *************** finding user based on id and update the data
-  const deleteUser = await UserModel.findByIdAndUpdate(
-    _id,
+  const deleteUser = await UserModel.findOneAndUpdate(
+    { _id, status: { $ne: `deleted` } },
     {
       // *************** changing status field to deleted and adding timestamp
       status: 'deleted',
       deleted_at: new Date(),
-    },
-
-    // *************** Update the Data
-    { new: true }
+    }
   );
 
   // *************** showing error message if user id cannot be found in database
   if (!deleteUser) {
-    throw new Error('User not found');
+    throw new Error('User already deleted');
   }
 
   // *************** returning user deleted data to user

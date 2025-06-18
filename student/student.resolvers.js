@@ -1,14 +1,20 @@
-// *************** IMPORT MODULE ***************
-const StudentModel = require('./student.models.js');
-const SchoolModel = require('../school/school.models.js');
-
 // *************** IMPORT LIBRARY ***************
 const mongoose = require('mongoose');
 const { Types } = require('mongoose');
 
+// *************** IMPORT MODULE ***************
+const StudentModel = require('./student.models.js');
+const SchoolModel = require('../school/school.models.js');
+
+// *************** IMPORT UTILITIES ***************
+const ValidateIdMongoose = require(`../utilities/id_validator.js`);
+
 // *************** IMPORT VALIDATOR ***************
 const { ValidateStudentInput } = require('./student.validator.js');
 
+// *************** QUERY ***************
+
+// *************** Get all student function
 /**
  * Retrieves all students whose status is set to "active".
  *
@@ -24,6 +30,7 @@ async function GetAllStudents() {
   return activeStudent;
 }
 
+// *************** Get student by id function
 /**
  * Retrieves a student by their unique ID.
  *
@@ -37,9 +44,7 @@ async function GetAllStudents() {
  */
 async function GetStudentById(parent, { _id }) {
   // *************** Validating student ID
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid Student ID`);
-  }
+  ValidateIdMongoose(_id);
 
   // *************** finding student based on id
   const student = await StudentModel.findById(_id).lean();
@@ -53,6 +58,9 @@ async function GetStudentById(parent, { _id }) {
   return student;
 }
 
+// *************** MUTATION ***************
+
+// *************** Create student function
 /**
  * Creates a new student and associates them with a school.
  *
@@ -84,14 +92,16 @@ async function CreateStudent(parent, { student_input }) {
 
   // *************** changing student input data and adding it to studentData
   const studentData = {
-    // *************** all student input data
-    ...student_input,
-
-    // *************** adding school history array with schoolId
-    school_history: [schoolId],
-
-    // *************** adding school_id with schoolId
+    first_name: student_input.first_name,
+    last_name: student_input.last_name,
+    email: student_input.email,
+    civility: student_input.civility,
+    postal_code_of_birth: student_input.postal_code_of_birth,
+    mobile_phone: student_input.mobile_phone,
+    address: student_input.address,
+    date_of_birth: student_input.date_of_birth,
     school_id: schoolId,
+    school_history: [schoolId],
   };
 
   // *************** creating new student based on the studentData
@@ -107,6 +117,7 @@ async function CreateStudent(parent, { student_input }) {
   return createdStudent;
 }
 
+// *************** Update student function
 /**
  * Updates an existing student's information, including handling changes to their associated school.
  *
@@ -121,18 +132,16 @@ async function CreateStudent(parent, { student_input }) {
  * @throws {Error} - Throws an error if attempting to update student ID or if student/school not found.
  */
 async function UpdateStudent(parent, { _id, student_input }) {
-  // *************** Validating student ID
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid Student ID`);
-  }
-
-  // *************** validate student_input
-  ValidateStudentInput(student_input);
-
   // ***************showing error message if the student tried to update their id
   if (student_input._id) {
     throw new Error('Cannot update Student ID');
   }
+
+  // *************** Validating student ID
+  await ValidateIdMongoose(_id);
+
+  // *************** validate student_input
+  await ValidateStudentInput(student_input);
 
   // *************** find user by id and adding it to student variable
   const student = await StudentModel.findById(_id);
@@ -176,7 +185,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
       await SchoolModel.updateOne(
         // *************** pull student data form old school
         { _id: currentSchoolId },
-        { $pull: { student: student._id } }
+        { $pull: { students: student._id } }
       );
     }
 
@@ -184,17 +193,30 @@ async function UpdateStudent(parent, { _id, student_input }) {
     await SchoolModel.updateOne(
       // *************** pushing student data to new school
       { _id: Types.ObjectId(newSchoolId) },
-      { $addToSet: { student: student._id } }
+      { $addToSet: { students: student._id } }
     );
   } else {
     // *************** if there's no change use the old school_history data
     student_input.school_history = student.school_history;
   }
 
+  // *************** Breakdown student input
+  const studentData = {
+    first_name: student_input.first_name,
+    last_name: student_input.last_name,
+    email: student_input.email,
+    civility: student_input.civility,
+    postal_code_of_birth: student_input.postal_code_of_birth,
+    mobile_phone: student_input.mobile_phone,
+    address: student_input.address,
+    date_of_birth: student_input.date_of_birth,
+    school_id: newSchoolId,
+    school_history: student_input.school_history,
+  };
   // *************** updating the student data and save it to database
   const updatedStudent = await StudentModel.findByIdAndUpdate(
     _id,
-    { $set: student_input },
+    { $set: studentData },
     { new: true }
   );
 
@@ -202,6 +224,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
   return updatedStudent;
 }
 
+// *************** Delete student function
 /**
  * Soft deletes a student by setting their status to "deleted" and recording the deletion timestamp.
  *
@@ -215,43 +238,30 @@ async function UpdateStudent(parent, { _id, student_input }) {
  */
 async function DeleteStudent(parent, { _id }) {
   // *************** Validating student ID
-  if (!Types.ObjectId.isValid(_id)) {
-    throw new Error(`Invalid Student ID`);
-  }
-
-  // *************** checking if the student already deleted
-  const isStudentAlreadyDeleted = await StudentModel.exists({
-    _id,
-    status: { $ne: 'deleted' },
-  });
-
-  // *************** showing error message if student already deleted
-  if (!isStudentAlreadyDeleted) {
-    throw new Error('Student already deleted');
-  }
+  await ValidateIdMongoose(_id);
 
   // *************** finding student based on id and update the data
-  const deleteStudent = await StudentModel.findByIdAndUpdate(
-    _id,
+  const deleteStudent = await StudentModel.findOneAndUpdate(
+    { _id, status: { $ne: `deleted` } },
     {
       // *************** changing status field to deleted and adding timstamp
       status: 'deleted',
       deleted_at: new Date(),
-    },
-
-    // *************** Update the Data
-    { new: true }
+    }
   );
 
-  // *************** showing error message if student id cannot be found in database
+  // *************** showing error message if student already deleted
   if (!deleteStudent) {
-    throw new Error('Student Not Found');
+    throw new ApolloError('Student already deleted');
   }
 
   // *************** returning student deleted data to user
   return deleteStudent;
 }
 
+// *************** LOADER ***************
+
+// *************** Get current school using loader function
 /**
  * Retrieves the current school information for a student using DataLoader.
  *
@@ -274,6 +284,7 @@ async function GetCurrentSchool(parent, args, ctx) {
   return result;
 }
 
+// *************** Get school history using loader function
 /**
  * Retrieves the full school history for a student using DataLoader.
  *
