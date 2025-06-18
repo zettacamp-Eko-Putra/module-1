@@ -27,6 +27,14 @@ async function ValidateSchoolInput(school_input) {
     throw new ApolloError('school legal name is required and must be string');
   }
 
+  // *************** validate if school school_legal_name has special character
+  const specialRegexCharacter = /[^a-zA-Z0-9\s]/;
+  if (specialRegexCharacter.test(school_input.school_legal_name)) {
+    throw new ApolloError(
+      `School legal name must not contain special character`
+    );
+  }
+
   // *************** validate school school_commercial_name
   if (
     !school_input.school_commercial_name ||

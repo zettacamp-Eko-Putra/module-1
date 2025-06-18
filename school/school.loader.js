@@ -2,6 +2,7 @@
 const keyBy = require('lodash/keyBy');
 const DataLoader = require('dataloader');
 const { Types } = require('mongoose');
+const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
@@ -26,7 +27,7 @@ async function SchoolBatch(schoolIds) {
     (ids) => !Types.ObjectId.isValid(ids)
   );
   if (invalidSchoolId.length) {
-    throw new Error(`Invalid school IDs: ${invalidSchoolId.join(', ')}`);
+    throw new ApolloError(`Invalid school IDs: ${invalidSchoolId.join(', ')}`);
   }
 
   // *************** find school data

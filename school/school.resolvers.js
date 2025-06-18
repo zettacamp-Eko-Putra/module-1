@@ -47,7 +47,7 @@ async function GetSchoolById(parent, { _id }) {
 
   // *************** showing message if the school cannot be found
   if (!school) {
-    throw new Error('School not found');
+    throw new ApolloError('School not found');
   }
 
   // *************** returning user data if user in database
@@ -71,21 +71,28 @@ async function GetSchoolById(parent, { _id }) {
  */
 async function CreateSchool(parent, { school_input }) {
   // *************** validate school_input
-  await ValidateSchoolInput(school_input);
+  const inputNameLower = school_input.school_legal_name.trim().toLowerCase();
 
-  // *************** check if the school name already taken by another school
-  const isSchoolNameAlreadyExist = await SchoolModel.exists({
-    status: 'active',
-    school_legal_name: {
-      $regex: `^${school_input.school_legal_name.trim()}$`,
-      $options: 'i',
+  // *************** find matching school by legal name
+  const matchingSchool = await SchoolModel.aggregate([
+    {
+      $addFields: {
+        school_legal_name_lowercase: { $toLower: '$school_legal_name' },
+      },
     },
-  });
+    {
+      $match: {
+        school_legal_name_lowercase: inputNameLower,
+        status: 'active',
+      },
+    },
+  ]).allowDiskUse(true);
 
-  // *************** showing error message if the name already taken by another school
-  if (isSchoolNameAlreadyExist) {
+    // *************** showing error message if school legal name already exists
+  if (matchingSchool.length) {
     throw new ApolloError('School name already exists');
   }
+
   // *************** breakdown the school input
   const schoolData = {
     school_commercial_name: school_input.school_commercial_name,
@@ -141,7 +148,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
 
   // ***************  showing error message if the school id cannot be found in database
   if (!updatedSchool) {
-    throw new Error('School not Found');
+    throw new ApolloError('School not Found');
   }
 
   // *************** returning school updated data to user
