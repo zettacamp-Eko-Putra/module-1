@@ -23,7 +23,7 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If any field fails validation.
  */
-async function ValidateStudentInput(student_input) {
+function ValidateStudentInput(student_input) {
   // *************** validate student first_name
   if (
     !student_input.first_name ||
@@ -69,26 +69,25 @@ async function ValidateStudentInput(student_input) {
   if (!Array.isArray(student_input.address) || !student_input.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
-  } else {
-    // *************** validate each address array
-    student_input.address.forEach((addr, index) => {
-      if (typeof addr.street !== 'string' || addr.street.trim() === '') {
-        throw new ApolloError(`Street at index ${index} not valid`);
-      }
-      if (typeof addr.city !== 'string' || addr.city.trim() === '') {
-        throw new ApolloError(`city at index ${index} not valid`);
-      }
-      if (typeof addr.province !== 'string' || addr.province.trim() === '') {
-        throw new ApolloError(`province at index ${index} not valid`);
-      }
-      if (
-        typeof addr.postal_code !== 'string' ||
-        addr.postal_code.trim() === ''
-      ) {
-        throw new ApolloError(`postal code at index ${index} not valid`);
-      }
-    });
   }
+  // *************** validate each address array
+  student_input.address.forEach((addr, index) => {
+    if (typeof addr.street !== 'string' || addr.street.trim() === '') {
+      throw new ApolloError(`Street at index ${index} not valid`);
+    }
+    if (typeof addr.city !== 'string' || addr.city.trim() === '') {
+      throw new ApolloError(`city at index ${index} not valid`);
+    }
+    if (typeof addr.province !== 'string' || addr.province.trim() === '') {
+      throw new ApolloError(`province at index ${index} not valid`);
+    }
+    if (
+      typeof addr.postal_code !== 'string' ||
+      addr.postal_code.trim() === ''
+    ) {
+      throw new ApolloError(`postal code at index ${index} not valid`);
+    }
+  });
 
   // *************** validate date_of_birth
   if (student_input.date_of_birth) {
