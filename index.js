@@ -37,7 +37,7 @@ async function InitializeServer() {
     // *************** Start Express server and listen on PORT
     app.listen(PORT, () => {
       console.log(
-        `Server ready at http://localhost:${PORT}${server.graphqlPath}`
+        `Server running`
       );
     });
   } catch (error) {
