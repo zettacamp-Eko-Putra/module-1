@@ -22,29 +22,33 @@ const SchoolModel = require('./school.models.js');
  * If a school is not found or inactive, the corresponding entry will be `null`.
  */
 async function SchoolBatch(schoolIds) {
-  // *************** validate all schoolIDs
-  const invalidSchoolId = schoolIds.filter(
-    (ids) => !Types.ObjectId.isValid(ids)
-  );
-  if (invalidSchoolId.length) {
-    throw new ApolloError(`Invalid school IDs: ${invalidSchoolId.join(', ')}`);
+  try {
+    // *************** validate all schoolIDs
+    const invalidSchoolId = schoolIds.find(
+      (ids) => !Types.ObjectId.isValid(ids)
+    );
+    if (invalidSchoolId) {
+      throw new ApolloError(`Invalid school IDs: ${invalidSchoolId}`);
+    }
+
+    // *************** find school data based on id and status
+    const schools = await SchoolModel.find({
+      // *************** find active school by id
+      _id: { $in: schoolIds },
+      status: 'active',
+    }).lean();
+
+    // *************** change array to object key base on school id
+    const schoolMap = keyBy(schools, (school) => String(school._id));
+
+    // *************** sort school data and giving null if the data is empty
+    const result = schoolIds.map((id) => schoolMap[String(id)] || null);
+
+    // *************** return data to caller
+    return result;
+  } catch (error) {
+    throw new ApolloError(error.message);
   }
-
-  // *************** find school data based on id and status
-  const schools = await SchoolModel.find({
-    // *************** find active school by id
-    _id: { $in: schoolIds },
-    status: 'active',
-  }).lean();
-
-  // *************** change array to object key base on school id
-  const schoolMap = keyBy(schools, (school) => String(school._id));
-
-  // *************** sort school data and giving null if the data is empty
-  const result = schoolIds.map((id) => schoolMap[String(id)] || null);
-
-  // *************** return data to caller
-  return result;
 }
 
 /**
