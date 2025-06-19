@@ -1,46 +1,48 @@
+// *************** IMPORT LIBRARY ***************
+const { ApolloError } = require('apollo-server');
+
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
 
-// *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../../utilities/id_validator.js`);
-
 // *************** IMPORT VALIDATOR ***************
 const { ValidateSchoolInput } = require('./school.validator.js');
-const { ApolloError } = require('apollo-server');
+const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** QUERY ***************
-// *************** Get All School function
 /**
- * Retrieves all school documents with status set to "active".
+ * Retrieves all school documents from the database with a status of "active".
+ * This function uses `.lean()` for improved performance by returning plain JavaScript objects.
  *
  * @async
  * @function GetAllSchools
- * @returns {Promise<object[]>} - A promise that resolves to an array of active school objects.
+ * @returns {Promise<Object[]>} - A promise that resolves to an array of active school objects.
+ * @throws {ApolloError} - Throws an ApolloError if the database query fails.
  */
 async function GetAllSchools() {
   try {
     // *************** find school data with status active
-    const activeSchool = await SchoolModel.find({ status: 'active' }).lean();
+    const activeSchools = await SchoolModel.find({ status: 'active' }).lean();
 
     // *************** returning school data with status active
-    return activeSchool;
+    return activeSchools;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-// *************** Get School by Id function
 /**
- * Retrieves a school by its unique ID.
+ * Retrieves a school document from the database by its unique ID.
+ * - Validates the provided ID.
+ * - Returns the school document if found and active.
  *
  * @async
  * @function GetSchoolById
- * @param {object} _ - Unused parent argument.
+ * @param {object} parent - Unused parent argument (GraphQL resolver pattern).
  * @param {object} args - The arguments object.
- * @param {string} _id - The ID of the school to retrieve.
+ * @param {string} args._id - The ID of the school to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the school object.
- * @throws {Error} - Throws an error if the school is not found.
+ * @throws {ApolloError} - Throws if the ID is invalid or the school is not found.
  */
 async function GetSchoolById(parent, { _id }) {
   try {
@@ -64,7 +66,6 @@ async function GetSchoolById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-// *************** Create school function
 /**
  * Creates a new school if the name is not already taken.
  *
@@ -80,10 +81,19 @@ async function GetSchoolById(parent, { _id }) {
 async function CreateSchool(parent, { school_input }) {
   try {
     // *************** validate school_input
+    ValidateSchoolInput(school_input);
+
+    // *************** Changing school input legal name to lower case
     const inputNameLower = school_input.school_legal_name.trim().toLowerCase();
 
     // *************** find matching school by legal name
     const matchingSchool = await SchoolModel.aggregate([
+      {
+        $project: {
+          school_legal_name: 1,
+          status: 1,
+        },
+      },
       {
         $addFields: {
           school_legal_name_lowercase: { $toLower: '$school_legal_name' },
@@ -92,7 +102,7 @@ async function CreateSchool(parent, { school_input }) {
       {
         $match: {
           school_legal_name_lowercase: inputNameLower,
-          status: 'active',
+          status: `active`,
         },
       },
     ]).allowDiskUse(true);
@@ -120,7 +130,6 @@ async function CreateSchool(parent, { school_input }) {
   }
 }
 
-// *************** Update School function
 /**
  * Updates an existing school by ID with the provided input data.
  *
@@ -135,16 +144,9 @@ async function CreateSchool(parent, { school_input }) {
  */
 async function UpdateSchool(parent, { _id, school_input }) {
   try {
-    // *************** showing error message if the school tried to update their id
-    if (school_input._id) {
-      throw new ApolloError('Cannot update School ID');
-    }
-
-    // *************** Validating school id
-    await ValidateIdMongoose(_id);
-
-    // *************** validate school_input
-    await ValidateSchoolInput(school_input);
+    // *************** Validating school id and school input
+    ValidateIdMongoose(_id);
+    ValidateSchoolInput(school_input);
 
     // *************** breakdown school input
     const schoolData = {
@@ -154,11 +156,14 @@ async function UpdateSchool(parent, { _id, school_input }) {
     };
 
     // *************** finding school based on id and overwrite it with new data and saving it to database
-    const updatedSchool = await SchoolModel.findByIdAndUpdate(
-      _id,
-      { $set: schoolData },
-      { new: true }
-    );
+    const updatedSchool = await SchoolModel.findOneAndUpdate(
+      { _id },
+      {
+        $set: schoolData,
+      }
+    )
+      .select('_id')
+      .lean();
 
     // ***************  showing error message if the school id cannot be found in database
     if (!updatedSchool) {
@@ -166,14 +171,13 @@ async function UpdateSchool(parent, { _id, school_input }) {
     }
 
     // *************** returning school updated data to user
-    return updatedSchool;
+    return { _id };
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-// *************** Delete school function
 /**
  * Soft deletes a school by setting its status to "deleted" and recording the deletion timestamp.
  *
@@ -198,7 +202,9 @@ async function DeleteSchool(parent, { _id }) {
         status: 'deleted',
         deleted_at: new Date(),
       }
-    );
+    )
+      .select('_id')
+      .lean();
 
     // *************** showing error message if school already deleted
     if (!deleteSchool) {
@@ -206,7 +212,7 @@ async function DeleteSchool(parent, { _id }) {
     }
 
     // *************** returning school deleted data to user
-    return deleteSchool;
+    return { _id };
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -214,43 +220,30 @@ async function DeleteSchool(parent, { _id }) {
 }
 
 // *************** LOADER ***************
-// *************** Get student data using loader function
 /**
  * Retrieves student data associated with a school using DataLoader.
  *
  * @async
- * @function GetStudentData
+ * @function GetStudentsData
  * @param {object} parent - The parent object, expected to be a school document.
  * @param {object} _ - Unused GraphQL argument.
  * @param {object} context - The GraphQL context object.
  * @param {object} context.loaders - DataLoader object from context.
  * @returns {Promise<Array>} - An array of student documents.
  */
-async function GetStudentData(parent, args, ctx) {
-  try {
-    // *************** adding loaders to ctx
-    const { loaders } = ctx;
-
-    // *************** creating if to check if the school student array empty
-    if (!parent.students || !parent.students.length) {
-      // *************** retuning value if student array empty
-      return [];
-    }
-
-    // *************** taking student data using data loader
-    const result = await loaders.student.loadMany(parent.students);
-
-    const filterResult = result.filter((student) => student !== null);
-
-    // *************** retuning the result and filter it not to showing null value
-    return filterResult;
-  } catch (error) {
-    // *************** Throw error message
-    throw new ApolloError(error.message);
+async function GetStudentsData(parent, args, ctx) {
+  // *************** creating if to check if the school student array empty
+  if (!parent.students || !parent.students.length) {
+    // *************** retuning value if student array empty
+    return [];
   }
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.student.loadMany(parent.students);
 }
 
-const schoolResolvers = {
+// *************** EXPORT MODULE ***************
+module.exports = {
   Query: {
     GetAllSchools,
     GetSchoolById,
@@ -261,9 +254,6 @@ const schoolResolvers = {
     DeleteSchool,
   },
   School: {
-    students: GetStudentData,
+    students: GetStudentsData,
   },
 };
-
-// *************** EXPORT MODULE ***************
-module.exports = schoolResolvers;

@@ -8,7 +8,7 @@ const StudentModel = require('./student.models.js');
 const SchoolModel = require('../school/school.models.js');
 
 // *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../../utilities/id_validator.js`);
+const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateStudentInput } = require('./student.validator.js');

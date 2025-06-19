@@ -17,7 +17,7 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If any required field is missing or improperly formatted.
  */
-async function ValidateSchoolInput(school_input) {
+function ValidateSchoolInput(school_input) {
   // *************** validate school school_legal_name
   if (
     !school_input.school_legal_name ||

@@ -5,7 +5,7 @@ const { ApolloError } = require('apollo-server');
 const UserModel = require('./user.models.js');
 
 // *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../../utilities/id_validator.js`);
+const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require('./user.validator.js');
