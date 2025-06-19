@@ -8,18 +8,17 @@ const { ApolloError } = require('apollo-server');
 const SchoolModel = require('./school.models.js');
 
 /**
- * Batch function to load multiple schools by their IDs.
- * Validates that all provided IDs are valid MongoDB ObjectIds.
- * Only returns schools with status "active". If a school ID is invalid, not found, or inactive,
- * the corresponding result in the returned array will be `null`.
+ * Batch function to load multiple active schools by their IDs using DataLoader.
+ * - Validates each ID to ensure it is a valid MongoDB ObjectId.
+ * - Fetches schools with matching IDs and status 'active'.
+ * - Returns the results in the same order as the input IDs.
+ * - If a school is not found or inactive, `null` is returned in its place.
  *
  * @async
  * @function SchoolBatch
- * @param {Array<string|import('mongoose').Types.ObjectId>} schoolIds - An array of school IDs to fetch.
- * @throws {Error} Throws an error if any provided school ID is not a valid MongoDB ObjectId.
- * @returns {Promise<Array<Object|null>>} - A Promise that resolves to an array of school documents.
- * The order of the results matches the order of the input IDs.
- * If a school is not found or inactive, the corresponding entry will be `null`.
+ * @param {Array<string|import('mongoose').Types.ObjectId>} schoolIds - An array of school IDs to load.
+ * @returns {Promise<Array<Object|null>>} - An array of school documents or `null` for not found/inactive entries, maintaining input order.
+ * @throws {ApolloError} - Throws if an invalid ID is encountered or if the query fails.
  */
 async function SchoolBatch(schoolIds) {
   try {
@@ -31,9 +30,8 @@ async function SchoolBatch(schoolIds) {
       throw new ApolloError(`Invalid school IDs: ${invalidSchoolId}`);
     }
 
-    // *************** find school data based on id and status
+    // *************** find school based on id and active status
     const schools = await SchoolModel.find({
-      // *************** find active school by id
       _id: { $in: schoolIds },
       status: 'active',
     }).lean();
