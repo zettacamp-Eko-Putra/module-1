@@ -30,7 +30,7 @@ async function SchoolBatch(schoolIds) {
     throw new ApolloError(`Invalid school IDs: ${invalidSchoolId.join(', ')}`);
   }
 
-  // *************** find school data
+  // *************** find school data based on id and status
   const schools = await SchoolModel.find({
     // *************** find active school by id
     _id: { $in: schoolIds },

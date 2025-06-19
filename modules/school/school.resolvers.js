@@ -2,7 +2,7 @@
 const SchoolModel = require('./school.models.js');
 
 // *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../utilities/id_validator.js`);
+const ValidateIdMongoose = require(`../../utilities/id_validator.js`);
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateSchoolInput } = require('./school.validator.js');
@@ -238,7 +238,7 @@ async function GetStudentData(parent, args, ctx) {
     }
 
     // *************** taking student data using data loader
-    const result = await loaders.students.loadMany(parent.students);
+    const result = await loaders.student.loadMany(parent.students);
 
     const filterResult = result.filter((student) => student !== null);
 
