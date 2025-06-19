@@ -7,35 +7,32 @@ const { ApolloError } = require('apollo-server');
 const StudentModel = require('./student.models.js');
 const SchoolModel = require('../school/school.models.js');
 
-// *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
-
 // *************** IMPORT VALIDATOR ***************
 const { ValidateStudentInput } = require('./student.validator.js');
+const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** QUERY ***************
-// *************** Get all student function
+
 /**
  * Retrieves all students whose status is set to "active".
  *
  * @async
- * @function GetAllStudent
+ * @function GetAllStudents
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active student objects.
  */
 async function GetAllStudents() {
   try {
     // *************** find student data with status active
-    const activeStudent = await StudentModel.find({ status: 'active' }).lean();
+    const activeStudents = await StudentModel.find({ status: 'active' }).lean();
 
     // *************** returning student data that has status "active"
-    return activeStudent;
+    return activeStudents;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-// *************** Get student by id function
 /**
  * Retrieves a student by their unique ID.
  *
@@ -45,7 +42,7 @@ async function GetAllStudents() {
  * @param {object} args - Arguments containing the student ID.
  * @param {string} _id - The ID of the student to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the student object.
- * @throws {Error} - Throws an error if the student is not found.
+ * @throws {ApolloError} - Throws an error if the student is not found.
  */
 async function GetStudentById(parent, { _id }) {
   try {
@@ -69,18 +66,30 @@ async function GetStudentById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-// *************** Create student function
 /**
- * Creates a new student and associates them with a school.
+ * Creates a new student and links them to a school by ID.
+ *
+ * Validates the input, checks the existence of the associated school,
+ * creates the student record, and updates the school's student list.
  *
  * @async
  * @function CreateStudent
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing student input data.
- * @param {object} student_input - Input data for the new student.
- * @param {string} student_input.school_id - The ID of the school to associate with the student.
- * @returns {Promise<object>} - A promise that resolves to the newly created student object.
- * @throws {Error} - Throws an error if the school is not found.
+ * @param {object} parent - Unused GraphQL parent resolver argument.
+ * @param {object} args - The GraphQL mutation arguments.
+ * @param {object} args.student_input - The input object containing student details.
+ * @param {string} args.student_input.first_name - Student's first name.
+ * @param {string} args.student_input.last_name - Student's last name.
+ * @param {string} args.student_input.email - Student's email.
+ * @param {string} args.student_input.civility - Civility (e.g., "Mr", "Mrs").
+ * @param {string} args.student_input.postal_code_of_birth - Student's birth postal code.
+ * @param {string} args.student_input.mobile_phone - Student's mobile phone number.
+ * @param {Array<object>} args.student_input.address - Array of address objects.
+ * @param {string} [args.student_input.date_of_birth] - Student's date of birth.
+ * @param {string} args.student_input.school_id - ID of the school the student is enrolling in.
+ *
+ * @returns {Promise<object>} - A promise that resolves to the created student object.
+ *
+ * @throws {ApolloError} - Throws if validation fails or the school ID is not found.
  */
 async function CreateStudent(parent, { student_input }) {
   try {
@@ -131,31 +140,37 @@ async function CreateStudent(parent, { student_input }) {
   }
 }
 
-// *************** Update student function
 /**
- * Updates an existing student's information, including handling changes to their associated school.
+ * Updates an existing student record in the database.
+ *
+ * Validates the student ID and input, handles school reassignment (if applicable),
+ * manages school history updates, and synchronizes student references
+ * in related school documents.
  *
  * @async
  * @function UpdateStudent
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing the student ID and input data.
- * @param {string} _id - The ID of the student to update.
- * @param {object} student_input - The updated student data.
- * @param {string} [student_input.school_id] - The ID of the new school, if changed.
- * @returns {Promise<object>} - A promise that resolves to the updated student object.
- * @throws {Error} - Throws an error if attempting to update student ID or if student/school not found.
+ * @param {object} parent - Unused GraphQL parent argument.
+ * @param {object} args - GraphQL arguments.
+ * @param {string} args._id - The ID of the student to update.
+ * @param {object} args.student_input - The student input data.
+ * @param {string} args.student_input.first_name - First name of the student.
+ * @param {string} args.student_input.last_name - Last name of the student.
+ * @param {string} args.student_input.email - Email address.
+ * @param {string} args.student_input.civility - Civility ("Mr" or "Mrs").
+ * @param {string} args.student_input.postal_code_of_birth - Postal code of birth.
+ * @param {string} args.student_input.mobile_phone - Mobile phone number.
+ * @param {Array<object>} args.student_input.address - List of address objects.
+ * @param {string} [args.student_input.date_of_birth] - Date of birth (optional).
+ * @param {string} args.student_input.school_id - The new school ID.
+ *
+ * @returns {Promise<{_id: string}>} - A promise resolving with the ID of the updated student.
+ *
+ * @throws {ApolloError} - Throws if validation fails, student not found, school not found, or update fails.
  */
 async function UpdateStudent(parent, { _id, student_input }) {
   try {
-    // ***************showing error message if the student tried to update their id
-    if (student_input._id) {
-      throw new ApolloError('Cannot update Student ID');
-    }
-
-    // *************** Validating student ID
+    // *************** Validating student ID and student input
     await ValidateIdMongoose(_id);
-
-    // *************** validate student_input
     await ValidateStudentInput(student_input);
 
     // *************** find user by id and adding it to student variable
@@ -231,46 +246,57 @@ async function UpdateStudent(parent, { _id, student_input }) {
       school_history: student_input.school_history,
     };
     // *************** updating the student data and save it to database
-    const updatedStudent = await StudentModel.findByIdAndUpdate(
-      _id,
-      { $set: studentData },
-      { new: true }
-    );
+    const updatedStudent = await StudentModel.findByIdAndUpdate(_id, {
+      $set: studentData,
+    })
+      .select('_id')
+      .lean();
+    // ***************  showing error message if the Student update fail
+    if (!updatedStudent) {
+      throw new ApolloError('Update Fail');
+    }
 
     // *************** returning the updated data
-    return updatedStudent;
+    return { _id };
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-// *************** Delete student function
 /**
- * Soft deletes a student by setting their status to "deleted" and recording the deletion timestamp.
+ * Soft deletes a student by setting their status to "deleted" and recording a timestamp.
+ *
+ * Validates the provided student ID, ensures the student is not already deleted,
+ * and updates the document. Returns the ID of the deleted student.
  *
  * @async
  * @function DeleteStudent
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing the student ID.
- * @param {string} _id - The ID of the student to delete.
- * @returns {Promise<object>} - A promise that resolves to the soft-deleted student object.
- * @throws {Error} - Throws an error if the student is not found.
+ * @param {object} parent - Unused GraphQL parent argument.
+ * @param {object} args - GraphQL arguments.
+ * @param {string} args._id - The ID of the student to delete.
+ *
+ * @returns {Promise<{_id: string}>} - A promise resolving to an object containing the deleted student's ID.
+ *
+ * @throws {ApolloError} - Throws if the ID is invalid, student not found, or already deleted.
  */
+
 async function DeleteStudent(parent, { _id }) {
   try {
     // *************** Validating student ID
     await ValidateIdMongoose(_id);
 
     // *************** finding student based on id and update the data
-    const deleteStudent = await StudentModel.findOneAndUpdate(
+    const deleteStudent = await StudentModel.findByIdAndUpdate(
       { _id, status: { $ne: `deleted` } },
       {
         // *************** changing status field to deleted and adding timstamp
         status: 'deleted',
         deleted_at: new Date(),
       }
-    );
+    )
+      .select('_id')
+      .lean();
 
     // *************** showing error message if student already deleted
     if (!deleteStudent) {
@@ -278,7 +304,7 @@ async function DeleteStudent(parent, { _id }) {
     }
 
     // *************** returning student deleted data to user
-    return deleteStudent;
+    return { _id };
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -286,59 +312,46 @@ async function DeleteStudent(parent, { _id }) {
 }
 
 // *************** LOADER ***************
-// *************** Get current school using loader function
 /**
  * Retrieves the current school information for a student using DataLoader.
  *
+ * Uses the student's `school_id` to load the corresponding school document from the database.
+ *
  * @async
  * @function GetCurrentSchool
- * @param {object} parent - The parent object containing the school ID (typically a student object).
- * @param {any} _ - Unused argument placeholder.
- * @param {object} context - The GraphQL context containing the loaders.
- * @param {object} context.loaders - Object containing DataLoader instances.
- * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
- * @returns {Promise<object>} - A promise that resolves to the school object associated with the student.
+ * @param {object} parent - The parent object containing the `school_id` field (typically a student).
+ * @param {object} args - GraphQL arguments (unused).
+ * @param {object} ctx - GraphQL context object containing the DataLoader instance.
+ * @param {DataLoader} ctx.school - DataLoader instance for batching and caching school lookups.
+ *
+ * @returns {Promise<object|null>} - A promise resolving to the school object, or `null` if not found.
  */
 async function GetCurrentSchool(parent, args, ctx) {
-  try {
-    // *************** adding loaders to ctx
-    const { loaders } = ctx;
-
-    // *************** using school loaders to mapping school data based on school id
-    const result = await loaders.school.load(String(parent.school_id));
-
-    return result;
-  } catch (error) {
-    // *************** Throw error message
-    throw new ApolloError(error.message);
-  }
+  // *************** using school loaders to mapping school data based on school id
+  return await ctx.school.load(String(parent.school_id));
 }
 
-// *************** Get school history using loader function
 /**
- * Retrieves the full school history for a student using DataLoader.
+ * Retrieves the school history for a student using DataLoader.
+ *
+ * Uses the student's `school_history` array to load multiple school documents from the database.
  *
  * @async
  * @function GetSchoolHistory
- * @param {object} parent - The parent object containing the school history array (usually a student object).
- * @param {any} _ - Unused GraphQL argument placeholder.
- * @param {object} context - The GraphQL context containing DataLoader instances.
- * @param {object} context.loaders - Object containing DataLoader instances.
- * @param {DataLoader<string, object>} context.loaders.school - DataLoader instance for loading school data by ID.
- * @returns {Promise<object[]>} - A promise that resolves to an array of school objects from the student's history.
+ * @param {object} parent - The parent object containing the `school_history` field (typically a student).
+ * @param {object} args - GraphQL arguments (unused).
+ * @param {object} ctx - GraphQL context object containing the DataLoader instance.
+ * @param {DataLoader} ctx.school - DataLoader instance for batching and caching school lookups.
+ *
+ * @returns {Promise<object[]>} - A promise resolving to an array of school objects.
  */
 async function GetSchoolHistory(parent, args, ctx) {
-  // *************** adding loaders to ctx
-  const { loaders } = ctx;
-
   // *************** load school data from dataloader
-  const result = await loaders.school.loadMany(parent.school_history);
-
-  // *************** returning school data
-  return result;
+  return await ctx.school.loadMany(parent.school_history);
 }
 
-const studentResolvers = {
+// *************** EXPORT MODULE ***************
+module.exports = {
   Query: {
     GetAllStudents,
     GetStudentById,
@@ -353,5 +366,3 @@ const studentResolvers = {
     school_history: GetSchoolHistory,
   },
 };
-// *************** EXPORT MODULE ***************
-module.exports = studentResolvers;

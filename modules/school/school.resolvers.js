@@ -156,7 +156,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
     };
 
     // *************** finding school based on id and overwrite it with new data and saving it to database
-    const updatedSchool = await SchoolModel.findOneAndUpdate(
+    const updatedSchool = await SchoolModel.findByIdAndUpdate(
       { _id },
       {
         $set: schoolData,
@@ -195,7 +195,7 @@ async function DeleteSchool(parent, { _id }) {
     await ValidateIdMongoose(_id);
 
     // *************** finding school and update the data
-    const deleteSchool = await SchoolModel.findOneAndUpdate(
+    const deleteSchool = await SchoolModel.findByIdAndUpdate(
       { _id, status: { $ne: 'deleted' } },
       {
         // *************** changing status field to deleted and adding timestamp
@@ -223,13 +223,17 @@ async function DeleteSchool(parent, { _id }) {
 /**
  * Retrieves student data associated with a school using DataLoader.
  *
+ * Loads all students referenced in the `students` array of the parent school object.
+ * Returns an empty array if no students are associated.
+ *
  * @async
  * @function GetStudentsData
- * @param {object} parent - The parent object, expected to be a school document.
- * @param {object} _ - Unused GraphQL argument.
- * @param {object} context - The GraphQL context object.
- * @param {object} context.loaders - DataLoader object from context.
- * @returns {Promise<Array>} - An array of student documents.
+ * @param {object} parent - The parent object containing the `students` field (typically a school).
+ * @param {object} args - GraphQL arguments (unused).
+ * @param {object} ctx - GraphQL context object containing the DataLoader instances.
+ * @param {DataLoader} ctx.loaders.student - DataLoader instance for batching and caching student lookups.
+ *
+ * @returns {Promise<object[]>} - A promise resolving to an array of student objects.
  */
 async function GetStudentsData(parent, args, ctx) {
   // *************** creating if to check if the school student array empty
