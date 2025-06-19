@@ -2,32 +2,34 @@
 const dataLoader = require('dataloader');
 const keyBy = require('lodash/keyBy');
 const { Types } = require('mongoose');
+const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const StudentModel = require('./student.models.js');
 
 /**
- * Batch function for loading multiple students by their IDs using DataLoader.
- * Only returns students with status "active". If a student ID is not found or is inactive,
+ * Batch function to load multiple students by their IDs.
+ * Only returns students with status "active". If a student ID is invalid or the student is not found,
  * the corresponding result will be `null`.
  *
  * @async
  * @function StudentBatch
- * @param {Array<string|ObjectId>} studentId - An array of student IDs to fetch.
- * @returns {Promise<Array<Object|null>>} - An array of student documents in the same order as input IDs, or `null` if not found.
+ * @param {Array<string|import('mongoose').Types.ObjectId>} studentIds - An array of student IDs to fetch.
+ * @returns {Promise<Array<Object|null>>} - A promise that resolves to an array of student documents
+ *   in the same order as the input IDs, or `null` for any not found or inactive.
+ * @throws {ApolloError} - Throws an error if any of the provided IDs are not valid MongoDB ObjectIds.
  */
 async function StudentBatch(studentIds) {
   // *************** validate all studentIDs
-  const invalidStudentId = studentIds.filter(
+  const invalidStudentId = studentIds.find(
     (ids) => !Types.ObjectId.isValid(ids)
   );
-  if (invalidStudentId.length) {
-    throw new Error(`Invalid student IDs: ${invalidStudentId.join(', ')}`);
+  if (invalidStudentId) {
+    throw new ApolloError(`Invalid student IDs: ${invalidStudentId}`);
   }
 
-  // *************** find student data
+  // *************** find student data based on id and active status
   const students = await StudentModel.find({
-    // *************** find active student data based on id
     _id: { $in: studentIds },
     status: 'active',
   }).lean();
