@@ -95,7 +95,7 @@ async function GetUserById(parent, { _id }) {
 async function CreateUser(parent, { user_input }) {
   try {
     // *************** validate user_input
-    await ValidateUserInput(user_input);
+    ValidateUserInput(user_input);
 
     // *************** check if the email already taken by another user
     const isEmailAlreadyExist = await UserModel.exists({
@@ -164,8 +164,8 @@ async function CreateUser(parent, { user_input }) {
 async function UpdateUser(parent, { _id, user_input }) {
   try {
     // *************** validate Id and user_input
-    await ValidateIdMongoose(_id);
-    await ValidateUserInput(user_input);
+    ValidateIdMongoose(_id);
+    ValidateUserInput(user_input);
 
     // *************** breakdown user input
     const userData = {
@@ -221,7 +221,7 @@ async function UpdateUser(parent, { _id, user_input }) {
 async function DeleteUser(parent, { _id }) {
   try {
     // *************** validate Id
-    await ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id);
 
     // *************** finding user based on id and update the data
     const deleteUser = await UserModel.findByIdAndUpdate(

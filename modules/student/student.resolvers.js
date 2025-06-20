@@ -180,8 +180,8 @@ async function CreateStudent(parent, { student_input }) {
 async function UpdateStudent(parent, { _id, student_input }) {
   try {
     // *************** Validating student ID and student input
-    await ValidateIdMongoose(_id);
-    await ValidateStudentInput(student_input);
+    ValidateIdMongoose(_id);
+    ValidateStudentInput(student_input);
 
     // *************** find user by id and adding it to student variable
     const student = await StudentModel.findById(_id);
@@ -294,7 +294,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
 async function DeleteStudent(parent, { _id }) {
   try {
     // *************** Validating student ID
-    await ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id);
 
     // *************** finding student based on id and update the data
     const deleteStudent = await StudentModel.findByIdAndUpdate(

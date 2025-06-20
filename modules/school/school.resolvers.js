@@ -189,7 +189,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
 async function DeleteSchool(parent, { _id }) {
   try {
     // *************** checking if the school id is valid
-    await ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id);
 
     // *************** finding school and update the data
     const deleteSchool = await SchoolModel.findByIdAndUpdate(
