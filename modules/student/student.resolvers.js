@@ -328,7 +328,7 @@ async function DeleteStudent(parent, { _id }) {
  */
 async function GetCurrentSchool(parent, args, ctx) {
   // *************** using school loaders to mapping school data based on school id
-  return await ctx.school.load(String(parent.school_id));
+  return await ctx.loaders.school.load(String(parent.school_id));
 }
 
 /**
@@ -347,7 +347,7 @@ async function GetCurrentSchool(parent, args, ctx) {
  */
 async function GetSchoolHistory(parent, args, ctx) {
   // *************** load school data from dataloader
-  return await ctx.school.loadMany(parent.school_history);
+  return await ctx.loaders.school.loadMany(parent.school_history);
 }
 
 // *************** EXPORT MODULE ***************

@@ -156,12 +156,9 @@ async function UpdateSchool(parent, { _id, school_input }) {
     };
 
     // *************** finding school based on id and overwrite it with new data and saving it to database
-    const updatedSchool = await SchoolModel.findByIdAndUpdate(
-      { _id },
-      {
-        $set: schoolData,
-      }
-    )
+    const updatedSchool = await SchoolModel.findByIdAndUpdate(_id, {
+      $set: schoolData,
+    })
       .select('_id')
       .lean();
 

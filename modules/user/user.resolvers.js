@@ -183,12 +183,9 @@ async function UpdateUser(parent, { _id, user_input }) {
     };
 
     // *************** finding user based on id and overwrite it with new data and saving it to database
-    const updatedUser = await UserModel.findByIdAndUpdate(
-      { _id },
-      {
-        $set: userData,
-      }
-    )
+    const updatedUser = await UserModel.findByIdAndUpdate(_id, {
+      $set: userData,
+    })
       .select('_id')
       .lean();
 
