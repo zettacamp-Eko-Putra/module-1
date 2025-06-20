@@ -287,14 +287,11 @@ async function DeleteStudent(parent, { _id }) {
     ValidateIdMongoose(_id);
 
     // *************** finding student based on id and update the data
-    const deleteStudent = await StudentModel.findByIdAndUpdate(
-      { _id },
-      {
-        // *************** changing status field to deleted and adding timstamp
-        status: 'deleted',
-        deleted_at: new Date(),
-      }
-    )
+    const deleteStudent = await StudentModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to deleted and adding timstamp
+      status: 'deleted',
+      deleted_at: new Date(),
+    })
       .select('_id')
       .lean();
 

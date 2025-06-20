@@ -192,14 +192,11 @@ async function DeleteSchool(parent, { _id }) {
     ValidateIdMongoose(_id);
 
     // *************** finding school and update the data
-    const deleteSchool = await SchoolModel.findByIdAndUpdate(
-      { _id },
-      {
-        // *************** changing status field to deleted and adding timestamp
-        status: 'deleted',
-        deleted_at: new Date(),
-      }
-    )
+    const deleteSchool = await SchoolModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to deleted and adding timestamp
+      status: 'deleted',
+      deleted_at: new Date(),
+    })
       .select('_id')
       .lean();
 
@@ -209,7 +206,7 @@ async function DeleteSchool(parent, { _id }) {
     }
 
     // *************** returning school deleted data to user
-    return { _id };
+    return _id;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);

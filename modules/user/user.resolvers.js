@@ -239,7 +239,7 @@ async function DeleteUser(parent, { _id }) {
     }
 
     // *************** returning user deleted data to user
-    return { _id };
+    return _id;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
