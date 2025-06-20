@@ -1,4 +1,4 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT LIBRARY *************** 
 require('dotenv').config();
 
 // *************** Environment configuration

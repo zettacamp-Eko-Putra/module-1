@@ -1,7 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const express = require('express');
 
-// *************** Function to initialize and return an Express application
 /**
  * Initializes and returns a new Express application instance.
  *

@@ -1,10 +1,11 @@
-// *************** IMPORT CORE ***************
+// *************** IMPORT MODULE ***************
+const { PORT } = require('./core/config');
+
+// *************** IMPORT UTILITIES ***************
 const CreateExpressApp = require(`./core/express.js`);
 const CreateApolloServer = require(`./core/apollo.js`);
 const ConnectToMongoDB = require(`./core/database.js`);
-const { PORT } = require('./core/config');
 
-// *************** Function to Initialize server
 /**
  * Initializes and starts the Express and Apollo GraphQL servers.
  * - Connects to the MongoDB database.
@@ -18,12 +19,13 @@ const { PORT } = require('./core/config');
  * @throws {Error} Logs any errors encountered during server initialization.
  */
 async function InitializeServer() {
-  // *************** Create Express app instance
-  const app = CreateExpressApp();
-
-  // *************** Create Apollo Server instance
-  const server = CreateApolloServer();
   try {
+    // *************** Create Express app instance
+    const app = CreateExpressApp();
+
+    // *************** Create Apollo Server instance
+    const server = CreateApolloServer();
+
     // *************** Connect to Mongo DB
     await ConnectToMongoDB();
 
@@ -36,9 +38,7 @@ async function InitializeServer() {
 
     // *************** Start Express server and listen on PORT
     app.listen(PORT, () => {
-      console.log(
-        `Server running`
-      );
+      console.log('Server running');
     });
   } catch (error) {
     // *************** Handle and log any errors during initialization

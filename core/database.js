@@ -1,10 +1,9 @@
-// *************** IMPORT CORE ***************
-const { HOST, DB_NAME } = require('./config');
-
 // *************** IMPORT LIBRARY ***************
 const mongoose = require('mongoose');
 
-// *************** Function to connect to MongoDB using Mongoose
+// *************** IMPORT MODULE ***************
+const { HOST, DB_NAME } = require('./config');
+
 /**
  * Establishes a connection to the MongoDB database using Mongoose.
  * Uses the configured HOST and DB_NAME environment variables.
@@ -22,7 +21,7 @@ async function ConnectToMongoDB() {
     });
     console.log('MongoDB connected');
   } catch (error) {
-    console.error('Error starting server:', error);
+    console.error('Error connecting to MongoDB:', error);
   }
 }
 

@@ -1,12 +1,13 @@
-// *************** IMPORT CORE ***************
-const TypeDefs = require('./typedefs.js');
-const Resolvers = require('./resolvers.js');
-const GetDataLoaders = require(`./loaders.js`);
-
 // *************** IMPORT LIBRARY ***************
 const { ApolloServer } = require('apollo-server-express');
 
-// *************** Function to get apollo server
+// *************** IMPORT MODULE ***************
+const TypeDefs = require('./typedefs.js');
+const Resolvers = require('./resolvers.js');
+
+// *************** IMPORT UTILITIES ***************
+const GetDataLoaders = require(`./loaders.js`);
+
 /**
  * Creates and configures a new instance of ApolloServer.
  * - Loads GraphQL type definitions, resolvers, and data loaders.

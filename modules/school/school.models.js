@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 // *************** MODEL Schema: School Address
-const SchoolAddressSchema = new Schema({
+const schoolAddressSchema = new Schema({
   // Name of street school location
   street: String,
 
@@ -26,7 +26,7 @@ const schoolSchema = new Schema({
   school_commercial_name: { type: String, required: true },
 
   // address for the school
-  address: [SchoolAddressSchema],
+  address: [schoolAddressSchema],
 
   // Students associated with the school
   students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],

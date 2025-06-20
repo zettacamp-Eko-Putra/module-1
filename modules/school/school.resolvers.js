@@ -156,11 +156,11 @@ async function UpdateSchool(parent, { _id, school_input }) {
     };
 
     // *************** finding school based on id and overwrite it with new data and saving it to database
-    const updatedSchool = await SchoolModel.findByIdAndUpdate(_id, {
-      $set: schoolData,
-    })
-      .select('_id')
-      .lean();
+    const updatedSchool = await SchoolModel.findByIdAndUpdate(
+      _id,
+      { $set: schoolData },
+      { new: true }
+    ).lean();
 
     // ***************  showing error message if the school id cannot be found in database
     if (!updatedSchool) {
@@ -168,7 +168,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
     }
 
     // *************** returning school updated data to user
-    return { _id };
+    return updatedSchool;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -193,7 +193,7 @@ async function DeleteSchool(parent, { _id }) {
 
     // *************** finding school and update the data
     const deleteSchool = await SchoolModel.findByIdAndUpdate(
-      { _id, status: { $ne: 'deleted' } },
+      { _id },
       {
         // *************** changing status field to deleted and adding timestamp
         status: 'deleted',
@@ -232,7 +232,7 @@ async function DeleteSchool(parent, { _id }) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of student objects.
  */
-async function GetStudentsData(parent, args, ctx) {
+async function Students(parent, args, ctx) {
   // *************** creating if to check if the school student array empty
   if (!parent.students || !parent.students.length) {
     // *************** retuning value if student array empty
@@ -255,6 +255,6 @@ module.exports = {
     DeleteSchool,
   },
   School: {
-    students: GetStudentsData,
+    students: Students,
   },
 };

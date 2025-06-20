@@ -2,7 +2,6 @@
 const CreateSchoolLoader = require('../modules/school/school.loader');
 const CreateStudentLoader = require('../modules/student/student.loader');
 
-// *************** Function to combine all loader
 /**
  * Creates and returns an object containing all configured DataLoaders
  * for batching and caching related data fetches.

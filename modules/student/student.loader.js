@@ -1,6 +1,6 @@
 // *************** IMPORT LIBRARY ***************
-const dataLoader = require('dataloader');
-const keyBy = require('lodash/keyBy');
+const DataLoader = require('dataloader');
+const KeyBy = require('lodash/keyBy');
 const { Types } = require('mongoose');
 const { ApolloError } = require('apollo-server');
 
@@ -35,7 +35,7 @@ async function StudentBatch(studentIds) {
   }).lean();
 
   // *************** create map from student id
-  const studentMap = keyBy(students, (student) => String(student._id));
+  const studentMap = KeyBy(students, (student) => String(student._id));
 
   // *************** insert null to if the student empty
   const result = studentIds.map((id) => studentMap[String(id)] || null);
@@ -53,7 +53,7 @@ async function StudentBatch(studentIds) {
  */
 const CreateStudentLoader = () => {
   // *************** creating dataloader using batch SchoolBatch
-  const loader = new dataLoader(StudentBatch);
+  const loader = new DataLoader(StudentBatch);
 
   // *************** return loader to user
   return loader;

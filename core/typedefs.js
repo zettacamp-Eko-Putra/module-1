@@ -19,7 +19,7 @@ const helperTypeDefs = gql`
 `;
 
 // *************** Combine all type definitions
-const typedefs = [
+const typeDefs = [
   UserTypeDefs,
   StudentTypeDefs,
   SchoolTypeDefs,
@@ -27,4 +27,4 @@ const typedefs = [
 ];
 
 // *************** EXPORT MODULE ***************
-module.exports = typedefs;
+module.exports = typeDefs;

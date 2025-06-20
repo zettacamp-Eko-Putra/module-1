@@ -96,22 +96,20 @@ async function CreateStudent(parent, { student_input }) {
     // *************** validate student_input
     ValidateStudentInput(student_input);
 
-    // *************** check if the email already taken by another student
+    // *************** find if email already exists
     const isEmailAlreadyExist = await StudentModel.exists({
       email: student_input.email.trim().toLowerCase(),
+      status: 'active',
     });
 
-    // *************** showing message if the email already taken by another student
+    // *************** showing error message if email already taken
     if (isEmailAlreadyExist) {
-      throw new ApolloError('Email taken');
+      throw new ApolloError('Email already taken');
     }
-
-    // *************** changing input school_id to object type
-    const schoolId = mongoose.Types.ObjectId(student_input.school_id);
 
     // *************** finding school data in database based on id
     const isSchoolExist = await SchoolModel.exists({
-      _id: schoolId,
+      _id: student_input.school_id,
     });
 
     // *************** showing message if school id cannot be found
@@ -123,14 +121,14 @@ async function CreateStudent(parent, { student_input }) {
     const studentData = {
       first_name: student_input.first_name,
       last_name: student_input.last_name,
-      email: student_input.email,
+      email: student_input.email.trim().toLowerCase(),
       civility: student_input.civility,
       postal_code_of_birth: student_input.postal_code_of_birth,
       mobile_phone: student_input.mobile_phone,
       address: student_input.address,
       date_of_birth: student_input.date_of_birth,
-      school_id: schoolId,
-      school_history: [schoolId],
+      school_id: student_input.school_id,
+      school_history: [student_input.school_id],
     };
 
     // *************** creating new student based on the studentData
@@ -138,7 +136,7 @@ async function CreateStudent(parent, { student_input }) {
 
     // *************** adding student id to school collection
     await SchoolModel.updateOne(
-      { _id: schoolId },
+      { _id: student_input.school_id },
       { $push: { students: createdStudent._id } }
     );
 
@@ -183,7 +181,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
     ValidateIdMongoose(_id);
     ValidateStudentInput(student_input);
 
-    // *************** find user by id and adding it to student variable
+    // *************** Find the student by ID
     const student = await StudentModel.findById(_id);
 
     // ***************showing error message if the student id cannot be found in database
@@ -191,83 +189,76 @@ async function UpdateStudent(parent, { _id, student_input }) {
       throw new ApolloError('Student not found');
     }
 
-    // *************** taking StudentInput and add it to newSchoolId variable
+    // *************** take the new school ID from input
     const newSchoolId = student_input.school_id;
 
-    // *************** taking current student id
+    // *************** Get the current school ID from the student data
     const currentSchoolId = student.school_id
       ? String(student.school_id)
       : null;
 
-    // *************** creating if to check if the current school id is different with new school id input
+    // *************** If the school is changing, validate the new school
     if (newSchoolId && newSchoolId !== currentSchoolId) {
-      // *************** finding new school id in the database
-      const newSchool = await SchoolModel.findById(newSchoolId);
-
-      // *************** showing error message if the new school id cannot be found or already deleted
-      if (!newSchool || newSchool.status === `deleted`)
-        throw new Error('New School Not Found or already deleted');
-
-      // *************** creating set to avoid duplicate data
-      const schoolHistorySet = new Set(
-        (student.school_history || []).map((id) => String(id))
-      );
-
-      // *************** creating if to check if the new school data already in school_history
-      if (!schoolHistorySet.has(newSchoolId)) {
-        schoolHistorySet.add(newSchoolId);
+      const newSchool = await SchoolModel.findById(newSchoolId)
+        .select('_id status')
+        .lean();
+      if (!newSchool || newSchool.status === 'deleted') {
+        throw new ApolloError('New School Not Found or already deleted');
       }
+    }
 
-      // *************** update school history with the new school history
-      student_input.school_history = Array.from(schoolHistorySet);
+    // *************** taking existing school history
+    const schoolHistory = [...(student.school_history || [])];
 
-      // *************** creating if to update data form old school
-      if (currentSchoolId) {
-        // *************** finding old school data based on database
-        await SchoolModel.updateOne(
-          // *************** pull student data form old school
-          { _id: currentSchoolId },
-          { $pull: { students: student._id } }
-        );
-      }
-
-      // *************** finding data of the new school
-      await SchoolModel.updateOne(
-        // *************** pushing student data to new school
-        { _id: Types.ObjectId(newSchoolId) },
-        { $addToSet: { students: student._id } }
-      );
-    } else {
-      // *************** if there's no change use the old school_history data
-      student_input.school_history = student.school_history;
+    // *************** add new school to history if it's different from current
+    if (newSchoolId && newSchoolId !== currentSchoolId) {
+      schoolHistory.push(newSchoolId);
     }
 
     // *************** Breakdown student input
     const studentData = {
       first_name: student_input.first_name,
       last_name: student_input.last_name,
-      email: student_input.email,
+      email: student_input.email.trim().toLowerCase(),
       civility: student_input.civility,
       postal_code_of_birth: student_input.postal_code_of_birth,
       mobile_phone: student_input.mobile_phone,
       address: student_input.address,
       date_of_birth: student_input.date_of_birth,
       school_id: newSchoolId,
-      school_history: student_input.school_history,
+      school_history: schoolHistory,
     };
-    // *************** updating the student data and save it to database
-    const updatedStudent = await StudentModel.findByIdAndUpdate(_id, {
-      $set: studentData,
-    })
-      .select('_id')
-      .lean();
+
+    // *************** Update the student in the database and return the updated document
+    const updatedStudent = await StudentModel.findByIdAndUpdate(
+      _id,
+      { $set: studentData },
+      { new: true }
+    ).lean();
+
     // ***************  showing error message if the Student update fail
     if (!updatedStudent) {
-      throw new ApolloError('Update Fail');
+      throw new ApolloError('Update fail student not found');
+    }
+
+    // *************** If school changed, update school references
+    if (newSchoolId && newSchoolId !== currentSchoolId) {
+      if (currentSchoolId) {
+        await SchoolModel.updateOne(
+          { _id: currentSchoolId },
+          { $pull: { students: student._id } }
+        );
+      }
+
+      // *************** Add student to new school
+      await SchoolModel.updateOne(
+        { _id: Types.ObjectId(newSchoolId) },
+        { $addToSet: { students: student._id } }
+      );
     }
 
     // *************** returning the updated data
-    return { _id };
+    return updatedStudent;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -290,7 +281,6 @@ async function UpdateStudent(parent, { _id, student_input }) {
  *
  * @throws {ApolloError} - Throws if the ID is invalid, student not found, or already deleted.
  */
-
 async function DeleteStudent(parent, { _id }) {
   try {
     // *************** Validating student ID
@@ -298,7 +288,7 @@ async function DeleteStudent(parent, { _id }) {
 
     // *************** finding student based on id and update the data
     const deleteStudent = await StudentModel.findByIdAndUpdate(
-      { _id, status: { $ne: `deleted` } },
+      { _id },
       {
         // *************** changing status field to deleted and adding timstamp
         status: 'deleted',
@@ -314,7 +304,7 @@ async function DeleteStudent(parent, { _id }) {
     }
 
     // *************** returning student deleted data to user
-    return { _id };
+    return _id;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -336,7 +326,12 @@ async function DeleteStudent(parent, { _id }) {
  *
  * @returns {Promise<object|null>} - A promise resolving to the school object, or `null` if not found.
  */
-async function GetCurrentSchool(parent, args, ctx) {
+async function School(parent, args, ctx) {
+  // *************** if there's no school_id, return null
+  if (!parent.school_id) {
+    return null;
+  }
+
   // *************** using school loaders to mapping school data based on school id
   return await ctx.loaders.school.load(String(parent.school_id));
 }
@@ -355,7 +350,12 @@ async function GetCurrentSchool(parent, args, ctx) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of school objects.
  */
-async function GetSchoolHistory(parent, args, ctx) {
+async function SchoolHistory(parent, args, ctx) {
+  // *************** if there's no school_id, return null
+  if (!parent.school_history) {
+    return null;
+  }
+
   // *************** load school data from dataloader
   return await ctx.loaders.school.loadMany(parent.school_history);
 }
@@ -372,7 +372,7 @@ module.exports = {
     DeleteStudent,
   },
   Student: {
-    school: GetCurrentSchool,
-    school_history: GetSchoolHistory,
+    school: School,
+    school_history: SchoolHistory,
   },
 };

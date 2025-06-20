@@ -100,6 +100,7 @@ async function CreateUser(parent, { user_input }) {
     // *************** check if the email already taken by another user
     const isEmailAlreadyExist = await UserModel.exists({
       email: user_input.email.trim().toLowerCase(),
+      status: 'active',
     });
 
     // *************** showing message if the email already taken by another user
@@ -117,7 +118,7 @@ async function CreateUser(parent, { user_input }) {
       mobile_phone: user_input.mobile_phone,
       entity: user_input.entity,
       address: user_input.address,
-      email: user_input.email,
+      email: user_input.email.trim().toLowerCase(),
       password: user_input.password,
       role: user_input.role,
     };
@@ -177,17 +178,17 @@ async function UpdateUser(parent, { _id, user_input }) {
       mobile_phone: user_input.mobile_phone,
       entity: user_input.entity,
       address: user_input.address,
-      email: user_input.email,
+      email: user_input.email.trim().toLowerCase(),
       password: user_input.password,
       role: user_input.role,
     };
 
     // *************** finding user based on id and overwrite it with new data and saving it to database
-    const updatedUser = await UserModel.findByIdAndUpdate(_id, {
-      $set: userData,
-    })
-      .select('_id')
-      .lean();
+    const updatedUser = await UserModel.findByIdAndUpdate(
+      _id,
+      { $set: userData },
+      { new: true }
+    ).lean();
 
     // *************** showing error message if the user id cannot be found in database
     if (!updatedUser) {
@@ -195,7 +196,7 @@ async function UpdateUser(parent, { _id, user_input }) {
     }
 
     // *************** returning user updated data to user
-    return { _id };
+    return updatedUser;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
@@ -224,14 +225,11 @@ async function DeleteUser(parent, { _id }) {
     ValidateIdMongoose(_id);
 
     // *************** finding user based on id and update the data
-    const deleteUser = await UserModel.findByIdAndUpdate(
-      { _id, status: { $ne: `deleted` } },
-      {
-        // *************** changing status field to deleted and adding timestamp
-        status: 'deleted',
-        deleted_at: new Date(),
-      }
-    )
+    const deleteUser = await UserModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to deleted and adding timestamp
+      status: 'deleted',
+      deleted_at: new Date(),
+    })
       .select('_id')
       .lean();
 
