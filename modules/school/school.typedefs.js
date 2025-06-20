@@ -1,52 +1,50 @@
-// *************** TYPE DEFINITION : School  ***************
+// *************** IMPORT LIBRARY ***************
+const { gql } = require('apollo-server');
 
 // *************** School type
-const schoolTypeDefs = `
-    type SchoolAddress{
-        street: String!
-        city: String!
-        province: String!
-        postal_code: String!  
-    }
+const schoolTypeDefs = gql`
+  type SchoolAddress {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
+  }
 
-    input SchoolAddressInput{
-        street: String!
-        city: String!
-        province: String!
-        postal_code: String!
-    }
+  input SchoolAddressInput {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
+  }
 
-    type School {
-        _id: ID!
-        school_legal_name: String!
-        school_commercial_name: String!
-        address: [SchoolAddress]
-        students: [Student]
-        status:String!
-        deleted_at:Date
-    }
+  type School {
+    _id: ID!
+    school_legal_name: String!
+    school_commercial_name: String!
+    address: [SchoolAddress]
+    students: [Student]
+    status: String!
+    deleted_at: Date
+  }
 
-    input SchoolInput{
-        school_legal_name: String!
-        school_commercial_name: String!
-        address:[SchoolAddressInput]!
-    }   
+  input SchoolInput {
+    school_legal_name: String!
+    school_commercial_name: String!
+    address: [SchoolAddressInput]!
+  }
 
-    extend type Query {
-        GetAllSchools: [School]
-        GetSchoolById(_id: ID!): School
-    }
+  extend type Query {
+    GetAllSchools: [School]
+    GetSchoolById(_id: ID!): School
+  }
 
-    extend type Mutation{
-        CreateSchool(
-          school_input: SchoolInput!): School!
+  extend type Mutation {
+    CreateSchool(school_input: SchoolInput!): School!
 
-        UpdateSchool(
-          _id:ID!,school_input: SchoolInput!): School
+    UpdateSchool(_id: ID!, school_input: SchoolInput!): School
 
-        DeleteSchool(
-          _id: ID!): School
-    }
+    DeleteSchool(_id: ID!): School
+  }
 `;
 
 // *************** EXPORT MODULE ***************

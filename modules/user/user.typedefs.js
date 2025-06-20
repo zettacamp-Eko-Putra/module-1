@@ -1,66 +1,64 @@
-// *************** TYPE DEFINITION: User ***************
+// *************** IMPORT LIBRARY ***************
+const { gql } = require('apollo-server');
 
 // *************** User Type
-const userTypeDefs = `
-    type UserAddress{
-        street:String!
-        city:String!
-        province:String!
-        postal_code:String!
-    }
+const userTypeDefs = gql`
+  type UserAddress {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
+  }
 
-    input UserAddressInput{
-        street:String!
-        city:String!
-        province:String!
-        postal_code:String!
-    }
+  input UserAddressInput {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
+  }
 
-    type User {
-        _id:ID!
-        first_name:String!
-        last_name:String!
-        civility:String!
-        office_phone:String
-        direct_line:String
-        mobile_phone:String
-        entity:String!
-        address:[UserAddress]!
-        email:String!
-        role:String!
-        status:String!
-        deleted_at:Date
-    }
+  type User {
+    _id: ID!
+    first_name: String!
+    last_name: String!
+    civility: String!
+    office_phone: String
+    direct_line: String
+    mobile_phone: String
+    entity: String!
+    address: [UserAddress]!
+    email: String!
+    role: String!
+    status: String!
+    deleted_at: Date
+  }
 
-    input UserInput{
-        first_name:String!
-        last_name:String!
-        civility:String!
-        office_phone:String
-        direct_line:String
-        mobile_phone:String!
-        entity:String!
-        address:[UserAddressInput]!
-        email:String!
-        password:String!
-        role:String! 
-    }
-    
-    extend type Query {
-        GetAllUsers: [User]
-        GetUserById(_id: ID!): User
-    }
+  input UserInput {
+    first_name: String!
+    last_name: String!
+    civility: String!
+    office_phone: String
+    direct_line: String
+    mobile_phone: String!
+    entity: String!
+    address: [UserAddressInput]!
+    email: String!
+    password: String!
+    role: String!
+  }
 
-    extend type Mutation{
-        CreateUser(
-            user_input: UserInput!): User!    
-    
-        UpdateUser(
-            _id:ID!,user_input: UserInput!): User
-        
-        DeleteUser(
-            _id: ID!): User
-    }
+  extend type Query {
+    GetAllUsers: [User]
+    GetUserById(_id: ID!): User
+  }
+
+  extend type Mutation {
+    CreateUser(user_input: UserInput!): User!
+
+    UpdateUser(_id: ID!, user_input: UserInput!): User
+
+    DeleteUser(_id: ID!): User
+  }
 `;
 
 // *************** EXPORT MODULE ***************
