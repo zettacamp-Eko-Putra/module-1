@@ -96,6 +96,16 @@ async function CreateStudent(parent, { student_input }) {
     // *************** validate student_input
     ValidateStudentInput(student_input);
 
+    // *************** check if the email already taken by another student
+    const isEmailAlreadyExist = await StudentModel.exists({
+      email: student_input.email.trim().toLowerCase(),
+    });
+
+    // *************** showing message if the email already taken by another student
+    if (isEmailAlreadyExist) {
+      throw new ApolloError('Email taken');
+    }
+
     // *************** changing input school_id to object type
     const schoolId = mongoose.Types.ObjectId(student_input.school_id);
 
@@ -129,7 +139,7 @@ async function CreateStudent(parent, { student_input }) {
     // *************** adding student id to school collection
     await SchoolModel.updateOne(
       { _id: schoolId },
-      { $push: { student: createdStudent._id } }
+      { $push: { students: createdStudent._id } }
     );
 
     // *************** returning new student data
