@@ -204,20 +204,21 @@ async function UpdateUser(parent, { _id, user_input }) {
 }
 
 /**
- * Soft-deletes a user by updating their status to "deleted" and setting a deletion timestamp.
+ * Soft deletes a user by setting its status to "deleted" and recording a deletion timestamp.
  *
- * This function first validates the provided user ID, then checks if the user exists and is not already deleted.
- * If found, it updates the `status` field to `'deleted'` and sets the `deleted_at` timestamp.
+ * This function first validates the given user ID, then updates the user's status
+ * to "deleted" and adds a `deleted_at` timestamp. If the user is not found or already deleted,
+ * it throws an error.
  *
  * @async
  * @function DeleteUser
- * @param {object} parent - GraphQL parent resolver (unused).
- * @param {object} args - The arguments object.
- * @param {string} args._id - The ID of the user to be deleted.
+ * @param {object} parent - GraphQL resolver parent (unused).
+ * @param {object} args - Arguments object.
+ * @param {string} args._id - The ID of the user to delete.
  *
- * @returns {Promise<{ _id: string }>} - A promise that resolves to an object containing the deleted user's ID.
+ * @returns {Promise<string>} - A promise that resolves to the ID of the deleted user.
  *
- * @throws {ApolloError} - Throws an error if the ID is invalid or the user is already deleted.
+ * @throws {ApolloError} - If the user ID is invalid or the user is not found or already deleted.
  */
 async function DeleteUser(parent, { _id }) {
   try {

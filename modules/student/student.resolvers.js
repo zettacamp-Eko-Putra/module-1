@@ -67,29 +67,30 @@ async function GetStudentById(parent, { _id }) {
 
 // *************** MUTATION ***************
 /**
- * Creates a new student and links them to a school by ID.
+ * Creates a new student record in the database.
  *
- * Validates the input, checks the existence of the associated school,
- * creates the student record, and updates the school's student list.
+ * This function validates the input, checks for existing email and valid school ID,
+ * then creates a new student, updates the associated school's student list,
+ * and returns the created student data.
  *
  * @async
  * @function CreateStudent
- * @param {object} parent - Unused GraphQL parent resolver argument.
- * @param {object} args - The GraphQL mutation arguments.
- * @param {object} args.student_input - The input object containing student details.
+ * @param {object} parent - GraphQL parent resolver (unused).
+ * @param {object} args - The arguments object.
+ * @param {object} args.student_input - Input object containing student information.
  * @param {string} args.student_input.first_name - Student's first name.
  * @param {string} args.student_input.last_name - Student's last name.
  * @param {string} args.student_input.email - Student's email.
- * @param {string} args.student_input.civility - Civility (e.g., "Mr", "Mrs").
- * @param {string} args.student_input.postal_code_of_birth - Student's birth postal code.
+ * @param {string} args.student_input.civility - Student's civility ("Mr" or "Mrs").
+ * @param {string} args.student_input.postal_code_of_birth - Postal code of the student's birth.
  * @param {string} args.student_input.mobile_phone - Student's mobile phone number.
- * @param {Array<object>} args.student_input.address - Array of address objects.
- * @param {string} [args.student_input.date_of_birth] - Student's date of birth.
- * @param {string} args.student_input.school_id - ID of the school the student is enrolling in.
+ * @param {Array<object>} args.student_input.address - List of student's address objects.
+ * @param {string|Date} [args.student_input.date_of_birth] - Optional date of birth.
+ * @param {string} args.student_input.school_id - The ID of the school the student is enrolled in.
  *
- * @returns {Promise<object>} - A promise that resolves to the created student object.
+ * @returns {Promise<object>} - A promise that resolves to the newly created student object.
  *
- * @throws {ApolloError} - Throws if validation fails or the school ID is not found.
+ * @throws {ApolloError} - Throws if validation fails, the email is already taken, or the school ID is invalid.
  */
 async function CreateStudent(parent, { student_input }) {
   try {
@@ -149,31 +150,30 @@ async function CreateStudent(parent, { student_input }) {
 }
 
 /**
- * Updates an existing student record in the database.
+ * Updates an existing student with the provided input.
  *
- * Validates the student ID and input, handles school reassignment (if applicable),
- * manages school history updates, and synchronizes student references
- * in related school documents.
+ * This function validates the student ID and input data, checks for school changes,
+ * updates school history, manages school-student references, and updates the student record in the database.
  *
  * @async
  * @function UpdateStudent
- * @param {object} parent - Unused GraphQL parent argument.
- * @param {object} args - GraphQL arguments.
+ * @param {object} parent - GraphQL parent resolver (unused).
+ * @param {object} args - The arguments object.
  * @param {string} args._id - The ID of the student to update.
- * @param {object} args.student_input - The student input data.
- * @param {string} args.student_input.first_name - First name of the student.
- * @param {string} args.student_input.last_name - Last name of the student.
- * @param {string} args.student_input.email - Email address.
- * @param {string} args.student_input.civility - Civility ("Mr" or "Mrs").
- * @param {string} args.student_input.postal_code_of_birth - Postal code of birth.
- * @param {string} args.student_input.mobile_phone - Mobile phone number.
- * @param {Array<object>} args.student_input.address - List of address objects.
- * @param {string} [args.student_input.date_of_birth] - Date of birth (optional).
- * @param {string} args.student_input.school_id - The new school ID.
+ * @param {object} args.student_input - The new data to update the student with.
+ * @param {string} args.student_input.first_name - Student's first name.
+ * @param {string} args.student_input.last_name - Student's last name.
+ * @param {string} args.student_input.email - Student's email.
+ * @param {string} args.student_input.civility - Student's civility ("Mr" or "Mrs").
+ * @param {string} args.student_input.postal_code_of_birth - Student's postal code of birth.
+ * @param {string} args.student_input.mobile_phone - Student's mobile phone.
+ * @param {Array<object>} args.student_input.address - List of student addresses.
+ * @param {string|Date} [args.student_input.date_of_birth] - Student's date of birth.
+ * @param {string} args.student_input.school_id - ID of the student's current school.
  *
- * @returns {Promise<{_id: string}>} - A promise resolving with the ID of the updated student.
+ * @returns {Promise<object>} - A promise that resolves to the updated student object.
  *
- * @throws {ApolloError} - Throws if validation fails, student not found, school not found, or update fails.
+ * @throws {ApolloError} - Throws if the student ID or school ID is invalid, or if any validation or database update fails.
  */
 async function UpdateStudent(parent, { _id, student_input }) {
   try {
@@ -266,20 +266,21 @@ async function UpdateStudent(parent, { _id, student_input }) {
 }
 
 /**
- * Soft deletes a student by setting their status to "deleted" and recording a timestamp.
+ * Soft deletes a student by setting their status to "deleted" and recording a deletion timestamp.
  *
- * Validates the provided student ID, ensures the student is not already deleted,
- * and updates the document. Returns the ID of the deleted student.
+ * This function validates the provided student ID, attempts to mark the student as deleted,
+ * and returns the ID of the deleted student. If the student does not exist or is already deleted,
+ * an error is thrown.
  *
  * @async
  * @function DeleteStudent
- * @param {object} parent - Unused GraphQL parent argument.
- * @param {object} args - GraphQL arguments.
+ * @param {object} parent - GraphQL parent resolver (unused).
+ * @param {object} args - The arguments object.
  * @param {string} args._id - The ID of the student to delete.
  *
- * @returns {Promise<{_id: string}>} - A promise resolving to an object containing the deleted student's ID.
+ * @returns {Promise<string>} - A promise that resolves to the ID of the deleted student.
  *
- * @throws {ApolloError} - Throws if the ID is invalid, student not found, or already deleted.
+ * @throws {ApolloError} - Throws if the ID is invalid or the student is not found.
  */
 async function DeleteStudent(parent, { _id }) {
   try {

@@ -176,15 +176,21 @@ async function UpdateSchool(parent, { _id, school_input }) {
 }
 
 /**
- * Soft deletes a school by setting its status to "deleted" and recording the deletion timestamp.
+ * Soft deletes a school by setting its status to "deleted" and recording a deletion timestamp.
+ *
+ * This function validates the provided school ID, updates the school's status to "deleted",
+ * and returns the ID of the deleted school. If the school is not found or already deleted,
+ * an error is thrown.
  *
  * @async
  * @function DeleteSchool
- * @param {object} _ - Unused parent argument.
+ * @param {object} parent - GraphQL parent resolver (unused).
  * @param {object} args - The arguments object.
- * @param {string} _id - The ID of the school to be soft-deleted.
- * @returns {Promise<object>} - A promise that resolves to the soft-deleted school object.
- * @throws {Error} - Throws an error if the school is not found.
+ * @param {string} args._id - The ID of the school to delete.
+ *
+ * @returns {Promise<string>} - A promise that resolves to the ID of the deleted school.
+ *
+ * @throws {ApolloError} - Throws if the ID is invalid or the school is not found or already deleted.
  */
 async function DeleteSchool(parent, { _id }) {
   try {
