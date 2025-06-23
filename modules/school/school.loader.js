@@ -1,8 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const keyBy = require('lodash/keyBy');
 const DataLoader = require('dataloader');
-const { Types } = require('mongoose');
-const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const SchoolModel = require('./school.models.js');
