@@ -7,6 +7,9 @@ const { ApolloError } = require('apollo-server');
 // *************** IMPORT MODULE ***************
 const StudentModel = require('./student.models.js');
 
+// *************** IMPORT VALIDATOR ***************
+const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
+
 /**
  * Batch function to load multiple students by their IDs.
  * Only returns students with status "active". If a student ID is invalid or the student is not found,
@@ -21,12 +24,7 @@ const StudentModel = require('./student.models.js');
  */
 async function StudentBatch(studentIds) {
   // *************** validate all studentIDs
-  const invalidStudentId = studentIds.find(
-    (ids) => !Types.ObjectId.isValid(ids)
-  );
-  if (invalidStudentId) {
-    throw new ApolloError(`Invalid student IDs: ${invalidStudentId}`);
-  }
+  ValidateIdMongoose(studentIds);
 
   // *************** find student data based on id and active status
   const students = await StudentModel.find({
