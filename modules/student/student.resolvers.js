@@ -21,7 +21,7 @@ const {
  * @function GetAllStudents
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active student objects.
  */
-async function GetAllStudents() {
+async function GetAllStudents(_, args) {
   try {
     // *************** find student data with status active
     const activeStudents = await StudentModel.find({ status: 'active' }).lean();
@@ -38,14 +38,14 @@ async function GetAllStudents() {
  * Retrieves a student by their unique ID.
  *
  * @async
- * @function GetStudentById
+ * @function GetOneStudent
  * @param {any} _ - Unused parent resolver parameter.
  * @param {object} args - Arguments containing the student ID.
  * @param {string} _id - The ID of the student to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the student object.
  * @throws {ApolloError} - Throws an error if the student is not found.
  */
-async function GetStudentById(_, { _id }) {
+async function GetOneStudent(_, { _id }) {
   try {
     // *************** Validating student ID
     ValidateIdMongoose(_id);
@@ -363,7 +363,7 @@ async function SchoolHistory(parent, _, ctx) {
 module.exports = {
   Query: {
     GetAllStudents,
-    GetStudentById,
+    GetOneStudent,
   },
   Mutation: {
     CreateStudent,

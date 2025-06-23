@@ -20,7 +20,7 @@ const {
  * @returns {Promise<Object[]>} - A promise that resolves to an array of active school objects.
  * @throws {ApolloError} - Throws an ApolloError if the database query fails.
  */
-async function GetAllSchools() {
+async function GetAllSchools(_, args) {
   try {
     // *************** find school data with status active
     const activeSchools = await SchoolModel.find({ status: 'active' }).lean();
@@ -39,14 +39,14 @@ async function GetAllSchools() {
  * - Returns the school document if found and active.
  *
  * @async
- * @function GetSchoolById
+ * @function GetOneSchool
  * @param {object} parent - Unused parent argument (GraphQL resolver pattern).
  * @param {object} args - The arguments object.
  * @param {string} args._id - The ID of the school to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the school object.
  * @throws {ApolloError} - Throws if the ID is invalid or the school is not found.
  */
-async function GetSchoolById(_, { _id }) {
+async function GetOneSchool(_, { _id }) {
   try {
     // *************** Validating school id
     ValidateIdMongoose(_id);
@@ -252,7 +252,7 @@ async function Students(parent, _, ctx) {
 module.exports = {
   Query: {
     GetAllSchools,
-    GetSchoolById,
+    GetOneSchool,
   },
   Mutation: {
     CreateSchool,

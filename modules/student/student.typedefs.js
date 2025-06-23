@@ -47,7 +47,7 @@ const studentTypeDefs = gql`
 
   extend type Query {
     GetAllStudents: [Student]
-    GetStudentById(_id: ID!): Student
+    GetOneStudent(_id: ID!): Student
   }
 
   extend type Mutation {

@@ -19,12 +19,7 @@ const baseTypeDefs = gql`
 `;
 
 // *************** Combine all type definitions
-const typeDefs = [
-  UserTypeDefs,
-  StudentTypeDefs,
-  SchoolTypeDefs,
-  baseTypeDefs,
-];
+const typeDefs = [UserTypeDefs, StudentTypeDefs, SchoolTypeDefs, baseTypeDefs];
 
 // *************** EXPORT MODULE ***************
 module.exports = typeDefs;

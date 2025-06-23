@@ -18,7 +18,7 @@ const {
  * @function GetAllUser
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
-async function GetAllUsers() {
+async function GetAllUsers(_, args) {
   try {
     // *************** find user data with status active
     const activeUsers = await UserModel.find({ status: 'active' }).lean();
@@ -38,14 +38,14 @@ async function GetAllUsers() {
  * If the user is not found, it throws an error.
  *
  * @async
- * @function GetUserById
+ * @function GetOneUser
  * @param {object} parent - Unused GraphQL parent resolver parameter.
  * @param {object} args - The arguments object.
  * @param {string} _id - The ID of the user to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the user object.
  * @throws {Error} - Throws an error if the user is not found.
  */
-async function GetUserById(_, { _id }) {
+async function GetOneUser(_, { _id }) {
   try {
     // *************** validate Id
     ValidateIdMongoose(_id);
@@ -253,7 +253,7 @@ async function DeleteUser(_, { _id }) {
 module.exports = {
   Query: {
     GetAllUsers,
-    GetUserById,
+    GetOneUser,
   },
 
   // *************** MUTATION ***************
