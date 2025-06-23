@@ -30,6 +30,8 @@ const userTypeDefs = gql`
     email: String!
     role: String!
     status: String!
+    created_at: Date
+    updated_at: Date
     deleted_at: Date
   }
 

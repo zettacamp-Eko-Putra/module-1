@@ -30,6 +30,8 @@ const studentTypeDefs = gql`
     school: School
     school_history: [School]
     status: String!
+    created_at: Date
+    updated_at: Date
     deleted_at: String
   }
 

@@ -24,6 +24,8 @@ const schoolTypeDefs = gql`
     address: [SchoolAddress]
     students: [Student]
     status: String!
+    created_at: Date
+    updated_at: Date
     deleted_at: Date
   }
 
