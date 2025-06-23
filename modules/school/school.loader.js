@@ -30,7 +30,6 @@ async function SchoolBatch(schoolIds) {
   // *************** find school based on id and active status
   const schools = await SchoolModel.find({
     _id: { $in: schoolIds },
-    status: 'active',
   }).lean();
 
   // *************** change array to object key base on school id

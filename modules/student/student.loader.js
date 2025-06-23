@@ -31,7 +31,6 @@ async function StudentBatch(studentIds) {
   // *************** find student data based on id and active status
   const students = await StudentModel.find({
     _id: { $in: studentIds },
-    status: 'active',
   }).lean();
 
   // *************** create map from student id
