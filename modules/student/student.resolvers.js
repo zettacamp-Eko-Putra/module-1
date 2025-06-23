@@ -332,7 +332,7 @@ async function school(parent, _, ctx) {
   }
 
   // *************** using school loaders to mapping school data based on school id
-  return await ctx.loaders.school.load(String(parent.school_id));
+  return await ctx.loaders.SchoolLoader.load(String(parent.school_id));
 }
 
 /**
@@ -356,7 +356,7 @@ async function school_history(parent, _, ctx) {
   }
 
   // *************** load school data from dataloader
-  return await ctx.loaders.school.loadMany(parent.school_history);
+  return await ctx.loaders.SchoolLoader.loadMany(parent.school_history);
 }
 
 // *************** EXPORT MODULE ***************

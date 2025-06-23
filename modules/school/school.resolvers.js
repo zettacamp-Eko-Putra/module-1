@@ -245,7 +245,7 @@ async function students(parent, _, ctx) {
   }
 
   // *************** retuning the result to the caller
-  return await ctx.loaders.student.loadMany(parent.students);
+  return await ctx.loaders.StudentLoader.loadMany(parent.students);
 }
 
 // *************** EXPORT MODULE ***************

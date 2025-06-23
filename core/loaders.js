@@ -1,6 +1,6 @@
 // *************** IMPORT MODULE ***************
-const CreateSchoolLoader = require('../modules/school/school.loader');
-const CreateStudentLoader = require('../modules/student/student.loader');
+const SchoolLoader = require('../modules/school/school.loader');
+const StudentLoader = require('../modules/student/student.loader');
 
 /**
  * Creates and returns an object containing all configured DataLoaders
@@ -13,8 +13,8 @@ const CreateStudentLoader = require('../modules/student/student.loader');
  */
 function GetDataLoaders() {
   return {
-    school: CreateSchoolLoader(),
-    student: CreateStudentLoader(),
+    SchoolLoader: SchoolLoader(),
+    StudentLoader: StudentLoader(),
   };
 }
 
