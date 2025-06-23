@@ -317,7 +317,7 @@ async function DeleteStudent(_, { _id }) {
  * Uses the student's `school_id` to load the corresponding school document from the database.
  *
  * @async
- * @function GetCurrentSchool
+ * @function school
  * @param {object} parent - The parent object containing the `school_id` field (typically a student).
  * @param {object} args - GraphQL arguments (unused).
  * @param {object} ctx - GraphQL context object containing the DataLoader instance.
@@ -325,7 +325,7 @@ async function DeleteStudent(_, { _id }) {
  *
  * @returns {Promise<object|null>} - A promise resolving to the school object, or `null` if not found.
  */
-async function School(parent, _, ctx) {
+async function school(parent, _, ctx) {
   // *************** if there's no school_id, return null
   if (!parent.school_id) {
     return null;
@@ -341,7 +341,7 @@ async function School(parent, _, ctx) {
  * Uses the student's `school_history` array to load multiple school documents from the database.
  *
  * @async
- * @function GetSchoolHistory
+ * @function school_history
  * @param {object} parent - The parent object containing the `school_history` field (typically a student).
  * @param {object} args - GraphQL arguments (unused).
  * @param {object} ctx - GraphQL context object containing the DataLoader instance.
@@ -349,7 +349,7 @@ async function School(parent, _, ctx) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of school objects.
  */
-async function SchoolHistory(parent, _, ctx) {
+async function school_history(parent, _, ctx) {
   // *************** if there's no school_id, return null
   if (!parent.school_history) {
     return null;
@@ -371,7 +371,7 @@ module.exports = {
     DeleteStudent,
   },
   Student: {
-    school: School,
-    school_history: SchoolHistory,
+    school: school,
+    school_history: school_history,
   },
 };

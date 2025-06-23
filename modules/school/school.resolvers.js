@@ -229,7 +229,7 @@ async function DeleteSchool(_, { _id }) {
  * Returns an empty array if no students are associated.
  *
  * @async
- * @function GetStudentsData
+ * @function Students
  * @param {object} parent - The parent object containing the `students` field (typically a school).
  * @param {object} args - GraphQL arguments (unused).
  * @param {object} ctx - GraphQL context object containing the DataLoader instances.
@@ -237,7 +237,7 @@ async function DeleteSchool(_, { _id }) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of student objects.
  */
-async function Students(parent, _, ctx) {
+async function students(parent, _, ctx) {
   // *************** creating if to check if the school student array empty
   if (!parent.students || !parent.students.length) {
     // *************** retuning value if student array empty
@@ -260,6 +260,6 @@ module.exports = {
     DeleteSchool,
   },
   School: {
-    students: Students,
+    students: students,
   },
 };
