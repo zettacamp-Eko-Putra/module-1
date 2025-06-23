@@ -255,7 +255,6 @@ module.exports = {
     GetAllUsers,
     GetOneUser,
   },
-
   Mutation: {
     CreateUser,
     UpdateUser,
