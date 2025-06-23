@@ -8,7 +8,7 @@ const SchoolModel = require('./school.models.js');
 const { ValidateSchoolInput } = require('./school.validator.js');
 const {
   ValidateIdMongoose,
-} = require(`../../utilities/common-validator/mongo-validator.js`);
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 // *************** QUERY ***************
 /**
@@ -36,7 +36,7 @@ async function GetAllSchools(_, args) {
 /**
  * Retrieves a school document from the database by its unique ID.
  * - Validates the provided ID.
- * - Returns the school document if found and active.
+ * - Returns the school document if found.
  *
  * @async
  * @function GetOneSchool

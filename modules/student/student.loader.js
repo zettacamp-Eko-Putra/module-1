@@ -45,10 +45,10 @@ async function StudentBatch(studentIds) {
  * Creates a DataLoader instance for batching and caching student data requests.
  * Uses the StudentBatch function to fetch multiple student records by their IDs efficiently.
  *
- * @function CreateStudentLoader
+ * @function StudentLoader
  * @returns {import('dataloader')} - A DataLoader instance configured to use the StudentBatch function.
  */
-const CreateStudentLoader = () => {
+const StudentLoader = () => {
   // *************** creating dataloader using batch SchoolBatch
   const loader = new DataLoader(StudentBatch);
 
@@ -57,4 +57,4 @@ const CreateStudentLoader = () => {
 };
 
 // *************** EXPORT MODULE ***************
-module.exports = CreateStudentLoader;
+module.exports = StudentLoader;

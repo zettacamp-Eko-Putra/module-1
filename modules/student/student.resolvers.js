@@ -11,7 +11,7 @@ const SchoolModel = require('../school/school.models.js');
 const { ValidateStudentInput } = require('./student.validator.js');
 const {
   ValidateIdMongoose,
-} = require(`../../utilities/common-validator/mongo-validator.js`);
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 // *************** QUERY ***************
 /**

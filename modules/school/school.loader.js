@@ -8,7 +8,7 @@ const SchoolModel = require('./school.models.js');
 // *************** IMPORT VALIDATOR ***************
 const {
   ValidateArrayIdMongoose,
-} = require(`../../utilities/common-validator/mongo-validator.js`);
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 /**
  * Batch function to load multiple active schools by their IDs using DataLoader.
@@ -45,10 +45,10 @@ async function SchoolBatch(schoolIds) {
 /**
  * Creates a DataLoader instance for batching and caching school data retrieval.
  *
- * @function CreateSchoolLoader
+ * @function SchoolLoader
  * @returns {DataLoader<string|import('mongoose').Types.ObjectId, Object|null>} - A DataLoader instance for schools.
  */
-function CreateSchoolLoader() {
+function SchoolLoader() {
   // *************** creating dataloader using batch SchoolBatch
   const loader = new DataLoader(SchoolBatch);
 
@@ -57,4 +57,4 @@ function CreateSchoolLoader() {
 }
 
 // *************** EXPORT MODULE ***************
-module.exports = CreateSchoolLoader;
+module.exports = SchoolLoader;
