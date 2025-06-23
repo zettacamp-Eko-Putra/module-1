@@ -6,7 +6,7 @@ const TypeDefs = require('./typedefs.js');
 const Resolvers = require('./resolvers.js');
 
 // *************** IMPORT UTILITIES ***************
-const GetDataLoaders = require(`./loaders.js`);
+const DataLoaders = require(`./loaders.js`);
 
 /**
  * Creates and configures a new instance of ApolloServer.
@@ -26,7 +26,7 @@ function CreateApolloServer() {
 
     // *************** Taking import from each loaders
     context: () => ({
-      loaders: GetDataLoaders(),
+      loaders: DataLoaders(),
     }),
   });
 }
