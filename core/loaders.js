@@ -11,7 +11,7 @@ const StudentLoader = require('../modules/student/student.loader');
  * @returns {import('dataloader')} return.school - DataLoader for fetching schools by ID.
  * @returns {import('dataloader')} return.student - DataLoader for fetching students by ID.
  */
-function initializeDataLoaders() {
+function InitializeDataLoaders() {
   return {
     SchoolLoader: SchoolLoader(),
     StudentLoader: StudentLoader(),
@@ -19,4 +19,4 @@ function initializeDataLoaders() {
 }
 
 // *************** EXPORT MODULE ***************
-module.exports = initializeDataLoaders;
+module.exports = InitializeDataLoaders;
