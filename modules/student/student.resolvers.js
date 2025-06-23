@@ -325,7 +325,7 @@ async function DeleteStudent(_, { _id }) {
  *
  * @returns {Promise<object|null>} - A promise resolving to the school object, or `null` if not found.
  */
-async function school(parent, _, ctx) {
+async function school_id(parent, _, ctx) {
   // *************** if there's no school_id, return null
   if (!parent.school_id) {
     return null;
@@ -371,7 +371,7 @@ module.exports = {
     DeleteStudent,
   },
   Student: {
-    school: school,
+    school: school_id,
     school_history: school_history,
   },
 };
