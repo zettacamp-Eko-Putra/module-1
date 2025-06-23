@@ -30,7 +30,7 @@ const SchoolSchema = new Schema(
     address: [SchoolAddressSchema],
 
     // Students associated with the school
-    students: [{ type: Schema.Types.ObjectId, ref: 'Student' }],
+    students: [{ type: Schema.Types.ObjectId, ref: 'student' }],
 
     // School status
     status: { type: String, enum: ['active', 'deleted'], default: 'active' },

@@ -51,13 +51,13 @@ const StudentSchema = new Schema(
     address: [StudentAddressSchema],
 
     // school id the student belongs to
-    school_id: { type: Schema.Types.ObjectId, ref: 'School', required: true },
+    school_id: { type: Schema.Types.ObjectId, ref: 'school', required: true },
 
     // Student status
     status: { type: String, enum: ['active', 'deleted'], default: 'active' },
 
     // Student School History
-    school_history: [{ type: Schema.Types.ObjectId, ref: 'School' }],
+    school_history: [{ type: Schema.Types.ObjectId, ref: 'school' }],
 
     // Delete at for the student
     deleted_at: { type: Date },
