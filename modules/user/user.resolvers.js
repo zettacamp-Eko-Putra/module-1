@@ -6,7 +6,9 @@ const UserModel = require('./user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require('./user.validator.js');
-const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
+const {
+  ValidateIdMongoose,
+} = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** QUERY ***************
 /**
