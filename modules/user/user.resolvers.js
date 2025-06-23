@@ -48,7 +48,7 @@ async function GetAllUsers(_, args) {
 async function GetOneUser(_, { _id }) {
   try {
     // *************** validate Id
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'GetOneUser');
 
     // *************** finding user based on id
     const user = await UserModel.findById(_id).lean();
@@ -167,7 +167,7 @@ async function CreateUser(_, { user_input }) {
 async function UpdateUser(_, { _id, user_input }) {
   try {
     // *************** validate Id and user_input
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'UpdateUser');
     ValidateUserInput(user_input);
 
     // *************** breakdown user input
@@ -225,7 +225,7 @@ async function UpdateUser(_, { _id, user_input }) {
 async function DeleteUser(_, { _id }) {
   try {
     // *************** validate Id
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'DeleteUser');
 
     // *************** finding user based on id and update the data
     const deleteUser = await UserModel.findByIdAndUpdate(_id, {

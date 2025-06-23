@@ -12,9 +12,9 @@ const { Types } = require(`mongoose`);
  * @param {string} [fieldName='_id'] - The name of the field being validated, included in the error message.
  * @throws {ApolloError} - Thrown if the provided ID is not a valid MongoDB ObjectId.
  */
-function ValidateIdMongoose(_id, fieldName = '_id') {
+function ValidateIdMongoose(_id, label) {
   if (!Types.ObjectId.isValid(_id)) {
-    throw new ApolloError(`Invalid ID for field "${fieldName}"`);
+    throw new ApolloError(`Invalid ID for field "${label}"`);
   }
 }
 

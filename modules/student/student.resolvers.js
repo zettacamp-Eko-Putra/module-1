@@ -48,7 +48,7 @@ async function GetAllStudents(_, args) {
 async function GetOneStudent(_, { _id }) {
   try {
     // *************** Validating student ID
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'GetOneStudent');
 
     // *************** finding student based on id
     const student = await StudentModel.findById(_id).lean();
@@ -179,7 +179,7 @@ async function CreateStudent(_, { student_input }) {
 async function UpdateStudent(_, { _id, student_input }) {
   try {
     // *************** Validating student ID and student input
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'UpdateStudent');
     ValidateStudentInput(student_input);
 
     // *************** Find the student by ID
@@ -286,7 +286,7 @@ async function UpdateStudent(_, { _id, student_input }) {
 async function DeleteStudent(_, { _id }) {
   try {
     // *************** Validating student ID
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'DeleteStudent');
 
     // *************** finding student based on id and update the data
     const deleteStudent = await StudentModel.findByIdAndUpdate(_id, {

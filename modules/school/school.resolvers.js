@@ -49,7 +49,7 @@ async function GetAllSchools(_, args) {
 async function GetOneSchool(_, { _id }) {
   try {
     // *************** Validating school id
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'GetOneSchool');
 
     // *************** finding school based on id
     const school = await SchoolModel.findById(_id).lean();
@@ -147,7 +147,7 @@ async function CreateSchool(_, { school_input }) {
 async function UpdateSchool(_, { _id, school_input }) {
   try {
     // *************** Validating school id and school input
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'UpdateSchool');
     ValidateSchoolInput(school_input);
 
     // *************** breakdown school input
@@ -197,7 +197,7 @@ async function UpdateSchool(_, { _id, school_input }) {
 async function DeleteSchool(_, { _id }) {
   try {
     // *************** checking if the school id is valid
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'DeleteSchool');
 
     // *************** finding school and update the data
     const deleteSchool = await SchoolModel.findByIdAndUpdate(_id, {
