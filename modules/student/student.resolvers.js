@@ -44,7 +44,7 @@ async function GetAllStudents() {
  * @returns {Promise<object>} - A promise that resolves to the student object.
  * @throws {ApolloError} - Throws an error if the student is not found.
  */
-async function GetStudentById(parent, { _id }) {
+async function GetStudentById(_, { _id }) {
   try {
     // *************** Validating student ID
     ValidateIdMongoose(_id);
@@ -92,7 +92,7 @@ async function GetStudentById(parent, { _id }) {
  *
  * @throws {ApolloError} - Throws if validation fails, the email is already taken, or the school ID is invalid.
  */
-async function CreateStudent(parent, { student_input }) {
+async function CreateStudent(_, { student_input }) {
   try {
     // *************** validate student_input
     ValidateStudentInput(student_input);
@@ -175,7 +175,7 @@ async function CreateStudent(parent, { student_input }) {
  *
  * @throws {ApolloError} - Throws if the student ID or school ID is invalid, or if any validation or database update fails.
  */
-async function UpdateStudent(parent, { _id, student_input }) {
+async function UpdateStudent(_, { _id, student_input }) {
   try {
     // *************** Validating student ID and student input
     ValidateIdMongoose(_id);
@@ -282,7 +282,7 @@ async function UpdateStudent(parent, { _id, student_input }) {
  *
  * @throws {ApolloError} - Throws if the ID is invalid or the student is not found.
  */
-async function DeleteStudent(parent, { _id }) {
+async function DeleteStudent(_, { _id }) {
   try {
     // *************** Validating student ID
     ValidateIdMongoose(_id);
@@ -324,7 +324,7 @@ async function DeleteStudent(parent, { _id }) {
  *
  * @returns {Promise<object|null>} - A promise resolving to the school object, or `null` if not found.
  */
-async function School(parent, args, ctx) {
+async function School(parent, _, ctx) {
   // *************** if there's no school_id, return null
   if (!parent.school_id) {
     return null;
@@ -348,7 +348,7 @@ async function School(parent, args, ctx) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of school objects.
  */
-async function SchoolHistory(parent, args, ctx) {
+async function SchoolHistory(parent, _, ctx) {
   // *************** if there's no school_id, return null
   if (!parent.school_history) {
     return null;

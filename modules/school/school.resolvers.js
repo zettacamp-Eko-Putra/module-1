@@ -44,7 +44,7 @@ async function GetAllSchools() {
  * @returns {Promise<object>} - A promise that resolves to the school object.
  * @throws {ApolloError} - Throws if the ID is invalid or the school is not found.
  */
-async function GetSchoolById(parent, { _id }) {
+async function GetSchoolById(_, { _id }) {
   try {
     // *************** Validating school id
     ValidateIdMongoose(_id);
@@ -78,7 +78,7 @@ async function GetSchoolById(parent, { _id }) {
  * @returns {Promise<object>} - A promise that resolves to the newly created school object.
  * @throws {Error} - Throws an error if a school with the same name already exists.
  */
-async function CreateSchool(parent, { school_input }) {
+async function CreateSchool(_, { school_input }) {
   try {
     // *************** validate school_input
     ValidateSchoolInput(school_input);
@@ -142,7 +142,7 @@ async function CreateSchool(parent, { school_input }) {
  * @returns {Promise<object>} - A promise that resolves to the updated school object.
  * @throws {Error} - Throws an error if the school ID is attempted to be updated or if the school is not found.
  */
-async function UpdateSchool(parent, { _id, school_input }) {
+async function UpdateSchool(_, { _id, school_input }) {
   try {
     // *************** Validating school id and school input
     ValidateIdMongoose(_id);
@@ -192,7 +192,7 @@ async function UpdateSchool(parent, { _id, school_input }) {
  *
  * @throws {ApolloError} - Throws if the ID is invalid or the school is not found or already deleted.
  */
-async function DeleteSchool(parent, { _id }) {
+async function DeleteSchool(_, { _id }) {
   try {
     // *************** checking if the school id is valid
     ValidateIdMongoose(_id);
@@ -235,7 +235,7 @@ async function DeleteSchool(parent, { _id }) {
  *
  * @returns {Promise<object[]>} - A promise resolving to an array of student objects.
  */
-async function Students(parent, args, ctx) {
+async function Students(parent, _, ctx) {
   // *************** creating if to check if the school student array empty
   if (!parent.students || !parent.students.length) {
     // *************** retuning value if student array empty

@@ -43,7 +43,7 @@ async function GetAllUsers() {
  * @returns {Promise<object>} - A promise that resolves to the user object.
  * @throws {Error} - Throws an error if the user is not found.
  */
-async function GetUserById(parent, { _id }) {
+async function GetUserById(_, { _id }) {
   try {
     // *************** validate Id
     ValidateIdMongoose(_id);
@@ -92,7 +92,7 @@ async function GetUserById(parent, { _id }) {
  *
  * @throws {ApolloError} - Throws error if input validation fails or the email is already used.
  */
-async function CreateUser(parent, { user_input }) {
+async function CreateUser(_, { user_input }) {
   try {
     // *************** validate user_input
     ValidateUserInput(user_input);
@@ -162,7 +162,7 @@ async function CreateUser(parent, { user_input }) {
  *
  * @throws {ApolloError} - Throws error if validation fails or user is not found.
  */
-async function UpdateUser(parent, { _id, user_input }) {
+async function UpdateUser(_, { _id, user_input }) {
   try {
     // *************** validate Id and user_input
     ValidateIdMongoose(_id);
@@ -220,7 +220,7 @@ async function UpdateUser(parent, { _id, user_input }) {
  *
  * @throws {ApolloError} - If the user ID is invalid or the user is not found or already deleted.
  */
-async function DeleteUser(parent, { _id }) {
+async function DeleteUser(_, { _id }) {
   try {
     // *************** validate Id
     ValidateIdMongoose(_id);
