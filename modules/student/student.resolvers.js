@@ -12,7 +12,6 @@ const { ValidateStudentInput } = require('./student.validator.js');
 const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
 
 // *************** QUERY ***************
-
 /**
  * Retrieves all students whose status is set to "active".
  *
