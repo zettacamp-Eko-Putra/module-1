@@ -7,7 +7,7 @@ const StudentTypeDefs = require('../modules/student/student.typedefs');
 const SchoolTypeDefs = require('../modules/school/school.typedefs');
 
 // *************** Define global helper type definitions
-const helperTypeDefs = gql`
+const baseTypeDefs = gql`
   scalar Date
 
   type Query {
@@ -23,7 +23,7 @@ const typeDefs = [
   UserTypeDefs,
   StudentTypeDefs,
   SchoolTypeDefs,
-  helperTypeDefs,
+  baseTypeDefs,
 ];
 
 // *************** EXPORT MODULE ***************
