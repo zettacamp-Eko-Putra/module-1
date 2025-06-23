@@ -6,7 +6,9 @@ const DataLoader = require('dataloader');
 const SchoolModel = require('./school.models.js');
 
 // *************** IMPORT VALIDATOR ***************
-const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
+const {
+  ValidateArrayIdMongoose,
+} = require(`../../utilities/common-validator/mongo-validator.js`);
 
 /**
  * Batch function to load multiple active schools by their IDs using DataLoader.
@@ -23,7 +25,7 @@ const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-valid
  */
 async function SchoolBatch(schoolIds) {
   // *************** validate all schoolIDs
-  ValidateIdMongoose(schoolIds);
+  ValidateArrayIdMongoose(schoolIds, 'schoolIds');
 
   // *************** find school based on id and active status
   const schools = await SchoolModel.find({

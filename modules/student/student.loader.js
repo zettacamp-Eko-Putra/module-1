@@ -6,7 +6,9 @@ const KeyBy = require('lodash/keyBy');
 const StudentModel = require('./student.models.js');
 
 // *************** IMPORT VALIDATOR ***************
-const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-validator.js`);
+const {
+  ValidateArrayIdMongoose,
+} = require(`../../utilities/common-validator/mongo-validator.js`);
 
 /**
  * Batch function to load multiple students by their IDs.
@@ -22,7 +24,7 @@ const ValidateIdMongoose = require(`../../utilities/common-validator/mongo-valid
  */
 async function StudentBatch(studentIds) {
   // *************** validate all studentIDs
-  ValidateIdMongoose(studentIds);
+  ValidateArrayIdMongoose(studentIds, 'studentIds');
 
   // *************** find student data based on id and active status
   const students = await StudentModel.find({
