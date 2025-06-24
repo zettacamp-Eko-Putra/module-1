@@ -10,13 +10,6 @@ const schoolTypeDefs = gql`
     postal_code: String!
   }
 
-  input SchoolAddressInput {
-    street: String!
-    city: String!
-    province: String!
-    postal_code: String!
-  }
-
   type School {
     _id: ID!
     school_legal_name: String!
@@ -27,6 +20,13 @@ const schoolTypeDefs = gql`
     created_at: Date
     updated_at: Date
     deleted_at: Date
+  }
+
+  input SchoolAddressInput {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
   }
 
   input SchoolInput {

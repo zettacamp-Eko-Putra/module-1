@@ -10,13 +10,6 @@ const userTypeDefs = gql`
     postal_code: String!
   }
 
-  input UserAddressInput {
-    street: String!
-    city: String!
-    province: String!
-    postal_code: String!
-  }
-
   type User {
     _id: ID!
     first_name: String!
@@ -33,6 +26,13 @@ const userTypeDefs = gql`
     created_at: Date
     updated_at: Date
     deleted_at: Date
+  }
+
+  input UserAddressInput {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
   }
 
   input UserInput {

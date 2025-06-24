@@ -10,13 +10,6 @@ const studentTypeDefs = gql`
     postal_code: String!
   }
 
-  input StudentAddressInput {
-    street: String!
-    city: String!
-    province: String!
-    postal_code: String!
-  }
-
   type Student {
     _id: ID!
     first_name: String!
@@ -33,6 +26,13 @@ const studentTypeDefs = gql`
     created_at: Date
     updated_at: Date
     deleted_at: String
+  }
+
+  input StudentAddressInput {
+    street: String!
+    city: String!
+    province: String!
+    postal_code: String!
   }
 
   input StudentInput {

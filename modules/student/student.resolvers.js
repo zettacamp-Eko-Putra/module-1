@@ -210,6 +210,18 @@ async function UpdateStudent(_, { _id, student_input }) {
       }
       // *************** add new school to history if it's different from current
       schoolHistory.push(newSchoolId);
+
+      // *************** Pull student from old school
+      await SchoolModel.updateOne(
+        { _id: currentSchoolId },
+        { $pull: { students: student._id } }
+      );
+
+      // *************** Add student to new school
+      await SchoolModel.updateOne(
+        { _id: Types.ObjectId(newSchoolId) },
+        { $addToSet: { students: student._id } }
+      );
     }
 
     // *************** Breakdown student input
@@ -232,27 +244,6 @@ async function UpdateStudent(_, { _id, student_input }) {
       { $set: studentData },
       { new: true }
     ).lean();
-
-    // ***************  showing error message if the Student update fail
-    if (!updatedStudent) {
-      throw new ApolloError('Update fail student not found');
-    }
-
-    // *************** If school changed, update school references
-    if (newSchoolId && newSchoolId !== currentSchoolId) {
-      if (currentSchoolId) {
-        await SchoolModel.updateOne(
-          { _id: currentSchoolId },
-          { $pull: { students: student._id } }
-        );
-      }
-
-      // *************** Add student to new school
-      await SchoolModel.updateOne(
-        { _id: Types.ObjectId(newSchoolId) },
-        { $addToSet: { students: student._id } }
-      );
-    }
 
     // *************** returning the updated data
     return updatedStudent;
