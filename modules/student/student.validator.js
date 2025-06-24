@@ -1,6 +1,11 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 
+// *************** IMPORT VALIDATOR ***************
+const {
+  ValidateIdMongoose,
+} = require('../../utilities/common-validator/mongo-validator.js');
+
 /**
  * Validates the student input object for required fields and proper data formats.
  * Throws an ApolloError if any validation rule is violated.
@@ -99,10 +104,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  if (!student_input.school_id || typeof student_input.school_id !== 'string') {
-    // *************** error message if the input not valid
-    throw new ApolloError('School ID is required and must be a string.');
-  }
+  ValidateIdMongoose(student_input.school_id, 'school_id');
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

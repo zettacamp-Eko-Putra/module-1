@@ -1,5 +1,4 @@
 // *************** IMPORT LIBRARY ***************
-const mongoose = require('mongoose');
 const { Types } = require('mongoose');
 const { ApolloError } = require('apollo-server');
 
@@ -198,6 +197,9 @@ async function UpdateStudent(_, { _id, student_input }) {
       ? String(student.school_id)
       : null;
 
+    // *************** taking existing school history
+    const schoolHistory = [...(student.school_history || [])];
+
     // *************** If the school is changing, validate the new school
     if (newSchoolId && newSchoolId !== currentSchoolId) {
       const newSchool = await SchoolModel.findById(newSchoolId)
@@ -206,13 +208,7 @@ async function UpdateStudent(_, { _id, student_input }) {
       if (!newSchool || newSchool.status === 'deleted') {
         throw new ApolloError('New School Not Found or already deleted');
       }
-    }
-
-    // *************** taking existing school history
-    const schoolHistory = [...(student.school_history || [])];
-
-    // *************** add new school to history if it's different from current
-    if (newSchoolId && newSchoolId !== currentSchoolId) {
+      // *************** add new school to history if it's different from current
       schoolHistory.push(newSchoolId);
     }
 
