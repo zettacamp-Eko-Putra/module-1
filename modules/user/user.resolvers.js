@@ -4,15 +4,13 @@ const { ApolloError } = require('apollo-server');
 // *************** IMPORT MODULE ***************
 const UserModel = require('./user.models.js');
 
-// *************** IMPORT UTILITIES ***************
-const ValidateIdMongoose = require(`../utilities/id_validator.js`);
-
 // *************** IMPORT VALIDATOR ***************
 const { ValidateUserInput } = require('./user.validator.js');
+const {
+  ValidateIdMongoose,
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 // *************** QUERY ***************
-
-// *************** Get all user function
 /**
  * Retrieves all users with active status from the database.
  *
@@ -20,20 +18,19 @@ const { ValidateUserInput } = require('./user.validator.js');
  * @function GetAllUser
  * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
  */
-async function GetAllUsers() {
+async function GetAllUsers(_, args) {
   try {
     // *************** find user data with status active
-    const activeUser = await UserModel.find({ status: 'active' }).lean();
+    const activeUsers = await UserModel.find({ status: 'active' }).lean();
 
     // *************** returning user data with status active
-    return activeUser;
+    return activeUsers;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-// *************** Get user by id function
 /**
  * Retrieves a user document by its unique ID.
  *
@@ -41,17 +38,17 @@ async function GetAllUsers() {
  * If the user is not found, it throws an error.
  *
  * @async
- * @function GetUserById
+ * @function GetOneUser
  * @param {object} parent - Unused GraphQL parent resolver parameter.
  * @param {object} args - The arguments object.
  * @param {string} _id - The ID of the user to retrieve.
  * @returns {Promise<object>} - A promise that resolves to the user object.
  * @throws {Error} - Throws an error if the user is not found.
  */
-async function GetUserById(parent, { _id }) {
+async function GetOneUser(_, { _id }) {
   try {
     // *************** validate Id
-    ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'GetOneUser');
 
     // *************** finding user based on id
     const user = await UserModel.findById(_id).lean();
@@ -70,28 +67,42 @@ async function GetUserById(parent, { _id }) {
 }
 
 // *************** MUTATION ***************
-
-// *************** Create user function
 /**
- * Creates a new user if the provided email is not already in use.
+ * Creates a new user after validating the input and checking for email uniqueness.
+ *
+ * This function performs input validation, checks if the email is already used,
+ * and saves the new user to the database.
  *
  * @async
  * @function CreateUser
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing user input.
- * @param {object} user_input - The user data to be saved.
- * @param {string} user_input.email - The user's email address.
+ * @param {object} parent - GraphQL parent resolver (unused).
+ * @param {object} args - Arguments object containing the user input.
+ * @param {object} args.user_input - The input data for creating the user.
+ * @param {string} args.user_input.first_name - User's first name.
+ * @param {string} args.user_input.last_name - User's last name.
+ * @param {string} args.user_input.civility - User's civility (e.g., "Mr", "Mrs").
+ * @param {string} [args.user_input.office_phone] - Optional office phone number.
+ * @param {string} [args.user_input.direct_line] - Optional direct line number.
+ * @param {string} args.user_input.mobile_phone - User's mobile phone number.
+ * @param {string} args.user_input.entity - The entity the user belongs to.
+ * @param {Array<object>} args.user_input.address - Array of address objects.
+ * @param {string} args.user_input.email - User's email address.
+ * @param {string} args.user_input.password - User's password.
+ * @param {string} args.user_input.role - User's role in the system.
+ *
  * @returns {Promise<object>} - A promise that resolves to the newly created user object.
- * @throws {Error} - Throws an error if the email is already taken.
+ *
+ * @throws {ApolloError} - Throws error if input validation fails or the email is already used.
  */
-async function CreateUser(parent, { user_input }) {
+async function CreateUser(_, { user_input }) {
   try {
     // *************** validate user_input
-    await ValidateUserInput(user_input);
+    ValidateUserInput(user_input);
 
     // *************** check if the email already taken by another user
     const isEmailAlreadyExist = await UserModel.exists({
       email: user_input.email.trim().toLowerCase(),
+      status: 'active',
     });
 
     // *************** showing message if the email already taken by another user
@@ -109,7 +120,7 @@ async function CreateUser(parent, { user_input }) {
       mobile_phone: user_input.mobile_phone,
       entity: user_input.entity,
       address: user_input.address,
-      email: user_input.email,
+      email: user_input.email.trim().toLowerCase(),
       password: user_input.password,
       role: user_input.role,
     };
@@ -125,32 +136,39 @@ async function CreateUser(parent, { user_input }) {
   }
 }
 
-// *************** Update user function
 /**
- * Updates an existing user's data based on the provided ID.
- * Prevents the user from modifying their own ID.
+ * Updates an existing user's information after validating the ID and input data.
+ *
+ * This function performs validation on the provided user ID and input, updates the user's
+ * details in the database, and returns the ID of the updated user.
  *
  * @async
  * @function UpdateUser
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing the user ID and updated data.
- * @param {string} _id - The ID of the user to update.
- * @param {object} user_input - The data to update the user with.
- * @returns {Promise<object>} - A promise that resolves to the updated user object.
- * @throws {Error} - Throws an error if the ID is being updated or if the user is not found.
+ * @param {object} parent - GraphQL parent resolver (unused).
+ * @param {object} args - Arguments object.
+ * @param {string} args._id - The unique ID of the user to update.
+ * @param {object} args.user_input - The new data for the user.
+ * @param {string} args.user_input.first_name - User's first name.
+ * @param {string} args.user_input.last_name - User's last name.
+ * @param {string} args.user_input.civility - User's civility ("Mr", "Mrs").
+ * @param {string} [args.user_input.office_phone] - Optional office phone number.
+ * @param {string} [args.user_input.direct_line] - Optional direct line number.
+ * @param {string} args.user_input.mobile_phone - User's mobile phone number.
+ * @param {string} args.user_input.entity - The entity the user belongs to.
+ * @param {Array<object>} args.user_input.address - Array of address objects.
+ * @param {string} args.user_input.email - User's email address.
+ * @param {string} args.user_input.password - User's password.
+ * @param {string} args.user_input.role - User's role in the system.
+ *
+ * @returns {Promise<{ _id: string }>} - A promise that resolves to an object containing the updated user ID.
+ *
+ * @throws {ApolloError} - Throws error if validation fails or user is not found.
  */
-async function UpdateUser(parent, { _id, user_input }) {
+async function UpdateUser(_, { _id, user_input }) {
   try {
-    // *************** showing error message if the user tried to update their id
-    if (user_input._id) {
-      throw new ApolloError('Cannot update User ID');
-    }
-
-    // *************** validate Id
-    await ValidateIdMongoose(_id);
-
-    // *************** validate user_input
-    await ValidateUserInput(user_input);
+    // *************** validate Id and user_input
+    ValidateIdMongoose(_id, 'UpdateUser');
+    ValidateUserInput(user_input);
 
     // *************** breakdown user input
     const userData = {
@@ -162,7 +180,7 @@ async function UpdateUser(parent, { _id, user_input }) {
       mobile_phone: user_input.mobile_phone,
       entity: user_input.entity,
       address: user_input.address,
-      email: user_input.email,
+      email: user_input.email.trim().toLowerCase(),
       password: user_input.password,
       role: user_input.role,
     };
@@ -172,7 +190,7 @@ async function UpdateUser(parent, { _id, user_input }) {
       _id,
       { $set: userData },
       { new: true }
-    );
+    ).lean();
 
     // *************** showing error message if the user id cannot be found in database
     if (!updatedUser) {
@@ -187,32 +205,36 @@ async function UpdateUser(parent, { _id, user_input }) {
   }
 }
 
-// *************** Delete User function
 /**
- * Soft deletes a user by updating their status to "deleted" and setting a deletion timestamp.
+ * Soft deletes a user by setting its status to "deleted" and recording a deletion timestamp.
+ *
+ * This function first validates the given user ID, then updates the user's status
+ * to "deleted" and adds a `deleted_at` timestamp. If the user is not found or already deleted,
+ * it throws an error.
  *
  * @async
  * @function DeleteUser
- * @param {any} _ - Unused parent resolver parameter.
- * @param {object} args - Arguments containing the user ID.
- * @param {string} _id - The ID of the user to delete.
- * @returns {Promise<object>} - A promise that resolves to the soft-deleted user object.
- * @throws {Error} - Throws an error if the user is not found.
+ * @param {object} parent - GraphQL resolver parent (unused).
+ * @param {object} args - Arguments object.
+ * @param {string} args._id - The ID of the user to delete.
+ *
+ * @returns {Promise<string>} - A promise that resolves to the ID of the deleted user.
+ *
+ * @throws {ApolloError} - If the user ID is invalid or the user is not found or already deleted.
  */
-async function DeleteUser(parent, { _id }) {
+async function DeleteUser(_, { _id }) {
   try {
     // *************** validate Id
-    await ValidateIdMongoose(_id);
+    ValidateIdMongoose(_id, 'DeleteUser');
 
     // *************** finding user based on id and update the data
-    const deleteUser = await UserModel.findOneAndUpdate(
-      { _id, status: { $ne: `deleted` } },
-      {
-        // *************** changing status field to deleted and adding timestamp
-        status: 'deleted',
-        deleted_at: new Date(),
-      }
-    );
+    const deleteUser = await UserModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to deleted and adding timestamp
+      status: 'deleted',
+      deleted_at: new Date(),
+    })
+      .select('_id')
+      .lean();
 
     // *************** showing error message if user id cannot be found in database
     if (!deleteUser) {
@@ -220,27 +242,22 @@ async function DeleteUser(parent, { _id }) {
     }
 
     // *************** returning user deleted data to user
-    return deleteUser;
+    return _id;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
 
-const userResolvers = {
-  // *************** QUERY ***************
+// *************** EXPORT MODULE ***************
+module.exports = {
   Query: {
     GetAllUsers,
-    GetUserById,
+    GetOneUser,
   },
-
-  // *************** MUTATION ***************
   Mutation: {
     CreateUser,
     UpdateUser,
     DeleteUser,
   },
 };
-
-// *************** EXPORT MODULE ***************
-module.exports = userResolvers;

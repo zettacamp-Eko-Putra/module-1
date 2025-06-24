@@ -1,6 +1,11 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 
+// *************** IMPORT VALIDATOR ***************
+const {
+  ValidateIdMongoose,
+} = require('../../utilities/common-validator/mongo-validator.js');
+
 /**
  * Validates the student input object for required fields and proper data formats.
  * Throws an ApolloError if any validation rule is violated.
@@ -23,7 +28,7 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If any field fails validation.
  */
-async function ValidateStudentInput(student_input) {
+function ValidateStudentInput(student_input) {
   // *************** validate student first_name
   if (
     !student_input.first_name ||
@@ -69,26 +74,25 @@ async function ValidateStudentInput(student_input) {
   if (!Array.isArray(student_input.address) || !student_input.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
-  } else {
-    // *************** validate each address array
-    student_input.address.forEach((addr, index) => {
-      if (typeof addr.street !== 'string' || addr.street.trim() === '') {
-        throw new ApolloError(`Street at index ${index} not valid`);
-      }
-      if (typeof addr.city !== 'string' || addr.city.trim() === '') {
-        throw new ApolloError(`city at index ${index} not valid`);
-      }
-      if (typeof addr.province !== 'string' || addr.province.trim() === '') {
-        throw new ApolloError(`province at index ${index} not valid`);
-      }
-      if (
-        typeof addr.postal_code !== 'string' ||
-        addr.postal_code.trim() === ''
-      ) {
-        throw new ApolloError(`postal code at index ${index} not valid`);
-      }
-    });
   }
+  // *************** validate each address array
+  student_input.address.forEach((addr, index) => {
+    if (typeof addr.street !== 'string' || addr.street.trim() === '') {
+      throw new ApolloError(`Street at index ${index} not valid`);
+    }
+    if (typeof addr.city !== 'string' || addr.city.trim() === '') {
+      throw new ApolloError(`city at index ${index} not valid`);
+    }
+    if (typeof addr.province !== 'string' || addr.province.trim() === '') {
+      throw new ApolloError(`province at index ${index} not valid`);
+    }
+    if (
+      typeof addr.postal_code !== 'string' ||
+      addr.postal_code.trim() === ''
+    ) {
+      throw new ApolloError(`postal code at index ${index} not valid`);
+    }
+  });
 
   // *************** validate date_of_birth
   if (student_input.date_of_birth) {
@@ -100,10 +104,7 @@ async function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  if (!student_input.school_id || typeof student_input.school_id !== 'string') {
-    // *************** error message if the input not valid
-    throw new ApolloError('School ID is required and must be a string.');
-  }
+  ValidateIdMongoose(student_input.school_id, 'school_id');
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

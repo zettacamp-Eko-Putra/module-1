@@ -1,102 +1,50 @@
-// *************** IMPORT CORE ***************
-require('dotenv').config();
-
 // *************** IMPORT MODULE ***************
-const UserTypeDefs = require('./user/user.typedefs');
-const StudentTypeDefs = require('./student/student.typedefs');
-const SchoolTypeDefs = require('./school/school.typedefs');
-const UserResolvers = require('./user/user.resolvers');
-const StudentResolvers = require('./student/student.resolvers');
-const SchoolResolvers = require('./school/school.resolvers');
+const { PORT } = require('./core/config');
 
-// *************** LOADER ***************
-const CreateSchoolLoader = require('./school/school.loader');
-const CreateStudentLoader = require('./student/student.loader');
+// *************** IMPORT UTILITIES ***************
+const CreateExpressApp = require(`./core/express.js`);
+const CreateApolloServer = require(`./core/apollo.js`);
+const ConnectToMongoDB = require(`./core/database.js`);
 
-// *************** IMPORT LIBRARY ***************
-const express = require('express');
-const { ApolloServer, gql } = require('apollo-server-express');
-const mongoose = require('mongoose');
-
-// *************** Configuration
-const app = express();
-const port = process.env.PORT;
-const dbName = process.env.DB_NAME;
-const host = process.env.HOST;
-const baseTypeDefs = gql`
-  scalar Date
-
-  type Query {
-    _empty: String
-  }
-  type Mutation {
-    _empty: String
-  }
-`;
-
-const server = new ApolloServer({
-  // *************** Taking import from each type def
-  typeDefs: [UserTypeDefs, StudentTypeDefs, SchoolTypeDefs, baseTypeDefs],
-
-  // *************** Taking import from each resolver
-  resolvers: [UserResolvers, StudentResolvers, SchoolResolvers],
-
-  // *************** Taking import from each loaders
-  context: () => ({
-    loaders: {
-      school: CreateSchoolLoader(),
-      students: CreateStudentLoader(),
-    },
-  }),
-});
-
-// *************** Function to start server
 /**
- * Initializes and starts the GraphQL server.
- *
- * - Starts the Apollo Server.
- * - Applies middleware to the Express app.
- * - Connects to MongoDB.
- * - Sets up a basic route at '/'.
- * - Listens on the specified port.
+ * Initializes and starts the Express and Apollo GraphQL servers.
+ * - Connects to the MongoDB database.
+ * - Starts the Apollo Server and applies its middleware to the Express app.
+ * - Sets up a basic health check route (`GET /`) that returns a simple status message.
+ * - Starts the Express HTTP server on the specified port.
  *
  * @async
- * @function StartServer
- * @returns {Promise<void>} - A Promise that resolves when the server is successfully started.
- * @throws {Error} - Logs error if the server fails to start.
+ * @function InitializeServer
+ * @returns {Promise<void>} - A Promise that resolves when the server is successfully running.
+ * @throws {Error} Logs any errors encountered during server initialization.
  */
-async function StartServer() {
+async function InitializeServer() {
   try {
-    // *************** running Apollo server asynchronous
-    await server.start();
+    // *************** Create Express app instance
+    const app = CreateExpressApp();
 
-    // *************** connect apollo server to express as middleware
+    // *************** Create Apollo Server instance
+    const server = CreateApolloServer();
+
+    // *************** Connect to Mongo DB
+    await ConnectToMongoDB();
+
+    // *************** Apply Apollo middleware to Express app
+    await server.start();
     server.applyMiddleware({ app, path: '/graphql' });
 
-    // *************** connect mongoose to mongoDB
-    await mongoose.connect(`mongodb://${host}/${dbName}`, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
-    // *************** message if the connection is success
-    console.log('MongoDB connected');
+    // *************** Health check route for basic server status
+    app.get('/', (req, res) => res.send('Server is running'));
 
-    // *************** adding endpoint to testing the server
-    app.get('/', (req, res) => {
-      res.send('Server is running');
-    });
-
-    // *************** adding message if the server running
-    app.listen(port, () => {
-      console.log(
-        `Server running at http://localhost:${port}${server.graphqlPath}`
-      );
+    // *************** Start Express server and listen on PORT
+    app.listen(PORT, () => {
+      console.log('Server running');
     });
   } catch (error) {
-    // *************** showing error message if cannot connect to the server
+    // *************** Handle and log any errors during initialization
     console.error('Error starting server:', error);
   }
 }
 
-// *************** calling function to start the server
-StartServer();
+// *************** calling function to Initialize the server
+InitializeServer();
