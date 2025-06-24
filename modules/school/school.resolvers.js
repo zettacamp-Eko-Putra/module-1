@@ -51,8 +51,8 @@ async function GetOneSchool(_, { _id }) {
     // *************** Validating school id
     ValidateIdMongoose(_id, 'GetOneSchool');
 
-    // *************** finding school based on id
-    const school = await SchoolModel.findById(_id).lean();
+    // *************** finding school based on id and status
+    const school = await SchoolModel.findOne({ _id, status: 'active' }).lean();
 
     // *************** showing message if the school cannot be found
     if (!school) {
@@ -85,33 +85,18 @@ async function CreateSchool(_, { school_input }) {
     // *************** validate school_input
     ValidateSchoolInput(school_input);
 
-    // *************** Changing school input legal name to lower case
-    const inputNameLower = school_input.school_legal_name.trim().toLowerCase();
+    // *************** Remove leading and trailing spaces from school legal name
+    const inputName = school_input.school_legal_name.trim();
 
-    // *************** find matching school by legal name
-    const matchingSchool = await SchoolModel.aggregate([
-      {
-        $project: {
-          school_legal_name: 1,
-          status: 1,
-        },
-      },
-      {
-        $addFields: {
-          school_legal_name_lowercase: { $toLower: '$school_legal_name' },
-        },
-      },
-      {
-        $match: {
-          school_legal_name_lowercase: inputNameLower,
-          status: `active`,
-        },
-      },
-    ]).allowDiskUse(true);
+    // *************** find exists school legal name in database
+    const isSchoolLegalNameAlreadyExists = await SchoolModel.exists({
+      school_legal_name: { $regex: `^${inputName}$`, $options: 'i' },
+      status: 'active',
+    });
 
-    // *************** showing error message if school legal name already exists
-    if (matchingSchool.length) {
-      throw new ApolloError('School name already exists');
+    // *************** Throwing error if there's exact name in database
+    if (isSchoolLegalNameAlreadyExists) {
+      throw new ApolloError('School legal name already exists');
     }
 
     // *************** breakdown the school input
@@ -149,6 +134,29 @@ async function UpdateSchool(_, { _id, school_input }) {
     // *************** Validating school id and school input
     ValidateIdMongoose(_id, 'UpdateSchool');
     ValidateSchoolInput(school_input);
+
+    // *************** Remove leading and trailing spaces from school legal name
+    const inputName = school_input.school_legal_name.trim().toLowerCase();
+
+    // *************** Find current school by id
+    const currentSchool = await SchoolModel.findById(_id).lean();
+
+    // *************** Find
+    const currentSchoolName = currentSchool.school_legal_name
+      .trim()
+      .toLowerCase();
+
+    // *************** Only check duplication if legal name changed
+    if (inputName !== currentSchoolName) {
+      const isSchoolLegalNameAlreadyExists = await SchoolModel.exists({
+        school_legal_name: { $regex: `^${inputName}$`, $options: 'i' },
+        status: 'active',
+      });
+
+      if (isSchoolLegalNameAlreadyExists) {
+        throw new ApolloError('School legal name already exists');
+      }
+    }
 
     // *************** breakdown school input
     const schoolData = {
@@ -200,11 +208,14 @@ async function DeleteSchool(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteSchool');
 
     // *************** finding school and update the data
-    const deleteSchool = await SchoolModel.findByIdAndUpdate(_id, {
-      // *************** changing status field to deleted and adding timestamp
-      status: 'deleted',
-      deleted_at: new Date(),
-    })
+    const deleteSchool = await SchoolModel.findOneAndUpdate(
+      { _id, status: { $ne: 'deleted' } },
+      {
+        // *************** changing status field to deleted and adding timestamp
+        status: 'deleted',
+        deleted_at: new Date(),
+      }
+    )
       .select('_id')
       .lean();
 

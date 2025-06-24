@@ -26,7 +26,7 @@ async function StudentBatch(studentIds) {
   // *************** validate all studentIDs
   ValidateArrayIdMongoose(studentIds, 'studentIds');
 
-  // *************** find student data based on id and active status
+  // *************** find student data based on id
   const students = await StudentModel.find({
     _id: { $in: studentIds },
   }).lean();
@@ -34,7 +34,7 @@ async function StudentBatch(studentIds) {
   // *************** create map from student id
   const studentMap = KeyBy(students, (student) => String(student._id));
 
-  // *************** insert null to if the student empty
+  // *************** sort student data and giving null if the data is empty
   const result = studentIds.map((id) => studentMap[String(id)] || null);
 
   // *************** return the data to user

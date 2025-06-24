@@ -27,7 +27,7 @@ async function SchoolBatch(schoolIds) {
   // *************** validate all schoolIDs
   ValidateArrayIdMongoose(schoolIds, 'schoolIds');
 
-  // *************** find school based on id and active status
+  // *************** find school based on id
   const schools = await SchoolModel.find({
     _id: { $in: schoolIds },
   }).lean();

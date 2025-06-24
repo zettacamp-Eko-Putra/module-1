@@ -51,7 +51,7 @@ async function GetOneUser(_, { _id }) {
     ValidateIdMongoose(_id, 'GetOneUser');
 
     // *************** finding user based on id
-    const user = await UserModel.findById(_id).lean();
+    const user = await UserModel.findOne({ _id, status: 'active' }).lean();
 
     // *************** showing message if the user cannot be found
     if (!user) {
@@ -170,6 +170,33 @@ async function UpdateUser(_, { _id, user_input }) {
     ValidateIdMongoose(_id, 'UpdateUser');
     ValidateUserInput(user_input);
 
+    // *************** Take user data
+    const user = await UserModel.findOne({ _id, status: 'active' }).lean();
+
+    // *************** Throw error if user dont exists
+    if (!user) {
+      throw new ApolloError('user already deleted');
+    }
+
+    // *************** Take email user input
+    const emailInput = user_input.email.trim().toLowerCase();
+
+    // *************** Take current user email
+    const currentEmail = user.email;
+
+    // *************** check if there same email in database
+    if (emailInput !== currentEmail) {
+      const isEmailAlreadyExist = await UserModel.exists({
+        email: emailInput,
+        status: 'active',
+        _id: { $ne: _id },
+      });
+      // *************** Throw error if there same email in database
+      if (isEmailAlreadyExist) {
+        throw new ApolloError('Email already exists');
+      }
+    }
+
     // *************** breakdown user input
     const userData = {
       first_name: user_input.first_name,
@@ -228,11 +255,14 @@ async function DeleteUser(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteUser');
 
     // *************** finding user based on id and update the data
-    const deleteUser = await UserModel.findByIdAndUpdate(_id, {
-      // *************** changing status field to deleted and adding timestamp
-      status: 'deleted',
-      deleted_at: new Date(),
-    })
+    const deleteUser = await UserModel.findOneAndUpdate(
+      { _id, status: { $ne: 'deleted' } },
+      {
+        // *************** changing status field to deleted and adding timestamp
+        status: 'deleted',
+        deleted_at: new Date(),
+      }
+    )
       .select('_id')
       .lean();
 

@@ -49,8 +49,11 @@ async function GetOneStudent(_, { _id }) {
     // *************** Validating student ID
     ValidateIdMongoose(_id, 'GetOneStudent');
 
-    // *************** finding student based on id
-    const student = await StudentModel.findById(_id).lean();
+    // *************** finding student based on id and status active
+    const student = await StudentModel.findOne({
+      _id,
+      status: 'active',
+    }).lean();
 
     // *************** showing message if the student cannot be found
     if (!student) {
@@ -184,9 +187,28 @@ async function UpdateStudent(_, { _id, student_input }) {
     // *************** Find the student by ID
     const student = await StudentModel.findById(_id);
 
-    // ***************showing error message if the student id cannot be found in database
+    // *************** showing error message if the student id cannot be found in database
     if (!student) {
       throw new ApolloError('Student not found');
+    }
+
+    // *************** Take email student input
+    const emailInput = student_input.email.trim().toLowerCase();
+
+    // *************** Take current student email
+    const currentEmail = student.email;
+
+    // *************** check if there same email in database
+    if (emailInput !== currentEmail) {
+      const isEmailAlreadyExist = await StudentModel.exists({
+        email: emailInput,
+        status: 'active',
+        _id: { $ne: _id },
+      });
+      // *************** Throw error if there same email in database
+      if (isEmailAlreadyExist) {
+        throw new ApolloError('Email already exists');
+      }
     }
 
     // *************** take the new school ID from input
@@ -276,11 +298,14 @@ async function DeleteStudent(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteStudent');
 
     // *************** finding student based on id and update the data
-    const deleteStudent = await StudentModel.findByIdAndUpdate(_id, {
-      // *************** changing status field to deleted and adding timstamp
-      status: 'deleted',
-      deleted_at: new Date(),
-    })
+    const deleteStudent = await StudentModel.findOneAndUpdate(
+      { _id, status: { $ne: 'deleted' } },
+      {
+        // *************** changing status field to deleted and adding timstamp
+        status: 'deleted',
+        deleted_at: new Date(),
+      }
+    )
       .select('_id')
       .lean();
 
