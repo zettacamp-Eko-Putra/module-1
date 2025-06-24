@@ -132,7 +132,6 @@ async function CreateStudent(_, { student_input }) {
       address: student_input.address,
       date_of_birth: student_input.date_of_birth,
       school_id: student_input.school_id,
-      school_history: [student_input.school_id],
     };
 
     // *************** creating new student based on the studentData
@@ -184,8 +183,11 @@ async function UpdateStudent(_, { _id, student_input }) {
     ValidateIdMongoose(_id, 'UpdateStudent');
     ValidateStudentInput(student_input);
 
-    // *************** Find the student by ID
-    const student = await StudentModel.findById(_id);
+    // *************** Find the student data
+    const student = await StudentModel.findOne({
+      _id,
+      status: 'active',
+    }).lean();
 
     // *************** showing error message if the student id cannot be found in database
     if (!student) {
@@ -231,7 +233,7 @@ async function UpdateStudent(_, { _id, student_input }) {
         throw new ApolloError('New School Not Found or already deleted');
       }
       // *************** add new school to history if it's different from current
-      schoolHistory.push(newSchoolId);
+      schoolHistory.push(currentSchoolId);
 
       // *************** Pull student from old school
       await SchoolModel.updateOne(
@@ -250,7 +252,7 @@ async function UpdateStudent(_, { _id, student_input }) {
     const studentData = {
       first_name: student_input.first_name,
       last_name: student_input.last_name,
-      email: student_input.email.trim().toLowerCase(),
+      email: emailInput,
       civility: student_input.civility,
       postal_code_of_birth: student_input.postal_code_of_birth,
       mobile_phone: student_input.mobile_phone,
@@ -297,7 +299,7 @@ async function DeleteStudent(_, { _id }) {
     // *************** Validating student ID
     ValidateIdMongoose(_id, 'DeleteStudent');
 
-    // *************** finding student based on id and update the data
+    // *************** finding student based on id and status and update the data
     const deleteStudent = await StudentModel.findOneAndUpdate(
       { _id, status: { $ne: 'deleted' } },
       {

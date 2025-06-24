@@ -141,7 +141,7 @@ async function UpdateSchool(_, { _id, school_input }) {
     // *************** Find current school by id
     const currentSchool = await SchoolModel.findById(_id).lean();
 
-    // *************** Find
+    // *************** Take current school legal name
     const currentSchoolName = currentSchool.school_legal_name
       .trim()
       .toLowerCase();

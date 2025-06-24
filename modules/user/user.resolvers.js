@@ -207,7 +207,7 @@ async function UpdateUser(_, { _id, user_input }) {
       mobile_phone: user_input.mobile_phone,
       entity: user_input.entity,
       address: user_input.address,
-      email: user_input.email.trim().toLowerCase(),
+      email: emailInput,
       password: user_input.password,
       role: user_input.role,
     };
