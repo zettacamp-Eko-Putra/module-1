@@ -1,0 +1,48 @@
+// *************** IMPORT LIBRARY ***************
+const { gql } = require('apollo-server');
+
+// *************** Block Type
+const blockTypeDefs = gql`
+  
+ Type Block{
+   _id:ID!
+   name:String!
+   description:String!
+   subject_ids:[Subject]
+   status:BlockStatus!
+   created_at:Date
+   created_by:ID
+   updated_by:[UpdatedBy]
+   deleted_at:Date
+   deleted_by:ID
+}
+
+ Type UpdatedBy{
+   user_id:ID
+   updated_at:Date
+}
+
+ Enum BlockStatus{
+   ACTIVE
+   DELETED
+}
+
+ Input BlockInput{ 
+   name:String!
+   description:String!
+}
+
+ extend type Query{
+   GetAllBlocks: [Block]
+   GetOneBlock(_id:ID!):Block
+}
+
+ extend type Mutation{
+   CreateBlock(block_input:BlockInput):Block!
+   UpdateBlock(_id:ID!, Block_input:BlockInput):Block
+   DeleteBlock(_id:ID!):ID
+}
+`;
+
+// *************** EXPORT MODULE ***************
+module.exports = blockTypeDefs;

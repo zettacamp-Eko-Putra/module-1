@@ -3,7 +3,6 @@ const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
 // *************** MODEL Schema: Block ***************
-
 const BlockSchema = new Schema(
   {
     // Name for the block
@@ -21,6 +20,7 @@ const BlockSchema = new Schema(
     // user id who create the block
     created_by: { type: Schema.Types.ObjectId, ref: 'user' },
 
+    // user id and time who update the block
     updated_by: [
       {
         user_id: { type: Schema.Types.ObjectId, ref: 'user' },
