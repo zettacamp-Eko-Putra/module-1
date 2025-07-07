@@ -113,7 +113,7 @@ async function UpdateBlock(_, { _id, block_input }) {
       });
 
       if (isBlockNameAlreadyExists) {
-        throw new ApolloError('block legal name already exists');
+        throw new ApolloError('block name already exists');
       }
     }
 
@@ -185,6 +185,17 @@ async function DeleteBlock(_, { _id }) {
   }
 }
 
+async function subject_ids(parent, _, ctx) {
+  // *************** creating if to check if the block subject array empty
+  if (!parent.subject || !parent.subject.length) {
+    // *************** retuning value if student array empty
+    return [];
+  }
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.SubjectLoader.loadMany(parent.subject);
+}
+
 // *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
@@ -195,5 +206,8 @@ module.exports = {
     CreateBlock,
     UpdateBlock,
     DeleteBlock,
+  },
+  block: {
+    subjects: subject_ids,
   },
 };
