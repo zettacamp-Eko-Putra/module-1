@@ -4,7 +4,7 @@ const { gql } = require('apollo-server');
 // *************** Block Type
 const blockTypeDefs = gql`
   
- Type Block{
+ type Block{
    _id:ID!
    name:String!
    description:String!
@@ -17,17 +17,17 @@ const blockTypeDefs = gql`
    deleted_by:ID
 }
 
- Type UpdatedBy{
+ type UpdatedBy{
    user_id:ID
    updated_at:Date
 }
 
- Enum BlockStatus{
+ enum BlockStatus{
    ACTIVE
    DELETED
 }
 
- Input BlockInput{ 
+ input BlockInput{ 
    name:String!
    description:String!
 }

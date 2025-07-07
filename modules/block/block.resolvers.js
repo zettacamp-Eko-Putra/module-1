@@ -47,3 +47,120 @@ async function GetOneBlock(_, { _id }) {
   }
 }
 
+async function CreateBlock(_, { block_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** validate block_input
+    ValidateBlockInput(block_input);
+
+    // *************** Remove leading and trailing spaces from block name
+    const inputName = block_input.name.trim();
+
+    // *************** find exists school legal name in database
+    const isBlockNameAlreadyExists = await BlockModel.exists({
+      name: { $regex: `^${inputName}$`, $options: 'i' },
+      status: 'ACTIVE',
+    });
+
+    // *************** Throwing error if there's exact name in database
+    if (isBlockNameAlreadyExists) {
+      throw new ApolloError('Block name already exists');
+    }
+
+    // *************** changing block input data and adding it to blockData
+    const blockData = {
+      name: inputName,
+      description: block_input.description,
+      created_by: user_id,
+    };
+
+    // *************** creating new block based on the blockData
+    const createdBlock = await BlockModel.create(blockData);
+
+    // *************** returning new block data
+    return createdBlock;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
+async function UpdateBlock(_, { _id, block_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** Validating block id and block input
+    ValidateIdMongoose(_id, 'UpdateSchool');
+    ValidateBlockInput(block_input);
+
+    // *************** Remove leading and trailing spaces from block legal name
+    const inputName = block_input.name.trim().toLowerCase();
+
+    // *************** Find current block by id
+    const currentBlock = await BlockModel.findById(_id).lean();
+
+    // *************** Take current block legal name
+    const currentBlockName = currentBlock.name.trim().toLowerCase();
+
+    // *************** Only check duplication if legal name changed
+    if (inputName !== currentBlockName) {
+      const isBlockNameAlreadyExists = await BlockModel.exists({
+        name: { $regex: `^${inputName}$`, $options: 'i' },
+        status: 'ACTIVE',
+      });
+
+      if (isBlockNameAlreadyExists) {
+        throw new ApolloError('block legal name already exists');
+      }
+    }
+
+    // *************** breakdown block input
+    const blockData = {
+      name: inputName,
+      description: block_input.description,
+    };
+
+    // *************** finding block based on id and overwrite it with new data and saving it to database
+    const updatedBlock = await BlockModel.findByIdAndUpdate(
+      _id,
+      {
+        $set: blockData,
+        $push: {
+          updated_by: {
+            user_id: user_id,
+            updated_at: new Date(),
+          },
+        },
+      },
+      { new: true }
+    ).lean();
+
+    // ***************  showing error message if the block id cannot be found in database
+    if (!updatedBlock) {
+      throw new ApolloError('block not Found');
+    }
+
+    // *************** returning block updated data to user
+    return updatedBlock;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
+
+
+// *************** EXPORT MODULE ***************
+module.exports = {
+  Query: {
+    GetAllBlocks,
+    GetOneBlock,
+  },
+  Mutation: {
+    CreateBlock,
+    UpdateBlock,
+  },
+};
