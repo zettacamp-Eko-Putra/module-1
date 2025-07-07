@@ -39,7 +39,7 @@ const blockTypeDefs = gql`
 
  extend type Mutation{
    CreateBlock(block_input:BlockInput):Block!
-   UpdateBlock(_id:ID!, Block_input:BlockInput):Block
+   UpdateBlock(_id:ID!, block_input:BlockInput):Block
    DeleteBlock(_id:ID!):ID
 }
 `;

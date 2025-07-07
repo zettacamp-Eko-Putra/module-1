@@ -5,7 +5,7 @@ const { ApolloError } = require('apollo-server');
 const BlockModel = require('./block.models.js');
 
 // *************** IMPORT VALIDATOR ***************
-
+const { ValidateBlockInput } = require('./block.validator.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
