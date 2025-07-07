@@ -151,7 +151,39 @@ async function UpdateBlock(_, { _id, block_input }) {
   }
 }
 
+async function DeleteBlock(_, { _id }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
 
+    // *************** checking if the block id is valid
+    ValidateIdMongoose(_id, 'DeleteBlock');
+
+    // *************** finding block and update the data
+    const deleteBlock = await BlockModel.findOneAndUpdate(
+      { _id, status: { $in: 'ACTIVE' } },
+      {
+        // *************** changing status field to DELETED and adding timestamp
+        status: 'DELETED',
+        deleted_by: user_id,
+        deleted_at: new Date(),
+      }
+    )
+      .select('_id')
+      .lean();
+
+    // *************** showing error message if block already deleted
+    if (!deleteBlock) {
+      throw new ApolloError('block not found');
+    }
+
+    // *************** returning block deleted id to user
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
 
 // *************** EXPORT MODULE ***************
 module.exports = {
@@ -162,5 +194,6 @@ module.exports = {
   Mutation: {
     CreateBlock,
     UpdateBlock,
+    DeleteBlock,
   },
 };
