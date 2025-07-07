@@ -3,6 +3,7 @@ const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const SubjectModel = require('./subject.models.js');
+const BlockModel = require('../block/block.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
@@ -46,9 +47,70 @@ async function GetOneSubject(_, { _id }) {
   }
 }
 
+async function CreateSubject(_, { subject_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** validate subject_input
+    // ValidateBlockInput(subject_input);
+
+    // *************** check if block exists
+    const isBlockExists = await BlockModel.exists({
+      _id: subject_input.block_id,
+      status: 'ACTIVE',
+    });
+
+    // *************** if block not exists throw ApolloError
+    if (!isBlockExists) {
+      throw new ApolloError('block not found');
+    }
+
+    // *************** Remove leading and trailing spaces from Subject name
+    const inputName = subject_input.name.trim();
+
+    // *************** find exists subject name in database
+    const isSubjectNameAlreadyExists = await SubjectModel.exists({
+      name: { $regex: `^${inputName}$`, $options: 'i' },
+      status: 'ACTIVE',
+    });
+
+    // *************** Throwing error if there's exact name in database
+    if (isSubjectNameAlreadyExists) {
+      throw new ApolloError('Subject name already exists');
+    }
+
+    // *************** changing Subject input data and adding it to SubjectData
+    const subjectData = {
+      block_id: subject_input.block_id,
+      name: inputName,
+      description: subject_input.description,
+      coefficient: subject_input.coefficient,
+      created_by: user_id,
+    };
+
+    // *************** creating new subject based on the subjectData
+    const createdSubject = await SubjectModel.create(subjectData);
+
+    await BlockModel.updateOne(
+      { _id: subject_input.block_id },
+      { $push: { subject_ids: createdSubject._id } }
+    );
+
+    // *************** returning new subject data
+    return createdSubject;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllSubjects,
     GetOneSubject,
+  },
+  Mutation: {
+    CreateSubject,
   },
 };
