@@ -22,8 +22,33 @@ async function GetAllSubjects(_, args) {
   }
 }
 
+async function GetOneSubject(_, { _id }) {
+  try {
+    // *************** Validating Subject ID
+    ValidateIdMongoose(_id, 'GetOneSubject');
+
+    // *************** finding Subject based on id and status ACTIVE
+    const subject = await SubjectModel.findOne({
+      _id,
+      status: 'ACTIVE',
+    }).lean();
+
+    // *************** showing message if the Subject cannot be found
+    if (!subject) {
+      throw new ApolloError('Subject Not Found');
+    }
+
+    // *************** returning subject data if Subject in database
+    return subject;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllSubjects,
+    GetOneSubject,
   },
 };
