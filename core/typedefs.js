@@ -5,6 +5,7 @@ const { gql } = require('apollo-server');
 const UserTypeDefs = require('../modules/user/user.typedefs');
 const StudentTypeDefs = require('../modules/student/student.typedefs');
 const SchoolTypeDefs = require('../modules/school/school.typedefs');
+const blockTypeDefs = require('../modules/block/block.typedefs');
 
 // *************** Define global helper type definitions
 const baseTypeDefs = gql`
