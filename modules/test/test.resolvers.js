@@ -9,7 +9,6 @@ const SubjectModel = require('./subject.models.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
-const { Query } = require('../user/user.resolvers.js');
 
 async function GetAllTests(_, { published_status }) {
   try {
@@ -32,8 +31,33 @@ async function GetAllTests(_, { published_status }) {
   }
 }
 
+async function GetOneTest(_, { _id }) {
+  try {
+    // *************** Validating test ID
+    ValidateIdMongoose(_id, 'GetOneTest');
+
+    // *************** finding test based on id and status ACTIVE
+    const test = await TestModel.findOne({
+      _id,
+      status: 'ACTIVE',
+    }).lean();
+
+    // *************** showing message if the test cannot be found
+    if (!test) {
+      throw new ApolloError('Test Not Found');
+    }
+
+    // *************** Return test data if found
+    return test;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllTests,
+    GetOneTest,
   },
 };
