@@ -180,6 +180,7 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
               user_id: user_id,
               updated_at: new Date(),
             },
+            mark_entry_date: new Date(),
           },
         },
         { new: true }
@@ -198,6 +199,40 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
   }
 }
 
+async function DeleteStudentTestResult(_, { _id }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** checking if the Student test Result id is valid
+    ValidateIdMongoose(_id, 'DeleteStudentTestResult');
+
+    // *************** finding Student test Result and update the data
+    const DeleteStudentTestResult =
+      await StudentTestResultModel.findOneAndUpdate(
+        { _id, status: 'ACTIVE', validation_status: 'NOT_VALIDATED' },
+        {
+          // *************** changing status field to DELETED and adding timestamp
+          status: 'DELETED',
+          deleted_by: user_id,
+          deleted_at: new Date(),
+        },
+        { new: true }
+      ).lean();
+
+    // *************** showing error message if Student test Result already deleted
+    if (!DeleteStudentTestResult) {
+      throw new ApolloError('Student test Result not found');
+    }
+
+    // *************** returning test deleted id to user
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllStudentTestResults,
@@ -205,5 +240,6 @@ module.exports = {
   },
   Mutation: {
     UpdateStudentTestResult,
+    DeleteStudentTestResult,
   },
 };
