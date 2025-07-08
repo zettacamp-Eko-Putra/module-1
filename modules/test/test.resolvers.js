@@ -190,6 +190,44 @@ async function UpdateTest(_, { _id, test_input }) {
   }
 }
 
+async function DeleteTest(_, { _id }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** checking if the test id is valid
+    ValidateIdMongoose(_id, 'DeleteTest');
+
+    // *************** finding test and update the data
+    const deleteTest = await TestModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE', published_status: 'NOT_PUBLISHED' },
+      {
+        // *************** changing status field to DELETED and adding timestamp
+        status: 'DELETED',
+        deleted_by: user_id,
+        deleted_at: new Date(),
+      },
+      { new: true }
+    ).lean();
+
+    // *************** showing error message if test already deleted
+    if (!deleteTest) {
+      throw new ApolloError('Test not found');
+    }
+
+    await SubjectModel.updateOne(
+      { _id: deleteTest.subject_id },
+      { $pull: { test_ids: deleteTest._id } }
+    );
+
+    // *************** returning test deleted id to user
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllTests,
@@ -198,5 +236,6 @@ module.exports = {
   Mutation: {
     CreateTest,
     UpdateTest,
+    DeleteTest,
   },
 };
