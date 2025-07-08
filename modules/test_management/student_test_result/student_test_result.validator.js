@@ -6,12 +6,12 @@ const {
 } = require('../../utilities/common-validator/mongo-validator.js');
 
 function ValidateStudentTestResultInput(StudentTestResult_input) {
-  // *************** validate user id
-  if (!StudentTestResult_input.user_id) {
+  // *************** validate student id
+  if (!StudentTestResult_input.student_id) {
     // *************** error message if the input not valid
-    throw new ApolloError('user id required and must be valid');
+    throw new ApolloError('student id required and must be valid');
   }
-  ValidateIdMongoose(StudentTestResult_input.user_id);
+  ValidateIdMongoose(StudentTestResult_input.student_id);
 
   // *************** validate test id
   if (!StudentTestResult_input.test_id) {

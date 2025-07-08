@@ -236,6 +236,16 @@ async function DeleteStudentTestResult(_, { _id }) {
   }
 }
 
+async function student_id(parent, _, ctx) {
+  // *************** creating if to check if the subject array empty
+  if (!parent.student_id)
+    // *************** retuning value if subject array empty
+    return null;
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.StudentLoader.load(parent.student_id);
+}
+
 module.exports = {
   Query: {
     GetAllStudentTestResults,
@@ -244,5 +254,9 @@ module.exports = {
   Mutation: {
     UpdateStudentTestResult,
     DeleteStudentTestResult,
+  },
+  StudentTestResult: {
+    student: student_id,
+    
   },
 };
