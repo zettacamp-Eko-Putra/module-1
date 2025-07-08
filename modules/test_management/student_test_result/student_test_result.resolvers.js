@@ -7,6 +7,9 @@ const TestModel = require('../../test/test.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
+  ValidateStudentTestResultInput,
+} = require('./student_test_result.validator.js');
+const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
