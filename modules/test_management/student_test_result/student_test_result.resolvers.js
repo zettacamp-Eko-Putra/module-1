@@ -32,8 +32,33 @@ async function GetAllStudentTestResults(_, { validation_status }) {
   }
 }
 
+async function GetOneStudentTestResult(_, { _id }) {
+  try {
+    // *************** Validating student test result ID
+    ValidateIdMongoose(_id, 'GetOneStudentTestResult');
+
+    // *************** finding student test result based on id and status ACTIVE
+    const studentTestResult = await StudentTestResultModel.findOne({
+      _id,
+      status: 'ACTIVE',
+    }).lean();
+
+    // *************** showing message if the student test result cannot be found
+    if (!studentTestResult) {
+      throw new ApolloError('student test result not Found');
+    }
+
+    // *************** Return student test result data if found
+    return studentTestResult;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllStudentTestResults,
+    GetOneStudentTestResult,
   },
 };
