@@ -38,6 +38,7 @@ const studentTestResultTypeDefs = gql`
     student_id: ID!
     test_id: ID!
     marks: [MarksInput]!
+    task_id: ID
   }
 
   input MarksInput {
