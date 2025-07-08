@@ -116,6 +116,80 @@ async function CreateTest(_, { test_input }) {
   }
 }
 
+async function UpdateTest(_, { _id, test_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** Validating test id and test input
+    ValidateIdMongoose(_id, 'UpdateTest');
+    ValidateTestInput(test_input);
+
+    // *************** Remove leading and trailing spaces from test name
+    const inputName = test_input.name.trim();
+
+    // *************** Find current test by id
+    const currentTest = await TestModel.findById(_id).lean();
+
+    // *************** If already published, prevent update
+    if (currentTest.published_status === 'PUBLISHED') {
+      throw new ApolloError('Test is already published and cannot be edited');
+    }
+
+    // *************** Take current test legal name
+    const currentTestName = currentTest.name.trim().toLowerCase();
+
+    // *************** Only check duplication if name changed
+    if (inputName !== currentTestName) {
+      const isTestNameAlreadyExists = await TestModel.exists({
+        name: { $regex: `^${inputName}$`, $options: 'i' },
+        status: 'ACTIVE',
+        subject_id: currentTest.subject_id,
+        _id: { $ne: _id },
+      });
+
+      if (isTestNameAlreadyExists) {
+        throw new ApolloError('Test name already exists');
+      }
+    }
+
+    // *************** prepare test data for database
+    const testData = {
+      subject_id: test_input.subject_id,
+      name: inputName,
+      description: test_input.description,
+      weight: test_input.weight,
+      notations: test_input.notations,
+    };
+
+    // *************** finding test based on id and overwrite it with new data and saving it to database
+    const updatedTest = await TestModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE' },
+      {
+        $set: testData,
+        $push: {
+          updated_by: {
+            user_id: user_id,
+            updated_at: new Date(),
+          },
+        },
+      },
+      { new: true }
+    ).lean();
+
+    // ***************  showing error message if the subject id cannot be found in database
+    if (!updatedTest) {
+      throw new ApolloError('Test not Found');
+    }
+
+    // *************** returning subject updated data to user
+    return updatedTest;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllTests,
@@ -123,5 +197,6 @@ module.exports = {
   },
   Mutation: {
     CreateTest,
+    UpdateTest,
   },
 };
