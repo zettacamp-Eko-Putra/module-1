@@ -210,6 +210,27 @@ async function DeleteSubject(_, { _id }) {
   }
 }
 
+async function block_id(parent, _, ctx) {
+  // *************** creating if to check if the block block array empty
+  if (!parent.block)
+    // *************** retuning value if block array empty
+    return null;
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.BlockLoader.loadOne(parent.block);
+}
+
+async function test_ids(parent, _, ctx) {
+  // *************** creating if to check if the test block array empty
+  if (!parent.test || !parent.test.length) {
+    // *************** retuning value if test array empty
+    return [];
+  }
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.TestLoader.loadMany(parent.test);
+}
+
 module.exports = {
   Query: {
     GetAllSubjects,
@@ -219,5 +240,9 @@ module.exports = {
     CreateSubject,
     UpdateSubject,
     DeleteSubject,
+  },
+  Subject: {
+    block: block_id,
+    test: test_ids,
   },
 };

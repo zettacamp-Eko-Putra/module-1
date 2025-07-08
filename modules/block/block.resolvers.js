@@ -187,8 +187,8 @@ async function DeleteBlock(_, { _id }) {
 
 async function subject_ids(parent, _, ctx) {
   // *************** creating if to check if the block subject array empty
-  if (!parent.subject || !parent.subject.length) {
-    // *************** retuning value if student array empty
+  if (!parent.subject_ids || !parent.subject_ids.length) {
+    // *************** retuning value if subject array empty
     return [];
   }
 
@@ -207,7 +207,7 @@ module.exports = {
     UpdateBlock,
     DeleteBlock,
   },
-  block: {
-    subjects: subject_ids,
+  Block: {
+    subject_ids: subject_ids,
   },
 };
