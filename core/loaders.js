@@ -1,6 +1,8 @@
 // *************** IMPORT MODULE ***************
+const BlockLoader = require('../modules/block/block.loader');
 const SchoolLoader = require('../modules/school/school.loader');
 const StudentLoader = require('../modules/student/student.loader');
+const SubjectLoader = require('../modules/subject/subject.loader');
 
 /**
  * Creates and returns an object containing all configured DataLoaders
@@ -15,6 +17,8 @@ function InitializeDataLoaders() {
   return {
     SchoolLoader: SchoolLoader(),
     StudentLoader: StudentLoader(),
+    BlockLoader: BlockLoader(),
+    SubjectLoader: SubjectLoader(),
   };
 }
 
