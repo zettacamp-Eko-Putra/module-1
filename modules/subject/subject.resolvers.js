@@ -172,6 +172,44 @@ async function UpdateSubject(_, { _id, subject_input }) {
   }
 }
 
+async function DeleteSubject(_, { _id }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** checking if the Subject id is valid
+    ValidateIdMongoose(_id, 'DeleteSubject');
+
+    // *************** finding Subject and update the data
+    const deleteSubject = await SubjectModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE' },
+      {
+        // *************** changing status field to DELETED and adding timestamp
+        status: 'DELETED',
+        deleted_by: user_id,
+        deleted_at: new Date(),
+      },
+      { new: true }
+    ).lean();
+
+    // *************** showing error message if subject already deleted
+    if (!deleteSubject) {
+      throw new ApolloError('Subject not found');
+    }
+
+    await BlockModel.updateOne(
+      { _id: deleteSubject.block_id },
+      { $pull: { subject_ids: deleteSubject._id } }
+    );
+
+    // *************** returning subject deleted id to user
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllSubjects,
@@ -180,5 +218,6 @@ module.exports = {
   Mutation: {
     CreateSubject,
     UpdateSubject,
+    DeleteSubject,
   },
 };
