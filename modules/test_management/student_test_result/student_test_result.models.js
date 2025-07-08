@@ -11,6 +11,13 @@ const StudentTestResultSchema = new Schema(
     // test id student_test_result belong to
     test_id: { type: Schema.Types.ObjectId, ref: 'test', required: true },
 
+    // user who will validate the mark
+    mark_validator_id: {
+      type: Schema.Types.ObjectId,
+      ref: 'user',
+      required: true,
+    },
+
     // marks inside the test
     marks: [
       {
@@ -18,6 +25,9 @@ const StudentTestResultSchema = new Schema(
         mark: { type: Number, required: true },
       },
     ],
+
+    // task id when marks been entered
+    task_id: { type: Schema.Types.ObjectId, ref: 'task' },
 
     // mark entry date for the student_test_result
     mark_entry_date: { type: Date },

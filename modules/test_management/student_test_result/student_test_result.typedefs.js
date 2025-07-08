@@ -7,6 +7,8 @@ const studentTestResultTypeDefs = gql`
     _id: ID!
     student_id: Student!
     test_id: Test!
+    task_id: ID!
+    mark_validator_id: ID!
     marks: [Marks!]!
     average_mark: Float
     mark_entry_date: Date
@@ -35,10 +37,7 @@ const studentTestResultTypeDefs = gql`
   }
 
   input StudentTestResultInput {
-    student_id: ID!
-    test_id: ID!
     marks: [MarksInput]!
-    task_id: ID
   }
 
   input MarksInput {

@@ -6,24 +6,6 @@ const {
 } = require('../../utilities/common-validator/mongo-validator.js');
 
 function ValidateStudentTestResultInput(StudentTestResult_input) {
-  // *************** validate student id
-  if (!StudentTestResult_input.student_id) {
-    // *************** error message if the input not valid
-    throw new ApolloError('student id required and must be valid');
-  }
-  ValidateIdMongoose(StudentTestResult_input.student_id);
-
-  // *************** validate test id
-  if (!StudentTestResult_input.test_id) {
-    // *************** error message if the input not valid
-    throw new ApolloError('test id required and must be valid');
-  }
-
-  ValidateIdMongoose(StudentTestResult_input.test_id);
-
-  if (StudentTestResult_input.task_id) {
-    ValidateIdMongoose(StudentTestResult_input.task_id);
-  }
   // *************** Validate marks
   if (
     !Array.isArray(StudentTestResult_input.marks) ||
@@ -46,5 +28,37 @@ function ValidateStudentTestResultInput(StudentTestResult_input) {
     }
   });
 }
+
+function PreventEditIfValidated(validation_status) {
+  if (validation_status === 'VALIDATED') {
+    // *************** If already published, prevent update
+    throw new ApolloError('Test is already published and cannot be edited');
+  }
+}
+
+function ValidateMarksAgainstNotations(marks, notations) {
+  const notationMap = {};
+  notations.forEach((n) => {
+    notationMap[n.notation_text] = n.max_point;
+  });
+
+  marks.forEach((markEntry) => {
+    const maxPoint = notationMap[markEntry.notation_text];
+    if (maxPoint === undefined) {
+      throw new ApolloError(
+        `Notation "${markEntry.notation_text}" not found in test`
+      );
+    }
+    if (markEntry.mark > maxPoint) {
+      throw new ApolloError(
+        `Mark for "${markEntry.notation_text}" cannot exceed ${maxPoint}`
+      );
+    }
+  });
+}
 // *************** EXPORT MODULE ***************
-module.exports = { ValidateStudentTestResultInput };
+module.exports = {
+  ValidateStudentTestResultInput,
+  PreventEditIfValidated,
+  ValidateMarksAgainstNotations,
+};

@@ -10,6 +10,12 @@ const {
   ValidateStudentTestResultInput,
 } = require('./student_test_result.validator.js');
 const {
+  PreventEditIfValidated,
+} = require('./student_test_result.validator.js');
+const {
+  ValidateMarksAgainstNotations,
+} = require('./student_test_result.validator.js');
+const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
@@ -60,7 +66,10 @@ async function GetOneStudentTestResult(_, { _id }) {
   }
 }
 
-async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
+async function UpdateMarksForStudentTestResult(
+  _,
+  { _id, studentTestResult_input }
+) {
   try {
     // *************** get one user id
     const user_id = '686b93d2cb55171e10da8c00';
@@ -74,55 +83,22 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
       _id
     ).lean();
 
-    // *************** check if student id is different
-    if (
-      String(currentStudentTestResult.student_id) !==
-      studentTestResult_input.student_id
-    ) {
-      throw new ApolloError('cannot update student');
-    }
-
-    // *************** check if test id is different
-    if (
-      String(currentStudentTestResult.test_id) !==
-      studentTestResult_input.test_id
-    ) {
-      throw new ApolloError('cannot update test id');
-    }
-
-    if (currentStudentTestResult.validation_status === 'VALIDATED') {
-      // *************** If already published, prevent update
-      throw new ApolloError('Test is already published and cannot be edited');
-    }
+    // *************** check if student test result validated
+    PreventEditIfValidated(currentStudentTestResult.validation_status);
 
     const test = await TestModel.findById(
-      studentTestResult_input.test_id
+      currentStudentTestResult.test_id
     ).lean();
     if (!test) throw new ApolloError('Test not found');
 
-    const notationMap = {};
-    test.notations.forEach((notation) => {
-      notationMap[notation.notation_text] = notation.max_point;
-    });
-
-    studentTestResult_input.marks.forEach((markEntry) => {
-      const maxPoint = notationMap[markEntry.notation_text];
-      if (maxPoint === undefined) {
-        throw new ApolloError(
-          `Notation "${markEntry.notation_text}" not found in test`
-        );
-      }
-      if (markEntry.mark > maxPoint) {
-        throw new ApolloError(
-          `Mark for "${markEntry.notation_text}" cannot exceed ${maxPoint}`
-        );
-      }
-    });
+    // *************** validate mark against notations
+    ValidateMarksAgainstNotations(
+      studentTestResult_input.marks,
+      test.notations
+    );
 
     // *************** prepare test data for database
     const studentTestResultData = {
-      student_id: studentTestResult_input.student_id,
-      test_id: studentTestResult_input.test_id,
       marks: studentTestResult_input.marks,
     };
 
@@ -145,18 +121,13 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
     if (studentTestResult_input.marks.length === test.notations.length) {
       studentTestResultData.mark_entry_date = new Date();
 
-      // *************** Require task_id to update task status
-      if (!studentTestResult_input.task_id) {
-        throw new ApolloError('task_id not provided');
-      }
-
       // *************** Update ENTER_MARKS task to COMPLETED
       await TaskModel.findOneAndUpdate(
         {
-          _id: studentTestResult_input.task_id,
+          _id: currentStudentTestResult.task_id,
           type: 'ENTER_MARKS',
           status: 'ACTIVE',
-          task_status: 'PENDING',
+          task_status: 'IN_PROGRESS',
         },
         { task_status: 'COMPLETED' }
       );
@@ -164,11 +135,7 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
       // *************** Create new VALIDATE_MARKS task
       await TaskModel.create({
         type: 'VALIDATE_MARKS',
-        status: 'ACTIVE',
-        task_status: 'PENDING',
-        student_test_result_id: _id,
-        assigned_to: ['<user_id_validators>'],
-        created_by: user_id,
+        user_id: currentStudentTestResult.mark_validator_id,
       });
     }
 
@@ -183,7 +150,6 @@ async function UpdateStudentTestResult(_, { _id, studentTestResult_input }) {
               user_id: user_id,
               updated_at: new Date(),
             },
-            mark_entry_date: new Date(),
           },
         },
         { new: true }
@@ -262,11 +228,11 @@ module.exports = {
     GetOneStudentTestResult,
   },
   Mutation: {
-    UpdateStudentTestResult,
+    UpdateMarksForStudentTestResult,
     DeleteStudentTestResult,
   },
   StudentTestResult: {
-    student: student_id,
-    test: test_id,
+    student_id: student_id,
+    test_id: test_id,
   },
 };
