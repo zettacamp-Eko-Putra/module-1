@@ -93,11 +93,11 @@ async function UpdateBlock(_, { _id, block_input }) {
     const user_id = '686b93d2cb55171e10da8c00';
 
     // *************** Validating block id and block input
-    ValidateIdMongoose(_id, 'UpdateSchool');
+    ValidateIdMongoose(_id, 'UpdateBlock');
     ValidateBlockInput(block_input);
 
     // *************** Remove leading and trailing spaces from block legal name
-    const inputName = block_input.name.trim().toLowerCase();
+    const inputName = block_input.name.trim();
 
     // *************** Find current block by id
     const currentBlock = await BlockModel.findById(_id).lean();
@@ -124,8 +124,8 @@ async function UpdateBlock(_, { _id, block_input }) {
     };
 
     // *************** finding block based on id and overwrite it with new data and saving it to database
-    const updatedBlock = await BlockModel.findByIdAndUpdate(
-      _id,
+    const updatedBlock = await BlockModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE' },
       {
         $set: blockData,
         $push: {

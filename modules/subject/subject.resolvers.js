@@ -105,6 +105,73 @@ async function CreateSubject(_, { subject_input }) {
   }
 }
 
+async function UpdateSubject(_, { _id, subject_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** Validating subject id and subject input
+    ValidateIdMongoose(_id, 'UpdateBlock');
+    ValidateSubjectInput(subject_input);
+
+    // *************** Remove leading and trailing spaces from subject legal name
+    const inputName = subject_input.name.trim();
+
+    // *************** Find current subject by id
+    const currentSubject = await SubjectModel.findById(_id).lean();
+
+    // *************** Take current subject legal name
+    const currentSubjectName = currentSubject.name.trim().toLowerCase();
+
+    // *************** Only check duplication if name changed
+    if (inputName !== currentSubjectName) {
+      const isSubjectNameAlreadyExists = await SubjectModel.exists({
+        name: { $regex: `^${inputName}$`, $options: 'i' },
+        status: 'ACTIVE',
+        block_id: currentSubject.block_id,
+        _id: { $ne: _id },
+      });
+
+      if (isSubjectNameAlreadyExists) {
+        throw new ApolloError('subject name already exists');
+      }
+    }
+
+    // *************** breakdown subject input
+    const subjectData = {
+      name: inputName,
+      description: subject_input.description,
+      coefficient: subject_input.coefficient,
+    };
+
+    // *************** finding subject based on id and overwrite it with new data and saving it to database
+    const updatedSubject = await SubjectModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE' },
+      {
+        $set: subjectData,
+        $push: {
+          updated_by: {
+            user_id: user_id,
+            updated_at: new Date(),
+          },
+        },
+      },
+      { new: true }
+    ).lean();
+
+    // ***************  showing error message if the subject id cannot be found in database
+    if (!updatedSubject) {
+      throw new ApolloError('subject not Found');
+    }
+
+    // *************** returning subject updated data to user
+    return updatedSubject;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllSubjects,
@@ -112,5 +179,6 @@ module.exports = {
   },
   Mutation: {
     CreateSubject,
+    UpdateSubject,
   },
 };
