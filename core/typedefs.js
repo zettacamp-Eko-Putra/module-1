@@ -7,6 +7,7 @@ const StudentTypeDefs = require('../modules/student/student.typedefs');
 const SchoolTypeDefs = require('../modules/school/school.typedefs');
 const BlockTypeDefs = require('../modules/block/block.typedefs');
 const subjectTypeDefs = require('../modules/subject/subject.typedefs');
+const testTypeDefs = require('../modules/test/test.typedefs');
 
 // *************** Define global helper type definitions
 const baseTypeDefs = gql`
@@ -27,6 +28,7 @@ const typeDefs = [
   SchoolTypeDefs,
   BlockTypeDefs,
   subjectTypeDefs,
+  testTypeDefs,
   baseTypeDefs,
 ];
 
