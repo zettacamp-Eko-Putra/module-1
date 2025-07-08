@@ -114,7 +114,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
     const user_id = '686b93d2cb55171e10da8c00';
 
     // *************** Validating subject id and subject input
-    ValidateIdMongoose(_id, 'UpdateBlock');
+    ValidateIdMongoose(_id, 'UpdateSubject');
     ValidateSubjectInput(subject_input);
 
     // *************** Remove leading and trailing spaces from subject legal name
@@ -122,6 +122,20 @@ async function UpdateSubject(_, { _id, subject_input }) {
 
     // *************** Find current subject by id
     const currentSubject = await SubjectModel.findById(_id).lean();
+
+    if (subject_input.coefficient !== currentSubject.coefficient) {
+      // *************** checking if the Subject has published test
+      const hasPublishedTest = await TestModel.exists({
+        subject_id: _id,
+        status: 'ACTIVE',
+        published_status: 'PUBLISHED',
+      });
+      if (hasPublishedTest) {
+        throw new ApolloError(
+          'cannot update coefficient, there test already published'
+        );
+      }
+    }
 
     // *************** Take current subject legal name
     const currentSubjectName = currentSubject.name.trim().toLowerCase();
