@@ -228,6 +228,16 @@ async function DeleteTest(_, { _id }) {
   }
 }
 
+async function subject_id(parent, _, ctx) {
+  // *************** creating if to check if the subject array empty
+  if (!parent.subject)
+    // *************** retuning value if subject array empty
+    return null;
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.SubjectLoader.loadOne(parent.subject);
+}
+
 module.exports = {
   Query: {
     GetAllTests,
@@ -237,5 +247,8 @@ module.exports = {
     CreateTest,
     UpdateTest,
     DeleteTest,
+  },
+  Test: {
+    subject: subject_id,
   },
 };
