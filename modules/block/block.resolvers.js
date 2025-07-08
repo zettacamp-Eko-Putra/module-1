@@ -2,7 +2,9 @@
 const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
-const BlockModel = require('./block.models.js');
+const BlockModel = require('../block/block.models.js');
+const SubjectModel = require('../subject/subject.models.js');
+const TestModel = require('../test/test.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateBlockInput } = require('./block.validator.js');
@@ -158,6 +160,27 @@ async function DeleteBlock(_, { _id }) {
 
     // *************** checking if the block id is valid
     ValidateIdMongoose(_id, 'DeleteBlock');
+
+    // *************** finding Subject
+    const subjectIds = await SubjectModel.find({
+      block_id: _id,
+      status: 'ACTIVE',
+    })
+      .select('_id')
+      .lean();
+
+    const subjectIdList = subjectIds.map((subject) => subject._id);
+
+    // *************** check if there test already published
+    const hasPublishedTest = await TestModel.exists({
+      subject_id: { $in: subjectIdList },
+      status: 'ACTIVE',
+      published_status: 'PUBLISHED',
+    });
+
+    if (hasPublishedTest) {
+      throw new ApolloError('cannot delete, there test already published');
+    }
 
     // *************** finding block and update the data
     const deleteBlock = await BlockModel.findOneAndUpdate(
