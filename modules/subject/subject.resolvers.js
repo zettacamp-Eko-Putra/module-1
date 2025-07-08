@@ -6,6 +6,7 @@ const SubjectModel = require('./subject.models.js');
 const BlockModel = require('../block/block.models.js');
 
 // *************** IMPORT VALIDATOR ***************
+const { ValidateSubjectInput } = require('./subject.validator.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
@@ -53,7 +54,7 @@ async function CreateSubject(_, { subject_input }) {
     const user_id = '686b93d2cb55171e10da8c00';
 
     // *************** validate subject_input
-    // ValidateBlockInput(subject_input);
+    ValidateSubjectInput(subject_input);
 
     // *************** check if block exists
     const isBlockExists = await BlockModel.exists({
@@ -69,8 +70,9 @@ async function CreateSubject(_, { subject_input }) {
     // *************** Remove leading and trailing spaces from Subject name
     const inputName = subject_input.name.trim();
 
-    // *************** find exists subject name in database
+    // *************** find exists subject name in same block
     const isSubjectNameAlreadyExists = await SubjectModel.exists({
+      block_id: subject_input.block_id,
       name: { $regex: `^${inputName}$`, $options: 'i' },
       status: 'ACTIVE',
     });
