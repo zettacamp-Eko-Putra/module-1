@@ -6,6 +6,7 @@ const subjectTypeDefs = gql`
   type Subject {
     _id: ID!
     block_id: ID!
+    block: Block
     name: String!
     description: String!
     coefficient: Float!
@@ -16,11 +17,6 @@ const subjectTypeDefs = gql`
     updated_by: [UpdatedBy]
     deleted_at: Date
     deleted_by: ID
-  }
-
-  type UpdatedBy {
-    user_id: ID
-    updated_at: Date
   }
 
   enum SubjectStatus {

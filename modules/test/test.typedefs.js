@@ -6,6 +6,7 @@ const testTypeDefs = gql`
   type Test {
     _id: ID!
     subject_id: ID!
+    subject: Subject
     name: String!
     description: String!
     weight: Float!
@@ -25,14 +26,11 @@ const testTypeDefs = gql`
     max_point: Float!
   }
 
-  type UpdatedBy {
-    user_id: ID
-    updated_at: Date
-  }
   enum TestStatus {
     ACTIVE
     DELETED
   }
+
   enum PublishedStatus {
     NOT_PUBLISHED
     PUBLISHED

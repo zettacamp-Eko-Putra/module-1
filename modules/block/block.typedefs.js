@@ -16,11 +16,6 @@ const blockTypeDefs = gql`
     deleted_by: ID
   }
 
-  type UpdatedBy {
-    user_id: ID
-    updated_at: Date
-  }
-
   enum BlockStatus {
     ACTIVE
     DELETED

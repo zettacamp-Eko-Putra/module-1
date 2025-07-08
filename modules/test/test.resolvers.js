@@ -3,7 +3,7 @@ const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const TestModel = require('./test.models.js');
-const SubjectModel = require('./subject.models.js');
+const SubjectModel = require('../subject/subject.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateTestInput } = require('./test.validator.js');
@@ -230,12 +230,12 @@ async function DeleteTest(_, { _id }) {
 
 async function subject_id(parent, _, ctx) {
   // *************** creating if to check if the subject array empty
-  if (!parent.subject)
+  if (!parent.subject_id)
     // *************** retuning value if subject array empty
     return null;
 
   // *************** retuning the result to the caller
-  return await ctx.loaders.SubjectLoader.loadOne(parent.subject);
+  return await ctx.loaders.SubjectLoader.load(parent.subject_id);
 }
 
 module.exports = {

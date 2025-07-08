@@ -193,7 +193,7 @@ async function subject_ids(parent, _, ctx) {
   }
 
   // *************** retuning the result to the caller
-  return await ctx.loaders.SubjectLoader.loadMany(parent.subject);
+  return await ctx.loaders.SubjectLoader.loadMany(parent.subject_ids);
 }
 
 // *************** EXPORT MODULE ***************

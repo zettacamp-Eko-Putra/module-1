@@ -2,7 +2,7 @@
 const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
-const SubjectModel = require('./subject.models.js');
+const SubjectModel = require('../subject/subject.models.js');
 const BlockModel = require('../block/block.models.js');
 
 // *************** IMPORT VALIDATOR ***************
@@ -214,23 +214,23 @@ async function DeleteSubject(_, { _id }) {
 
 async function block_id(parent, _, ctx) {
   // *************** creating if to check if the block block array empty
-  if (!parent.block)
+  if (!parent.block_id)
     // *************** retuning value if block array empty
     return null;
 
   // *************** retuning the result to the caller
-  return await ctx.loaders.BlockLoader.loadOne(parent.block);
+  return await ctx.loaders.BlockLoader.load(parent.block_id);
 }
 
 async function test_ids(parent, _, ctx) {
-  // *************** creating if to check if the test block array empty
-  if (!parent.test || !parent.test.length) {
+  // *************** creating if to check if the testids block array empty
+  if (!parent.test_ids || !parent.test_ids.length) {
     // *************** retuning value if test array empty
     return [];
   }
 
   // *************** retuning the result to the caller
-  return await ctx.loaders.TestLoader.loadMany(parent.test);
+  return await ctx.loaders.TestLoader.loadMany(parent.test_ids);
 }
 
 module.exports = {
@@ -245,6 +245,6 @@ module.exports = {
   },
   Subject: {
     block: block_id,
-    test: test_ids,
+    test_ids: test_ids,
   },
 };

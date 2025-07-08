@@ -19,6 +19,10 @@ const baseTypeDefs = gql`
   type Mutation {
     _empty: String
   }
+  type UpdatedBy {
+    user_id: ID
+    updated_at: Date
+  }
 `;
 
 // *************** Combine all type definitions
