@@ -44,12 +44,17 @@ const taskTypeDefs = gql`
     due_date: Date
   }
 
+  input AssignCorrectorInput {
+    user_id: ID!
+  }
+
   extend type Query {
     GetAllTasks(type: TypeTask, task_status: TaskStatus): [Task]
     GetOneTask(_id: ID): Task
   }
 
   extend type Mutation {
+    AssignCorrector(_id: ID!, task_input: AssignCorrectorInput!): ID
     UpdateTask(_id: ID!, task_input: TaskInput!): Task
     DeleteTask(_id: ID!): ID
   }

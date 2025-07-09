@@ -12,6 +12,18 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+
+/**
+ * Query resolver to retrieve all subjects with status "ACTIVE".
+ * 
+ * @async
+ * @function GetAllSubjects
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments (not used in this function).
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of subject objects with status "ACTIVE".
+ * 
+ * @throws {ApolloError} - Throws an ApolloError if fetching subjects fails.
+ */
 async function GetAllSubjects(_, args) {
   try {
     // *************** find subject data with status ACTIVE

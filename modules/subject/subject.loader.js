@@ -10,6 +10,17 @@ const {
   ValidateArrayIdMongoose,
 } = require(`../../utilities/common-validator/mongo-validator.js`);
 
+/**
+ * Batch function to load subject data based on a list of subject IDs.
+ *
+ * @async
+ * @function SubjectBatch
+ * @param {string[]} subjectIds - Array of subject IDs to fetch.
+ * @returns {Promise<(Object|null)[]>} - A Promise that resolves to an array of subject objects
+ *   sorted by the order of input IDs. If a subject ID is not found, `null` is returned in its place.
+ *
+ * @throws {ApolloError} - If subjectIds are not valid MongoDB ObjectIds.
+ */
 async function SubjectBatch(subjectIds) {
   // *************** validate all subjectIds
   ValidateArrayIdMongoose(subjectIds, 'subjectIds');
@@ -29,6 +40,12 @@ async function SubjectBatch(subjectIds) {
   return result;
 }
 
+/**
+ * Creates a DataLoader instance for batching and caching subject data fetches.
+ *
+ * @function SubjectLoader
+ * @returns {DataLoader<string, Object|null>} - A DataLoader instance that batches subject ID queries.
+ */
 const SubjectLoader = () => {
   // *************** creating dataloader using batch SchoolBatch
   const loader = new DataLoader(SubjectBatch);
