@@ -60,7 +60,7 @@ async function CreateBlock(_, { block_input }) {
     // *************** Remove leading and trailing spaces from block name
     const inputName = block_input.name.trim();
 
-    // *************** find exists school legal name in database
+    // *************** find block name in database
     const isBlockNameAlreadyExists = await BlockModel.exists({
       name: { $regex: `^${inputName}$`, $options: 'i' },
       status: 'ACTIVE',

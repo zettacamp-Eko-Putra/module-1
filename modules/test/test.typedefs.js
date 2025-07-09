@@ -26,6 +26,11 @@ const testTypeDefs = gql`
     max_point: Float!
   }
 
+  input PublishTestInput {
+    test_id: ID!
+    user_id: ID!
+  }
+
   enum TestStatus {
     ACTIVE
     DELETED
@@ -58,6 +63,7 @@ const testTypeDefs = gql`
   extend type Mutation {
     CreateTest(test_input: TestInput): Test!
     UpdateTest(_id: ID!, test_input: TestInput): Test
+    PublishTest(task_input: PublishTestInput!): ID
     DeleteTest(_id: ID!): ID
   }
 `;
