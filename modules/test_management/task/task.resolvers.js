@@ -156,6 +156,16 @@ async function DeleteTask(_, { _id }) {
   }
 }
 
+async function test_id(parent, _, ctx) {
+  // *************** creating if to check if the subject array empty
+  if (!parent.test_id)
+    // *************** retuning value if subject array empty
+    return null;
+
+  // *************** retuning the result to the caller
+  return await ctx.loaders.TestLoader.load(parent.test_id);
+}
+
 async function user_id(parent, _, ctx) {
   // *************** creating if to check if the subject array empty
   if (!parent.user_id)
@@ -177,5 +187,6 @@ module.exports = {
   },
   Task: {
     user: user_id,
+    test: test_id,
   },
 };
