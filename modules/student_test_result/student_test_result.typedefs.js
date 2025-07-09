@@ -40,6 +40,7 @@ const studentTestResultTypeDefs = gql`
     student_id: ID!
     test_id: ID!
     task_id: ID!
+    user_id: ID!
     marks: [MarksInput]!
   }
 
@@ -63,7 +64,8 @@ const studentTestResultTypeDefs = gql`
 
   extend type Mutation {
     EnterMarksForStudentTestResult(
-      student_test_result_input: EnterStudentTestResultInput!
+      _id: ID!
+      task_input: EnterStudentTestResultInput!
     ): StudentTestResult
 
     UpdateMarksForStudentTestResult(

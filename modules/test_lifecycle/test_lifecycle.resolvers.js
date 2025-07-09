@@ -153,9 +153,9 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   const userIdCreate = '686b93d2cb55171e10da8c00';
 
   ValidateIdMongoose(_id);
-  ValidateIdMongoose(task_input.test_id);
-  ValidateIdMongoose(task_input.user_id);
-  ValidateIdMongoose(task_input.student_id);
+  ValidateIdMongoose(task_input.test_id, 'test_id');
+  ValidateIdMongoose(task_input.user_id, 'user_id');
+  ValidateIdMongoose(task_input.student_id, 'student_id');
 
   const taskData = await TaskModel.findOne({
     _id: _id,
@@ -174,7 +174,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
       student_id: task_input.student_id,
       status: 'ACTIVE',
       validation_status: 'VALIDATED',
-    }).lean();
+    });
 
   if (isStudentTestResultCombiationExists) {
     throw new ApolloError('Combination test and student already exists');
@@ -182,8 +182,8 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 
   const isUserExists = await UserModel.exists({
     _id: task_input.user_id,
-    status: 'ACTIVE',
-  }).lean();
+    status: 'active',
+  });
 
   if (!isUserExists) {
     throw new ApolloError('User not found');
@@ -193,7 +193,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     _id: task_input.test_id,
     status: 'ACTIVE',
     published_status: 'PUBLISHED',
-  }).lean();
+  });
 
   if (!testData) {
     throw new ApolloError('Test not found');
