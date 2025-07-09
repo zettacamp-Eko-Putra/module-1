@@ -5,8 +5,9 @@ const SchoolResolvers = require('../modules/school/school.resolvers');
 const BlockResolvers = require('../modules/block/block.resolvers');
 const SubjectResolvers = require('../modules/subject/subject.resolvers');
 const TestResolvers = require('../modules/test/test.resolvers');
-const Student_test_resultResolvers = require('../modules/student_test_result/student_test_result.resolvers');
+const StudentTestResultResolvers = require('../modules/student_test_result/student_test_result.resolvers');
 const TaskResolvers = require('../modules/task/task.resolvers');
+const TestLifeCycleResolvers = require('../modules/test_lifecycle/test_lifecycle.resolvers');
 
 // *************** Combine all resolver definitions
 const resolvers = [
@@ -16,8 +17,9 @@ const resolvers = [
   BlockResolvers,
   SubjectResolvers,
   TestResolvers,
-  Student_test_resultResolvers,
+  StudentTestResultResolvers,
   TaskResolvers,
+  TestLifeCycleResolvers,
 ];
 
 // *************** EXPORT MODULE ***************

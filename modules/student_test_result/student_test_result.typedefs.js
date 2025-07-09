@@ -52,6 +52,10 @@ const studentTestResultTypeDefs = gql`
     mark: Float!
   }
 
+  input ValidateMarksInput {
+    studentTestResult_id: ID!
+  }
+
   extend type Query {
     GetAllStudentTestResults: [StudentTestResult]
     GetOneStudentTestResult(_id: ID!): StudentTestResult
@@ -67,6 +71,7 @@ const studentTestResultTypeDefs = gql`
       student_test_result_input: UpdateStudentTestResultInput!
     ): StudentTestResult
 
+    ValidateMarks(_id: ID!, task_input: ValidateMarksInput!): ID
     DeleteStudentTestResult(_id: ID!): ID
   }
 `;
