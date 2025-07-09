@@ -188,8 +188,7 @@ async function DeleteStudentTestResult(_, { _id }) {
           status: 'DELETED',
           deleted_by: user_id,
           deleted_at: new Date(),
-        },
-        { new: true }
+        }
       ).lean();
 
     // *************** showing error message if Student test Result already deleted
