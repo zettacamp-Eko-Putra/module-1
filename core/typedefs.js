@@ -8,8 +8,8 @@ const SchoolTypeDefs = require('../modules/school/school.typedefs');
 const BlockTypeDefs = require('../modules/block/block.typedefs');
 const subjectTypeDefs = require('../modules/subject/subject.typedefs');
 const testTypeDefs = require('../modules/test/test.typedefs');
-const studentTestResultTypeDefs = require('../modules/test_management/student_test_result/student_test_result.typedefs');
-const taskTypeDefs = require('../modules/test_management/task/task.typedefs');
+const studentTestResultTypeDefs = require('../modules/student_test_result/student_test_result.typedefs');
+const taskTypeDefs = require('../modules/task/task.typedefs');
 
 // *************** Define global helper type definitions
 const baseTypeDefs = gql`

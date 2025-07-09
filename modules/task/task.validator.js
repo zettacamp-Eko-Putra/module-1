@@ -4,7 +4,7 @@ const { ApolloError } = require('apollo-server');
 // *************** IMPORT VALIDATOR ***************
 const {
   ValidateIdMongoose,
-} = require('../../../utilities/common-validator/mongo-validator.js');
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 function ValidateTask(task_input) {
   // *************** Validate test id

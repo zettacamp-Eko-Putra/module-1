@@ -3,12 +3,12 @@ const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const TaskModel = require('./task.models.js');
-const UserModel = require('../../user/user.models.js');
+const UserModel = require('../user/user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
   ValidateIdMongoose,
-} = require('../../../utilities/common-validator/mongo-validator.js');
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 async function GetAllTasks(_, { type, task_status }) {
   try {

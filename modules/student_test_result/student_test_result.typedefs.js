@@ -36,7 +36,14 @@ const studentTestResultTypeDefs = gql`
     NOT_VALIDATED
   }
 
-  input StudentTestResultInput {
+  input EnterStudentTestResultInput {
+    student_id: ID!
+    test_id: ID!
+    task_id: ID!
+    marks: [MarksInput]!
+  }
+
+  input UpdateStudentTestResultInput {
     marks: [MarksInput]!
   }
 
@@ -51,9 +58,13 @@ const studentTestResultTypeDefs = gql`
   }
 
   extend type Mutation {
+    EnterMarksForStudentTestResult(
+      student_test_result_input: EnterStudentTestResultInput!
+    ): StudentTestResult
+
     UpdateMarksForStudentTestResult(
       _id: ID!
-      student_test_result_input: StudentTestResultInput!
+      student_test_result_input: UpdateStudentTestResultInput!
     ): StudentTestResult
 
     DeleteStudentTestResult(_id: ID!): ID

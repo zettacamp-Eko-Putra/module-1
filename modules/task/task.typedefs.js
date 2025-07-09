@@ -45,7 +45,11 @@ const taskTypeDefs = gql`
   }
 
   input AssignCorrectorInput {
-    user_id: ID!
+    user_id:ID!
+  }
+
+  EnterMarksForStudentTestResultInput{
+  user_id: ID!
   }
 
   extend type Query {
@@ -55,6 +59,13 @@ const taskTypeDefs = gql`
 
   extend type Mutation {
     AssignCorrector(_id: ID!, task_input: AssignCorrectorInput!): ID
+
+    EnterMarksForStudentTestResult(
+      task_input: EnterMarksForStudentTestResultInput!
+    ): ID
+
+
+    
     UpdateTask(_id: ID!, task_input: TaskInput!): Task
     DeleteTask(_id: ID!): ID
   }

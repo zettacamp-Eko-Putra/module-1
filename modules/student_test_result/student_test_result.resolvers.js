@@ -3,7 +3,7 @@ const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('./student_test_result.models.js');
-const TestModel = require('../../test/test.models.js');
+const TestModel = require('../test/test.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
@@ -14,7 +14,7 @@ const {
 } = require('./student_test_result.validator.js');
 const {
   ValidateIdMongoose,
-} = require('../../../utilities/common-validator/mongo-validator.js');
+} = require('../../utilities/common-validator/mongo-validator.js');
 
 async function GetAllStudentTestResults(_, { validation_status }) {
   try {
