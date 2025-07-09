@@ -12,16 +12,15 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
-
 /**
  * Query resolver to retrieve all subjects with status "ACTIVE".
- * 
+ *
  * @async
  * @function GetAllSubjects
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL query arguments (not used in this function).
  * @returns {Promise<Object[]>} - A Promise that resolves to an array of subject objects with status "ACTIVE".
- * 
+ *
  * @throws {ApolloError} - Throws an ApolloError if fetching subjects fails.
  */
 async function GetAllSubjects(_, args) {
@@ -37,6 +36,19 @@ async function GetAllSubjects(_, args) {
   }
 }
 
+/**
+ * Query resolver to retrieve a single subject by its ID with status "ACTIVE".
+ *
+ * @async
+ * @function GetOneSubject
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} args._id - The ID of the subject to retrieve.
+ * @returns {Promise<Object>} - A Promise that resolves to the subject object if found.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the ID is invalid,
+ *   the subject is not found, or an error occurs during retrieval.
+ */
 async function GetOneSubject(_, { _id }) {
   try {
     // *************** Validating Subject ID
@@ -61,6 +73,23 @@ async function GetOneSubject(_, { _id }) {
   }
 }
 
+/**
+ * Mutation resolver to create a new subject under a specified block.
+ *
+ * @async
+ * @function CreateSubject
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {Object} args.subject_input - Input object containing subject details.
+ * @param {string} args.subject_input.block_id - ID of the block the subject belongs to.
+ * @param {string} args.subject_input.name - Name of the subject.
+ * @param {string} args.subject_input.description - Description of the subject.
+ * @param {number} args.subject_input.coefficient - Coefficient value of the subject.
+ * @returns {Promise<Object>} - A Promise that resolves to the newly created subject object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if validation fails, block is not found,
+ *   subject name already exists in the same block, or an error occurs during creation.
+ */
 async function CreateSubject(_, { subject_input }) {
   try {
     // *************** get one user id
@@ -120,6 +149,24 @@ async function CreateSubject(_, { subject_input }) {
   }
 }
 
+/**
+ * Mutation resolver to update a subject by its ID with new data.
+ *
+ * @async
+ * @function UpdateSubject
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the subject to update.
+ * @param {Object} args.subject_input - Input object containing the updated subject details.
+ * @param {string} args.subject_input.name - Updated name of the subject.
+ * @param {string} args.subject_input.description - Updated description of the subject.
+ * @param {number} args.subject_input.coefficient - Updated coefficient value of the subject.
+ * @returns {Promise<Object>} - A Promise that resolves to the updated subject object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if validation fails,
+ *   the subject is not found, the name already exists in the same block,
+ *   or if the coefficient is modified while a published test exists.
+ */
 async function UpdateSubject(_, { _id, subject_input }) {
   try {
     // *************** get one user id
@@ -201,6 +248,20 @@ async function UpdateSubject(_, { _id, subject_input }) {
   }
 }
 
+/**
+ * Mutation resolver to soft delete a subject by setting its status to "DELETED".
+ *
+ * @async
+ * @function DeleteSubject
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the subject to delete.
+ * @returns {Promise<string>} - A Promise that resolves to the deleted subject's ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the subject ID is invalid,
+ *   a published test exists for the subject, the subject is not found,
+ *   or any error occurs during the deletion process.
+ */
 async function DeleteSubject(_, { _id }) {
   try {
     // *************** get one user id
@@ -250,6 +311,17 @@ async function DeleteSubject(_, { _id }) {
   }
 }
 
+/**
+ * Field resolver to retrieve block data for a subject based on its block_id.
+ *
+ * @async
+ * @function block_id
+ * @param {Object} parent - Parent object containing block_id field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.BlockLoader - DataLoader for loading blocks by ID.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the block object, or null if block_id is not present.
+ */
 async function block_id(parent, _, ctx) {
   // *************** creating if to check if the block block array empty
   if (!parent.block_id)
@@ -260,6 +332,17 @@ async function block_id(parent, _, ctx) {
   return await ctx.loaders.BlockLoader.load(parent.block_id);
 }
 
+/**
+ * Field resolver to retrieve test data for a subject based on test_ids array.
+ *
+ * @async
+ * @function test_ids
+ * @param {Object} parent - Parent object containing test_ids field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.TestLoader - DataLoader for loading tests by ID.
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of test objects. Returns an empty array if no test_ids are present.
+ */
 async function test_ids(parent, _, ctx) {
   // *************** creating if to check if the testids block array empty
   if (!parent.test_ids || !parent.test_ids.length) {
