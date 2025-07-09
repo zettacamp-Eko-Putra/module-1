@@ -3,6 +3,7 @@ const { ApolloError } = require('apollo-server');
 
 // *************** IMPORT MODULE ***************
 const TaskModel = require('./task.models.js');
+const UserModel = require('../../user/user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
@@ -59,9 +60,89 @@ async function GetOneTask(_, { _id }) {
   }
 }
 
+async function UpdateTask(_, { _id, task_input }) {
+  try {
+    // *************** get one user id
+    const user_id = '686b93d2cb55171e10da8c00';
+
+    // *************** Validating test id and Task input
+    ValidateIdMongoose(_id, 'UpdateTask');
+    ValidateTaskInput(task_input);
+
+    // *************** Find current Task by id
+    const currentTask = await TaskModel.findOne({
+      _id,
+      status: 'ACTIVE',
+      task_status: 'PENDING',
+    }).lean();
+
+    if (!currentTask) {
+      throw new ApolloError('Task not found');
+    }
+
+    // *************** Check if due_date is changed and still in the future
+    if (
+      task_input.due_date &&
+      new Date(task_input.due_date).getTime() !==
+        new Date(currentTask.due_date).getTime()
+    ) {
+      const now = new Date();
+      const dueDate = new Date(task_input.due_date);
+      if (dueDate <= now) {
+        throw new ApolloError('Due date must be in the future');
+      }
+    }
+
+    const isNewUserInDatabase = await UserModel.exists({
+      _id: task_input.user_id,
+      status: 'ACTIVE',
+    });
+
+    if (!isNewUserInDatabase) {
+      throw new ApolloError('New user not found');
+    }
+
+    // *************** breakdown Task input
+    const taskData = {
+      test_id: task_input.test_id,
+      user_id: task_input.user_id,
+      due_date: task_input.due_date,
+    };
+
+    // *************** finding Task based on id and overwrite it with new data and saving it to database
+    const updatedTask = await TaskModel.findOneAndUpdate(
+      { _id, status: 'ACTIVE', task_status: 'PENDING' },
+      {
+        $set: taskData,
+        $push: {
+          updated_by: {
+            user_id: user_id,
+            updated_at: new Date(),
+          },
+        },
+      },
+      { new: true }
+    ).lean();
+
+    // ***************  showing error message if the Task id cannot be found in database
+    if (!updatedTask) {
+      throw new ApolloError('Task not Found');
+    }
+
+    // *************** returning Task updated data to user
+    return updatedTask;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 module.exports = {
   Query: {
     GetAllTasks,
     GetOneTask,
+  },
+  Mutation: {
+    UpdateTask,
   },
 };
