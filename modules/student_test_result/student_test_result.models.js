@@ -26,6 +26,9 @@ const StudentTestResultSchema = new Schema(
       },
     ],
 
+    // average mark for calculation
+    average_mark: { type: Number },
+
     // task id when marks been entered
     task_id: { type: Schema.Types.ObjectId, ref: 'task' },
 

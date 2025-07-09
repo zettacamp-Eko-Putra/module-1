@@ -160,13 +160,14 @@ async function UpdateBlock(_, { _id, block_input }) {
     const currentBlock = await BlockModel.findById(_id).lean();
 
     // *************** Take current block legal name
-    const currentBlockName = currentBlock.name.trim().toLowerCase();
+    const currentBlockName = currentBlock.name.trim();
 
     // *************** Only check duplication if legal name changed
     if (inputName !== currentBlockName) {
       const isBlockNameAlreadyExists = await BlockModel.exists({
         name: { $regex: `^${inputName}$`, $options: 'i' },
         status: 'ACTIVE',
+        _id: { $ne: _id },
       });
 
       if (isBlockNameAlreadyExists) {
@@ -331,6 +332,6 @@ module.exports = {
     DeleteBlock,
   },
   Block: {
-    subject_ids: subject_ids,
+    subject_ids,
   },
 };

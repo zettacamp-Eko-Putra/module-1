@@ -100,25 +100,23 @@ async function UpdateMarksForStudentTestResult(
       test.notations
     );
 
-    // *************** prepare test data for database
-    const studentTestResultData = {
-      marks: studentTestResult_input.marks,
-    };
-
     // *************** Check if marks have changed
     const marksChanged =
       JSON.stringify(currentStudentTestResult.marks) !==
       JSON.stringify(studentTestResult_input.marks);
 
-    // *************** If changed, calculate new average mark
-    if (marksChanged) {
-      const total = studentTestResult_input.marks.reduce(
-        (sum, markEntry) => sum + markEntry.mark,
-        0
-      );
-      const average = total / studentTestResult_input.marks.length;
-      studentTestResultData.average_mark = parseFloat(average.toFixed(2));
-    }
+    // *************** always count average
+    const total = studentTestResult_input.marks.reduce(
+      (sum, markEntry) => sum + markEntry.mark,
+      0
+    );
+    const average = total / studentTestResult_input.marks.length;
+
+    // *************** Simpan marks dan average
+    const studentTestResultData = {
+      marks: studentTestResult_input.marks,
+      average_mark: parseFloat(average.toFixed(2)),
+    };
 
     // *************** Check if all marks entered (complete entry)
     if (studentTestResult_input.marks.length === test.notations.length) {
