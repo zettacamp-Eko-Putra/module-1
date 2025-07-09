@@ -35,8 +35,33 @@ async function GetAllTasks(_, { type, task_status }) {
   }
 }
 
-module.exports = {
-    Query:{
-        GetAllTasks
+async function GetOneTask(_, { _id }) {
+  try {
+    // *************** Validating task ID
+    ValidateIdMongoose(_id, 'GetOneTask');
+
+    // *************** finding task based on id and status ACTIVE
+    const taskResult = await TaskModel.findOne({
+      _id,
+      status: 'ACTIVE',
+    }).lean();
+
+    // *************** showing message if the task cannot be found
+    if (!taskResult) {
+      throw new ApolloError('Task not Found');
     }
+
+    // *************** Return task data if found
+    return taskResult;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
 }
+
+module.exports = {
+  Query: {
+    GetAllTasks,
+    GetOneTask,
+  },
+};
