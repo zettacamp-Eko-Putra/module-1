@@ -80,19 +80,6 @@ async function UpdateTask(_, { _id, task_input }) {
       throw new ApolloError('Task not found');
     }
 
-    // *************** Check if due_date is changed and still in the future
-    if (
-      task_input.due_date &&
-      new Date(task_input.due_date).getTime() !==
-        new Date(currentTask.due_date).getTime()
-    ) {
-      const now = new Date();
-      const dueDate = new Date(task_input.due_date);
-      if (dueDate <= now) {
-        throw new ApolloError('Due date must be in the future');
-      }
-    }
-
     const isNewUserInDatabase = await UserModel.exists({
       _id: task_input.user_id,
       status: 'ACTIVE',

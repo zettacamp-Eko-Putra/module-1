@@ -1,10 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 
-const {
-  ValidateIdMongoose,
-} = require('../../utilities/common-validator/mongo-validator.js');
-
 function ValidateStudentTestResultInput(StudentTestResult_input) {
   // *************** Validate marks
   if (
