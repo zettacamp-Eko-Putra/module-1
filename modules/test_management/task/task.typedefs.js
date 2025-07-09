@@ -7,6 +7,7 @@ const taskTypeDefs = gql`
     _id: ID!
     test_id: ID
     user_id: ID
+    user: User
     type: TypeTask!
     task_status: TaskStatus!
     status: Status
