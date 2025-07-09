@@ -4,6 +4,7 @@ const { ApolloError } = require('apollo-server');
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('./student_test_result.models.js');
 const TestModel = require('../test/test.models.js');
+const TaskModel = require('../task/task.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
@@ -99,11 +100,6 @@ async function UpdateMarksForStudentTestResult(
       studentTestResult_input.marks,
       test.notations
     );
-
-    // *************** Check if marks have changed
-    const marksChanged =
-      JSON.stringify(currentStudentTestResult.marks) !==
-      JSON.stringify(studentTestResult_input.marks);
 
     // *************** always count average
     const total = studentTestResult_input.marks.reduce(
