@@ -4,6 +4,7 @@ const SchoolLoader = require('../modules/school/school.loader');
 const StudentLoader = require('../modules/student/student.loader');
 const SubjectLoader = require('../modules/subject/subject.loader');
 const TestLoader = require('../modules/test/test.loader');
+const UserLoader = require('../modules/user/user.loader');
 
 /**
  * Creates and returns an object containing all configured DataLoaders
@@ -21,6 +22,7 @@ function InitializeDataLoaders() {
     BlockLoader: BlockLoader(),
     SubjectLoader: SubjectLoader(),
     TestLoader: TestLoader(),
+    UserLoader: UserLoader(),
   };
 }
 

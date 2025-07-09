@@ -10,6 +10,17 @@ const {
   ValidateArrayIdMongoose,
 } = require(`../../utilities/common-validator/mongo-validator.js`);
 
+/**
+ * Batch function to load test data based on a list of test IDs.
+ *
+ * @async
+ * @function TestBatch
+ * @param {string[]} testIds - Array of test IDs to fetch.
+ * @returns {Promise<(Object|null)[]>} - A Promise that resolves to an array of test objects
+ *   sorted according to the input order. If a test ID is not found, `null` is returned in its place.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if any test ID is not a valid MongoDB ObjectId.
+ */
 async function TestBatch(testIds) {
   // *************** validate all testids
   ValidateArrayIdMongoose(testIds, 'testIds');
@@ -29,6 +40,12 @@ async function TestBatch(testIds) {
   return result;
 }
 
+/**
+ * Creates a DataLoader instance for batching and caching test data fetches.
+ *
+ * @function TestLoader
+ * @returns {DataLoader<string, Object|null>} - A DataLoader instance that batches test ID queries and returns corresponding test objects.
+ */
 const TestLoader = () => {
   // *************** creating dataloader using batch TestBatch
   const loader = new DataLoader(TestBatch);

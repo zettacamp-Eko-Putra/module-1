@@ -11,6 +11,18 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+/**
+ * Query resolver to retrieve all tests with status "ACTIVE", optionally filtered by published_status.
+ *
+ * @async
+ * @function GetAllTests
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} [args.published_status] - Optional filter to match test's published status (e.g., "PENDING", "PUBLISHED").
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of test objects matching the filter.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if fetching tests fails.
+ */
 async function GetAllTests(_, { published_status }) {
   try {
     // *************** Create filter to find only tests with status ACTIVE
@@ -32,6 +44,19 @@ async function GetAllTests(_, { published_status }) {
   }
 }
 
+/**
+ * Query resolver to retrieve a single test by its ID with status "ACTIVE".
+ *
+ * @async
+ * @function GetOneTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} args._id - The ID of the test to retrieve.
+ * @returns {Promise<Object>} - A Promise that resolves to the test object if found.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the ID is invalid,
+ *   the test is not found, or an error occurs during the retrieval.
+ */
 async function GetOneTest(_, { _id }) {
   try {
     // *************** Validating test ID
@@ -56,6 +81,25 @@ async function GetOneTest(_, { _id }) {
   }
 }
 
+/**
+ * Mutation resolver to create a new test under a specific subject.
+ *
+ * @async
+ * @function CreateTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {Object} args.test_input - Input object containing test details.
+ * @param {string} args.test_input.subject_id - The ID of the subject the test belongs to.
+ * @param {string} args.test_input.name - The name of the test.
+ * @param {string} args.test_input.description - The description of the test.
+ * @param {number} args.test_input.weight - The weight of the test in evaluation.
+ * @param {string[]} args.test_input.notations - An array of notation strings for the test.
+ * @returns {Promise<Object>} - A Promise that resolves to the newly created test object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if validation fails,
+ *   the subject is not found, the test name already exists within the same subject,
+ *   or an error occurs during creation.
+ */
 async function CreateTest(_, { test_input }) {
   try {
     // *************** get one user id
@@ -116,6 +160,25 @@ async function CreateTest(_, { test_input }) {
   }
 }
 
+/**
+ * Mutation resolver to update a test by its ID with new data.
+ *
+ * @async
+ * @function UpdateTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the test to update.
+ * @param {Object} args.test_input - Input object containing updated test details.
+ * @param {string} args.test_input.subject_id - Updated subject ID the test belongs to.
+ * @param {string} args.test_input.name - Updated name of the test.
+ * @param {string} args.test_input.description - Updated description of the test.
+ * @param {number} args.test_input.weight - Updated weight of the test.
+ * @param {string[]} args.test_input.notations - Updated notations of the test.
+ * @returns {Promise<Object>} - A Promise that resolves to the updated test object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if validation fails, the test is not found,
+ *   the test is already published, or the test name already exists under the same subject.
+ */
 async function UpdateTest(_, { _id, test_input }) {
   try {
     // *************** get one user id
@@ -190,6 +253,20 @@ async function UpdateTest(_, { _id, test_input }) {
   }
 }
 
+/**
+ * Mutation resolver to soft delete a test by setting its status to "DELETED".
+ * Only allows deletion if the test is not yet published.
+ *
+ * @async
+ * @function DeleteTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the test to delete.
+ * @returns {Promise<string>} - A Promise that resolves to the deleted test's ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the test ID is invalid,
+ *   the test is not found or already published, or any error occurs during deletion.
+ */
 async function DeleteTest(_, { _id }) {
   try {
     // *************** get one user id
@@ -228,6 +305,17 @@ async function DeleteTest(_, { _id }) {
   }
 }
 
+/**
+ * Field resolver to retrieve subject data for a test based on its subject_id.
+ *
+ * @async
+ * @function subject_id
+ * @param {Object} parent - Parent object containing subject_id field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.SubjectLoader - DataLoader for loading subject by ID.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the subject object, or null if subject_id is not present.
+ */
 async function subject_id(parent, _, ctx) {
   // *************** creating if to check if the subject array empty
   if (!parent.subject_id)
