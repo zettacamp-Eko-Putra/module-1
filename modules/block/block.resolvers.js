@@ -12,6 +12,17 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+/**
+ * Query resolver to retrieve all blocks with status "ACTIVE".
+ *
+ * @async
+ * @function GetAllBlocks
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments (not used in this function).
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of block objects with status "ACTIVE".
+ *
+ * @throws {ApolloError} - Throws an ApolloError if fetching blocks fails.
+ */
 async function GetAllBlocks(_, args) {
   try {
     // *************** find block data with status ACTIVE
@@ -25,6 +36,19 @@ async function GetAllBlocks(_, args) {
   }
 }
 
+/**
+ * Query resolver to retrieve a single block by its ID with status "ACTIVE".
+ *
+ * @async
+ * @function GetOneBlock
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} args._id - The ID of the block to retrieve.
+ * @returns {Promise<Object>} - A Promise that resolves to the block object if found.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the ID is invalid, the block is not found,
+ *   or if any other error occurs during the process.
+ */
 async function GetOneBlock(_, { _id }) {
   try {
     // *************** Validating block ID
@@ -49,6 +73,21 @@ async function GetOneBlock(_, { _id }) {
   }
 }
 
+/**
+ * Mutation resolver to create a new block if the name does not already exist.
+ *
+ * @async
+ * @function CreateBlock
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {Object} args.block_input - Input object containing block details.
+ * @param {string} args.block_input.name - Name of the block.
+ * @param {string} args.block_input.description - Description of the block.
+ * @returns {Promise<Object>} - A Promise that resolves to the newly created block object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if validation fails, the block name already exists,
+ *   or if an error occurs during creation.
+ */
 async function CreateBlock(_, { block_input }) {
   try {
     // *************** get one user id
@@ -89,6 +128,22 @@ async function CreateBlock(_, { block_input }) {
   }
 }
 
+/**
+ * Mutation resolver to update a block by its ID with new data.
+ *
+ * @async
+ * @function UpdateBlock
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the block to update.
+ * @param {Object} args.block_input - Input object containing the updated block details.
+ * @param {string} args.block_input.name - Updated name of the block.
+ * @param {string} args.block_input.description - Updated description of the block.
+ * @returns {Promise<Object>} - A Promise that resolves to the updated block object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the ID is invalid, validation fails,
+ *   the block is not found, or the name already exists.
+ */
 async function UpdateBlock(_, { _id, block_input }) {
   try {
     // *************** get one user id
@@ -153,6 +208,20 @@ async function UpdateBlock(_, { _id, block_input }) {
   }
 }
 
+/**
+ * Mutation resolver to soft delete a block by setting its status to "DELETED".
+ *
+ * @async
+ * @function DeleteBlock
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the block to delete.
+ * @returns {Promise<string>} - A Promise that resolves to the deleted block's ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the block ID is invalid,
+ *   a published test exists under the block, the block is not found,
+ *   or any other error occurs during deletion.
+ */
 async function DeleteBlock(_, { _id }) {
   try {
     // *************** get one user id
@@ -208,6 +277,17 @@ async function DeleteBlock(_, { _id }) {
   }
 }
 
+/**
+ * Field resolver to retrieve subject data for a block based on subject_ids array.
+ *
+ * @async
+ * @function subject_ids
+ * @param {Object} parent - Parent object containing subject_ids field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.SubjectLoader - DataLoader for loading subjects by ID.
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of subject objects. Returns an empty array if no subject_ids are present.
+ */
 async function subject_ids(parent, _, ctx) {
   // *************** creating if to check if the block subject array empty
   if (!parent.subject_ids || !parent.subject_ids.length) {
