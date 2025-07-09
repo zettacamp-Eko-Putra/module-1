@@ -264,6 +264,26 @@ async function DeleteBlock(_, { _id }) {
       .select('_id')
       .lean();
 
+    // *************** Delete all subjects under this block
+    const deletedSubjects = await SubjectModel.updateMany(
+      { block_id: _id, status: 'ACTIVE' },
+      {
+        status: 'DELETED',
+        deleted_at: new Date(),
+        deleted_by: user_id,
+      }
+    );
+
+    // *************** Delete all tests that belong to those subjects
+    await TestModel.updateMany(
+      { subject_id: { $in: subjectIdList }, status: 'ACTIVE' },
+      {
+        status: 'DELETED',
+        deleted_at: new Date(),
+        deleted_by: user_id,
+      }
+    );
+
     // *************** showing error message if block already deleted
     if (!deleteBlock) {
       throw new ApolloError('block not found');

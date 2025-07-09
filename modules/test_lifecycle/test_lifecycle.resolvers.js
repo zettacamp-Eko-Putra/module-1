@@ -36,7 +36,7 @@ async function PublishTest(_, { task_input }) {
     // *************** checking if the responsible user exists and is ACTIVE
     const isUserExists = await UserModel.exists({
       _id: task_input.user_id,
-      status: 'ACTIVE',
+      status: 'active',
     });
 
     // *************** throwing error if user not found or inactive
@@ -84,7 +84,7 @@ async function AssignCorrector(_, { _id, task_input }) {
 
   const isUserExists = await UserModel.exists({
     _id: task_input.user_id,
-    status: 'ACTIVE',
+    status: 'active',
   });
 
   if (!isUserExists) {
@@ -127,19 +127,19 @@ async function AssignCorrector(_, { _id, task_input }) {
     _id: getTaskData.test_id,
     published_status: 'PUBLISHED',
     status: 'ACTIVE',
-  }).populate('subject');
+  }).populate('subject_id');
 
-  const students = await StudentModel.find({ status: 'ACTIVE' });
+  const students = await StudentModel.find({ status: 'active' });
 
   const emailSubject = 'You have been assigned as a Test Corrector!';
   const emailBody = `
     You have been assigned to correct the test:
       - Test Name: ${testData.name}
-      - Subject: ${testData.subject.name}
+      - Subject: ${testData.subject_id.name}
       - Description: ${testData.description}
 
        You will be correcting tests for the following students:
-      ${students.map((s) => `- ${s.name}`).join('\n')}
+      ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
       `;
 
   console.log(`Subject: ${emailSubject}`);

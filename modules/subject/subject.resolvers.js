@@ -303,6 +303,16 @@ async function DeleteSubject(_, { _id }) {
       { $pull: { subject_ids: deleteSubject._id } }
     );
 
+    // *************** Delete all tests that belong to those subjects
+    await TestModel.updateMany(
+      { subject_id: _id, status: 'ACTIVE' },
+      {
+        status: 'DELETED',
+        deleted_at: new Date(),
+        deleted_by: user_id,
+      }
+    );
+
     // *************** returning subject deleted id to user
     return _id;
   } catch (error) {
