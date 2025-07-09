@@ -10,14 +10,11 @@ const {
   ValidateStudentTestResultInput,
 } = require('./student_test_result.validator.js');
 const {
-  PreventEditIfValidated,
-} = require('./student_test_result.validator.js');
-const {
   ValidateMarksAgainstNotations,
 } = require('./student_test_result.validator.js');
 const {
   ValidateIdMongoose,
-} = require('../../utilities/common-validator/mongo-validator.js');
+} = require('../../../utilities/common-validator/mongo-validator.js');
 
 async function GetAllStudentTestResults(_, { validation_status }) {
   try {
@@ -74,22 +71,28 @@ async function UpdateMarksForStudentTestResult(
     // *************** get one user id
     const user_id = '686b93d2cb55171e10da8c00';
 
-    // *************** Validating test id and test input
+    // *************** Validating test id and student test result input
     ValidateIdMongoose(_id, 'UpdateStudentTestResult');
     ValidateStudentTestResultInput(studentTestResult_input);
 
     // *************** Find current student Test Result by id
-    const currentStudentTestResult = await StudentTestResultModel.findById(
-      _id
-    ).lean();
+    const currentStudentTestResult = await StudentTestResultModel.findOne({
+      _id,
+      status: 'ACTIVE',
+      validation_status: 'NOT_VALIDATED',
+    }).lean();
 
-    // *************** check if student test result validated
-    PreventEditIfValidated(currentStudentTestResult.validation_status);
+    if (!currentStudentTestResult) {
+      throw new ApolloError('Student test result not found');
+    }
 
     const test = await TestModel.findById(
       currentStudentTestResult.test_id
     ).lean();
-    if (!test) throw new ApolloError('Test not found');
+
+    if (!test) {
+      throw new ApolloError('Test not found');
+    }
 
     // *************** validate mark against notations
     ValidateMarksAgainstNotations(

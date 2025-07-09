@@ -29,13 +29,6 @@ function ValidateStudentTestResultInput(StudentTestResult_input) {
   });
 }
 
-function PreventEditIfValidated(validation_status) {
-  if (validation_status === 'VALIDATED') {
-    // *************** If already published, prevent update
-    throw new ApolloError('Test is already published and cannot be edited');
-  }
-}
-
 function ValidateMarksAgainstNotations(marks, notations) {
   const notationMap = {};
   notations.forEach((n) => {
@@ -59,6 +52,5 @@ function ValidateMarksAgainstNotations(marks, notations) {
 // *************** EXPORT MODULE ***************
 module.exports = {
   ValidateStudentTestResultInput,
-  PreventEditIfValidated,
   ValidateMarksAgainstNotations,
 };
