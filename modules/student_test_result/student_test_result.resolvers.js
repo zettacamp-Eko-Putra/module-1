@@ -155,7 +155,9 @@ async function UpdateMarksForStudentTestResult(
     );
 
     // *************** count average
-    const average = (total / studentTestResult_input.marks.length).toFixed(2);
+    const average = parseFloat(
+      (total / studentTestResult_input.marks.length).toFixed(2)
+    );
 
     // *************** save marks and the average
     const studentTestResultData = {
@@ -166,10 +168,8 @@ async function UpdateMarksForStudentTestResult(
 
     // *************** Check if all marks entered
     if (studentTestResult_input.marks.length === test.notations.length) {
-      studentTestResultData.mark_entry_date = new Date();
-
       // *************** Update ENTER_MARKS task to COMPLETED
-      await TaskModel.findOneAndUpdate(
+      await TaskModel.updateOne(
         {
           _id: currentStudentTestResult.task_id,
           type: 'ENTER_MARKS',
