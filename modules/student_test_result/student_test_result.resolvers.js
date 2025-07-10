@@ -240,7 +240,7 @@ async function DeleteStudentTestResult(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteStudentTestResult');
 
     // *************** finding Student test Result and update the data
-    const deletedStudentTestResult  =
+    const deletedStudentTestResult =
       await StudentTestResultModel.findOneAndUpdate(
         { _id, status: 'ACTIVE', validation_status: 'NOT_VALIDATED' },
         {
@@ -363,8 +363,8 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   );
   const average = parseFloat((total / task_input.marks.length).toFixed(2));
 
-  // *************** build student test result
-  const newStudentTestResult = new StudentTestResultModel({
+  // *************** create student test result
+  const newStudentTestResult = await StudentTestResultModel.create({
     student_id: task_input.student_id,
     test_id: task_input.test_id,
     task_id: _id,
@@ -374,9 +374,6 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     mark_entry_date: new Date(),
     created_by: userIdCreate,
   });
-
-  // *************** save result
-  await newStudentTestResult.save();
 
   // *************** determine if task is completed
   const isComplete = task_input.marks.length === notations.length;
@@ -391,14 +388,13 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 
   // *************** if task is completed, create VALIDATE_MARKS task
   if (isComplete) {
-    const validateTask = new TaskModel({
+    const validateTask = await TaskModel.create({
       test_id: task_input.test_id,
       user_id: task_input.user_id,
       type: 'VALIDATE_MARKS',
       created_at: new Date(),
       created_by: userIdCreate,
     });
-    await validateTask.save();
 
     return validateTask._id;
   }
