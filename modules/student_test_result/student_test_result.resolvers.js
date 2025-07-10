@@ -175,7 +175,7 @@ async function UpdateMarksForStudentTestResult(
     }
 
     // *************** Check if all marks entered
-    if (studentTestResult_input.marks.length === test.notations.length) {
+    if (studentTestResult_input.marks.length === notations.length) {
       // *************** Update ENTER_MARKS task to COMPLETED
       await TaskModel.updateOne(
         {
