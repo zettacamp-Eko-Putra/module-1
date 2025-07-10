@@ -377,24 +377,23 @@ async function ValidateMarks(_, { _id, task_input }) {
   ValidateIdMongoose(task_input.studentTestResult_id);
 
   // *************** student test result data
-  const getStudentTestResultData =
-    await StudentTestResultModel.findOneAndUpdate(
-      {
-        _id: task_input.studentTestResult_id,
-        status: 'ACTIVE',
-        validation_status: 'NOT_VALIDATED',
-      },
-      {
-        validation_status: 'VALIDATED',
-      }
-    );
+  const getStudentTestResultData = await StudentTestResultModel.findOne(
+    {
+      _id: task_input.studentTestResult_id,
+      status: 'ACTIVE',
+      validation_status: 'NOT_VALIDATED',
+    },
+    {
+      validation_status: 'VALIDATED',
+    }
+  );
 
   if (!getStudentTestResultData) {
     throw new ApolloError('Student test result not found');
   }
 
   // *************** get task data
-  const getTaskData = await TaskModel.findOneAndUpdate(
+  const getTaskData = await TaskModel.findOne(
     {
       _id: _id,
       type: 'VALIDATE_MARKS',
@@ -408,6 +407,13 @@ async function ValidateMarks(_, { _id, task_input }) {
   if (!getTaskData) {
     throw new ApolloError('Task not found');
   }
+
+  await StudentTestResultModel.updateOne(
+    { _id: task_input.studentTestResult_id },
+    { validation_status: 'VALIDATED' }
+  );
+
+  await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
 
   return _id;
 }
