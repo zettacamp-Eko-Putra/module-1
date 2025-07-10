@@ -532,7 +532,7 @@ module.exports = {
     ValidateMarks,
   },
   StudentTestResult: {
-    student_id: student_id,
-    test_id: test_id,
+    student_id,
+    test_id,
   },
 };

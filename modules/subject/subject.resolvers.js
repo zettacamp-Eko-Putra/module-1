@@ -376,6 +376,6 @@ module.exports = {
   },
   Subject: {
     block: block_id,
-    test_ids: test_ids,
+    test_ids,
   },
 };
