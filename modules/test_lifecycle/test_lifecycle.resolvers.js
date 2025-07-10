@@ -12,6 +12,26 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+/**
+ * Mutation resolver to publish a test and create an ASSIGN_CORRECTOR task.
+ * Publishes a test if it's active and not yet published,
+ * and assigns a user to the next step in the workflow.
+ *
+ * @async
+ * @function PublishTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {Object} args.task_input - Input containing test and user information.
+ * @param {string} args.task_input.test_id - The ID of the test to publish.
+ * @param {string} args.task_input.user_id - The ID of the user to assign as corrector.
+ * @returns {Promise<string>} - A Promise that resolves to the published test's ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - test_id or user_id is invalid.
+ * - The test is not found, already published, or not active.
+ * - The user is not found or not active.
+ * - Any error occurs during update or task creation.
+ */
 async function PublishTest(_, { task_input }) {
   try {
     // *************** get one user
@@ -74,6 +94,26 @@ async function PublishTest(_, { task_input }) {
   }
 }
 
+/**
+ * Mutation resolver to assign a corrector for a test by completing the ASSIGN_CORRECTOR task
+ * and creating a new ENTER_MARKS task for the assigned user.
+ * Also logs a simulated email notification to the console.
+ *
+ * @async
+ * @function AssignCorrector
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the task (ASSIGN_CORRECTOR) to complete.
+ * @param {Object} args.task_input - Input object containing user_id to assign as corrector.
+ * @param {string} args.task_input.user_id - The ID of the user who will enter marks.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created ENTER_MARKS task.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The task ID or user ID is invalid.
+ * - The user does not exist or is not active.
+ * - The task is not found or not in PENDING status.
+ * - The test is not found or not published and active.
+ */
 async function AssignCorrector(_, { _id, task_input }) {
   // *************** get one user id
   const user_id = '686b93d2cb55171e10da8c00';
@@ -82,6 +122,7 @@ async function AssignCorrector(_, { _id, task_input }) {
   ValidateIdMongoose(_id);
   ValidateIdMongoose(task_input.user_id);
 
+  // *************** check user exists in database
   const isUserExists = await UserModel.exists({
     _id: task_input.user_id,
     status: 'active',
@@ -91,6 +132,7 @@ async function AssignCorrector(_, { _id, task_input }) {
     throw new ApolloError('User not found');
   }
 
+  // *************** get task data
   const getTaskData = await TaskModel.findOneAndUpdate(
     {
       _id: _id,
@@ -113,6 +155,7 @@ async function AssignCorrector(_, { _id, task_input }) {
     throw new ApolloError('Task not found');
   }
 
+  // *************** create enter marks task
   const createEnterMarksTask = new TaskModel({
     type: 'ENTER_MARKS',
     test_id: getTaskData.test_id,
@@ -123,14 +166,17 @@ async function AssignCorrector(_, { _id, task_input }) {
   // *************** saving the new ENTER_MARKS task
   await createEnterMarksTask.save();
 
+  // *************** get test data
   const testData = await TestModel.findOne({
     _id: getTaskData.test_id,
     published_status: 'PUBLISHED',
     status: 'ACTIVE',
   }).populate('subject_id');
 
+  // *************** get active student
   const students = await StudentModel.find({ status: 'active' });
 
+  // *************** email that being send to corrector
   const emailSubject = 'You have been assigned as a Test Corrector!';
   const emailBody = `
     You have been assigned to correct the test:
@@ -142,12 +188,41 @@ async function AssignCorrector(_, { _id, task_input }) {
       ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
       `;
 
+  // *************** send to console
   console.log(`Subject: ${emailSubject}`);
   console.log(`Body:\n${emailBody}`);
 
+  // *************** return enter marks id
   return createEnterMarksTask._id;
 }
 
+/**
+ * Mutation resolver to enter marks for a student on a specific test.
+ * Validates all related IDs, ensures test and student combination is unique,
+ * checks mark validity, calculates average, stores result,
+ * and updates task status or creates a VALIDATE_MARKS task if complete.
+ *
+ * @async
+ * @function EnterMarksForStudentTestResult
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - ID of the ENTER_MARKS task being performed.
+ * @param {Object} args.task_input - Object containing all required inputs for entering marks.
+ * @param {string} args.task_input.test_id - The test ID for which marks are entered.
+ * @param {string} args.task_input.user_id - The user ID of the corrector.
+ * @param {string} args.task_input.student_id - The student ID receiving the marks.
+ * @param {Array<{notation_text: string, mark: number}>} args.task_input.marks - List of marks with notation.
+ * @returns {Promise<string>} - The ID of the next task (VALIDATE_MARKS) if completed, or current ENTER_MARKS task.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - Any ID is invalid (task_id, test_id, user_id, student_id).
+ * - Task not found or not active.
+ * - Combination of test and student already exists and validated.
+ * - Assigned user does not exist or is not active.
+ * - Test not found or not in PUBLISHED status.
+ * - Number of marks exceeds notations.
+ * - Mark value is out of allowed range or notation is not recognized.
+ */
 async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   // *************** get one user
   const userIdCreate = '686b93d2cb55171e10da8c00';
@@ -279,9 +354,11 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 }
 
 async function ValidateMarks(_, { _id, task_input }) {
+  // *************** validate id and input id
   ValidateIdMongoose(_id);
   ValidateIdMongoose(task_input.studentTestResult_id);
 
+  // *************** get one user
   const getStudentTestResultData =
     await StudentTestResultModel.findOneAndUpdate(
       {
