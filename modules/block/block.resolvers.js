@@ -153,11 +153,18 @@ async function UpdateBlock(_, { _id, block_input }) {
     ValidateIdMongoose(_id, 'UpdateBlock');
     ValidateBlockInput(block_input);
 
+    // *************** find block data
+    const currentBlock = await BlockModel.findOne({
+      _id: _id,
+      status: 'ACTIVE',
+    });
+
+    if (!currentBlock) {
+      throw new ApolloError('block not found');
+    }
+
     // *************** Remove leading and trailing spaces from block legal name
     const inputName = block_input.name.trim();
-
-    // *************** Find current block by id
-    const currentBlock = await BlockModel.findById(_id).lean();
 
     // *************** Take current block legal name
     const currentBlockName = currentBlock.name.trim();
