@@ -60,20 +60,23 @@ function ValidateMarksAgainstNotations(marks, notations) {
 
   marks.forEach((markEntry) => {
     const maxPoint = notationMap[markEntry.notation_text];
-    // *************** Validate if notation text same with input
+
+    // *************** Validate if notation text is valid
     if (maxPoint === undefined) {
       throw new ApolloError(
         `Notation "${markEntry.notation_text}" not found in test`
       );
     }
-    // *************** Validate if mark not exceed max point
-    if (markEntry.mark > maxPoint) {
+
+    // *************** Validate if mark is within valid range
+    if (markEntry.mark < 0 || markEntry.mark > maxPoint) {
       throw new ApolloError(
-        `Mark for "${markEntry.notation_text}" cannot exceed ${maxPoint}`
+        `Invalid mark for "${markEntry.notation_text}": must be between 0 and ${maxPoint}`
       );
     }
   });
 }
+
 // *************** EXPORT MODULE ***************
 module.exports = {
   ValidateStudentTestResultInput,

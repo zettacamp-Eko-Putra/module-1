@@ -240,7 +240,7 @@ async function DeleteStudentTestResult(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteStudentTestResult');
 
     // *************** finding Student test Result and update the data
-    const DeleteStudentTestResult =
+    const deletedStudentTestResult  =
       await StudentTestResultModel.findOneAndUpdate(
         { _id, status: 'ACTIVE', validation_status: 'NOT_VALIDATED' },
         {
@@ -252,7 +252,7 @@ async function DeleteStudentTestResult(_, { _id }) {
       ).lean();
 
     // *************** showing error message if Student test Result already deleted
-    if (!DeleteStudentTestResult) {
+    if (!deletedStudentTestResult) {
       throw new ApolloError('Student test Result not found');
     }
 
@@ -354,28 +354,14 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   }
 
   // *************** validate individual marks
-  for (const markEntry of task_input.marks) {
-    const notation = notations.find(
-      (n) => n.notation_text === markEntry.notation_text
-    );
-    if (!notation) {
-      throw new ApolloError(
-        `Notation '${markEntry.notation_text}' not found in test`
-      );
-    }
-    if (markEntry.mark < 0 || markEntry.mark > notation.max_point) {
-      throw new ApolloError(
-        `Invalid mark for ${markEntry.notation_text}: must be between 0 and ${notation.max_point}`
-      );
-    }
-  }
+  ValidateMarksAgainstNotations(task_input.marks, testData.notations);
 
   // *************** calculate average
   const total = task_input.marks.reduce(
     (sum, markEntry) => sum + markEntry.mark,
     0
   );
-  const average = (total / task_input.marks.length).toFixed(2);
+  const average = parseFloat((total / task_input.marks.length).toFixed(2));
 
   // *************** build student test result
   const newStudentTestResult = new StudentTestResultModel({
