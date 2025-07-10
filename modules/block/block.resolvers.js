@@ -238,6 +238,15 @@ async function DeleteBlock(_, { _id }) {
     // *************** checking if the block id is valid
     ValidateIdMongoose(_id, 'DeleteBlock');
 
+    // *************** check if block exists
+    const isBlockExists = await BlockModel.exists({
+      _id: _id,
+      status: 'ACTIVE',
+    });
+    if (!isBlockExists) {
+      throw new ApolloError('Block not exists');
+    }
+
     // *************** finding Subject
     const subjectIdList = await SubjectModel.distinct('_id', {
       block_id: _id,
@@ -256,20 +265,15 @@ async function DeleteBlock(_, { _id }) {
     }
 
     // *************** finding block and update the data
-    const deleteBlock = await BlockModel.findOneAndUpdate(
-      { _id, status: { $in: 'ACTIVE' } },
-      {
-        // *************** changing status field to DELETED and adding timestamp
-        status: 'DELETED',
-        deleted_by: user_id,
-        deleted_at: new Date(),
-      }
-    )
-      .select('_id')
-      .lean();
+    const deleteBlock = await BlockModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to DELETED and adding timestamp
+      status: 'DELETED',
+      deleted_by: user_id,
+      deleted_at: new Date(),
+    });
 
     // *************** Delete all subjects under this block
-    const deletedSubjects = await SubjectModel.updateMany(
+    await SubjectModel.updateMany(
       { block_id: _id, status: 'ACTIVE' },
       {
         status: 'DELETED',
