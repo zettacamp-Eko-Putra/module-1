@@ -4,6 +4,8 @@ const { ApolloError } = require('apollo-server');
 // *************** IMPORT MODULE ***************
 const TestModel = require('./test.models.js');
 const SubjectModel = require('../subject/subject.models.js');
+const TaskModel = require('../task/task.models.js');
+const UserModel = require('../user/user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateTestInput } = require('./test.validator.js');
@@ -306,6 +308,190 @@ async function DeleteTest(_, { _id }) {
 }
 
 /**
+ * Mutation resolver to publish a test and create an ASSIGN_CORRECTOR task.
+ * Publishes a test if it's active and not yet published,
+ * and assigns a user to the next step in the workflow.
+ *
+ * @async
+ * @function PublishTest
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {Object} args.task_input - Input containing test and user information.
+ * @param {string} args.task_input.test_id - The ID of the test to publish.
+ * @param {string} args.task_input.user_id - The ID of the user to assign as corrector.
+ * @returns {Promise<string>} - A Promise that resolves to the published test's ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - test_id or user_id is invalid.
+ * - The test is not found, already published, or not active.
+ * - The user is not found or not active.
+ * - Any error occurs during update or task creation.
+ */
+async function PublishTest(_, { task_input }) {
+  try {
+    // *************** get one user
+    const userIdCreate = '686b93d2cb55171e10da8c00';
+
+    // *************** validating test_id and user_id
+    ValidateIdMongoose(task_input.test_id);
+    ValidateIdMongoose(task_input.user_id);
+
+    // *************** find the test with status ACTIVE and NOT_PUBLISHED
+    const getTestData = await TestModel.findOne({
+      _id: task_input.test_id,
+      status: 'ACTIVE',
+      published_status: 'NOT_PUBLISHED',
+    });
+
+    // *************** throwing error if test not found or already published
+    if (!getTestData) {
+      throw new ApolloError('Test not found');
+    }
+
+    // *************** checking if the responsible user exists and is ACTIVE
+    const isUserExists = await UserModel.exists({
+      _id: task_input.user_id,
+      status: 'active',
+    });
+
+    // *************** throwing error if user not found or inactive
+    if (!isUserExists) {
+      throw new ApolloError('User not found');
+    }
+
+    // *************** preparing test update data with publish info
+    const updateTestData = {
+      published_date: new Date(),
+      published_status: 'PUBLISHED',
+    };
+
+    // *************** applying the update to the test document
+    getTestData.set(updateTestData);
+    await getTestData.save();
+
+    // *************** creating ASSIGN_CORRECTOR task for the responsible user
+    const createAssignCorrectorTask = new TaskModel({
+      test_id: task_input.test_id,
+      user_id: task_input.user_id,
+      type: 'ASSIGN_CORRECTOR',
+      created_at: new Date(),
+      created_by: userIdCreate,
+    });
+
+    // *************** saving the task to the database
+    await createAssignCorrectorTask.save();
+
+    // *************** returning the test _id after publishing
+    return getTestData._id;
+  } catch (error) {
+    // *************** throwing formatted Apollo error in case of exception
+    throw new ApolloError(error.message);
+  }
+}
+
+/**
+ * Mutation resolver to assign a corrector for a test by completing the ASSIGN_CORRECTOR task
+ * and creating a new ENTER_MARKS task for the assigned user.
+ * Also logs a simulated email notification to the console.
+ *
+ * @async
+ * @function AssignCorrector
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the task (ASSIGN_CORRECTOR) to complete.
+ * @param {Object} args.task_input - Input object containing user_id to assign as corrector.
+ * @param {string} args.task_input.user_id - The ID of the user who will enter marks.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created ENTER_MARKS task.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The task ID or user ID is invalid.
+ * - The user does not exist or is not active.
+ * - The task is not found or not in PENDING status.
+ * - The test is not found or not published and active.
+ */
+async function AssignCorrector(_, { _id, task_input }) {
+  // *************** get one user id
+  const user_id = '686b93d2cb55171e10da8c00';
+
+  // *************** validate id and task input user id
+  ValidateIdMongoose(_id);
+  ValidateIdMongoose(task_input.user_id);
+
+  // *************** check user exists in database
+  const isUserExists = await UserModel.exists({
+    _id: task_input.user_id,
+    status: 'active',
+  });
+
+  if (!isUserExists) {
+    throw new ApolloError('User not found');
+  }
+
+  // *************** get task data
+  const getTaskData = await TaskModel.findOneAndUpdate(
+    {
+      _id: _id,
+      type: 'ASSIGN_CORRECTOR',
+      task_status: 'PENDING',
+    },
+    {
+      task_status: 'COMPLETED',
+      $push: {
+        updated_by: {
+          user_id: user_id,
+          updated_at: new Date(),
+        },
+      },
+    },
+    { new: true }
+  );
+
+  if (!getTaskData) {
+    throw new ApolloError('Task not found');
+  }
+
+  // *************** create enter marks task
+  const createEnterMarksTask = new TaskModel({
+    type: 'ENTER_MARKS',
+    test_id: getTaskData.test_id,
+    user_id: task_input.user_id,
+    created_at: new Date(),
+    created_by: user_id,
+  });
+  // *************** saving the new ENTER_MARKS task
+  await createEnterMarksTask.save();
+
+  // *************** get test data
+  const testData = await TestModel.findOne({
+    _id: getTaskData.test_id,
+    published_status: 'PUBLISHED',
+    status: 'ACTIVE',
+  }).populate('subject_id');
+
+  // *************** get active student
+  const students = await StudentModel.find({ status: 'active' });
+
+  // *************** email that being send to corrector
+  const emailSubject = 'You have been assigned as a Test Corrector!';
+  const emailBody = `
+    You have been assigned to correct the test:
+      - Test Name: ${testData.name}
+      - Subject: ${testData.subject_id.name}
+      - Description: ${testData.description}
+
+       You will be correcting tests for the following students:
+      ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
+      `;
+
+  // *************** send to console
+  console.log(`Subject: ${emailSubject}`);
+  console.log(`Body:\n${emailBody}`);
+
+  // *************** return enter marks id
+  return createEnterMarksTask._id;
+}
+
+/**
  * Field resolver to retrieve subject data for a test based on its subject_id.
  *
  * @async
@@ -335,6 +521,8 @@ module.exports = {
     CreateTest,
     UpdateTest,
     DeleteTest,
+    PublishTest,
+    AssignCorrector,
   },
   Test: {
     subject: subject_id,

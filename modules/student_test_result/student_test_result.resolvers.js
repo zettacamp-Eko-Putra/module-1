@@ -5,6 +5,7 @@ const { ApolloError } = require('apollo-server');
 const StudentTestResultModel = require('./student_test_result.models.js');
 const TestModel = require('../test/test.models.js');
 const TaskModel = require('../task/task.models.js');
+const UserModel = require('../user/user.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const {
@@ -154,7 +155,7 @@ async function UpdateMarksForStudentTestResult(
     );
 
     // *************** count average
-    const average = (total / studentTestResult_input.marks.length, toFixed(2));
+    const average = (total / studentTestResult_input.marks.length).toFixed(2);
 
     // *************** save marks and the average
     const studentTestResultData = {
@@ -264,6 +265,220 @@ async function DeleteStudentTestResult(_, { _id }) {
 }
 
 /**
+ * Mutation resolver to enter marks for a student on a specific test.
+ * Validates all related IDs, ensures test and student combination is unique,
+ * checks mark validity, calculates average, stores result,
+ * and updates task status or creates a VALIDATE_MARKS task if complete.
+ *
+ * @async
+ * @function EnterMarksForStudentTestResult
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - ID of the ENTER_MARKS task being performed.
+ * @param {Object} args.task_input - Object containing all required inputs for entering marks.
+ * @param {string} args.task_input.test_id - The test ID for which marks are entered.
+ * @param {string} args.task_input.user_id - The user ID of the corrector.
+ * @param {string} args.task_input.student_id - The student ID receiving the marks.
+ * @param {Array<{notation_text: string, mark: number}>} args.task_input.marks - List of marks with notation.
+ * @returns {Promise<string>} - The ID of the next task (VALIDATE_MARKS) if completed, or current ENTER_MARKS task.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - Any ID is invalid (task_id, test_id, user_id, student_id).
+ * - Task not found or not active.
+ * - Combination of test and student already exists and validated.
+ * - Assigned user does not exist or is not active.
+ * - Test not found or not in PUBLISHED status.
+ * - Number of marks exceeds notations.
+ * - Mark value is out of allowed range or notation is not recognized.
+ */
+async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
+  // *************** get one user
+  const userIdCreate = '686b93d2cb55171e10da8c00';
+
+  // *************** validate id input
+  ValidateIdMongoose(_id);
+  ValidateIdMongoose(task_input.test_id, 'test_id');
+  ValidateIdMongoose(task_input.user_id, 'user_id');
+  ValidateIdMongoose(task_input.student_id, 'student_id');
+
+  // *************** get task based on criteria
+  const taskData = await TaskModel.findOne({
+    _id: _id,
+    type: 'ENTER_MARKS',
+    task_status: 'PENDING',
+    status: 'ACTIVE',
+  });
+
+  if (!taskData) {
+    throw new ApolloError('Task not found');
+  }
+
+  // *************** check if there student and test combination
+  const isStudentTestResultCombiationExists =
+    await StudentTestResultModel.exists({
+      test_id: task_input.test_id,
+      student_id: task_input.student_id,
+      status: 'ACTIVE',
+      validation_status: 'VALIDATED',
+    });
+
+  if (isStudentTestResultCombiationExists) {
+    throw new ApolloError('Combination test and student already exists');
+  }
+
+  // *************** check user exists in database
+  const isUserExists = await UserModel.exists({
+    _id: task_input.user_id,
+    status: 'active',
+  });
+
+  if (!isUserExists) {
+    throw new ApolloError('User not found');
+  }
+
+  // *************** get test data based on criteria
+  const testData = await TestModel.findOne({
+    _id: task_input.test_id,
+    status: 'ACTIVE',
+    published_status: 'PUBLISHED',
+  });
+
+  if (!testData) {
+    throw new ApolloError('Test not found');
+  }
+
+  // *************** validate marks count
+  const notations = testData.notations;
+  if (task_input.marks.length > notations.length) {
+    throw new ApolloError('Number of marks must not exceed notations');
+  }
+
+  // *************** validate individual marks
+  for (const markEntry of task_input.marks) {
+    const notation = notations.find(
+      (n) => n.notation_text === markEntry.notation_text
+    );
+    if (!notation) {
+      throw new ApolloError(
+        `Notation '${markEntry.notation_text}' not found in test`
+      );
+    }
+    if (markEntry.mark < 0 || markEntry.mark > notation.max_point) {
+      throw new ApolloError(
+        `Invalid mark for ${markEntry.notation_text}: must be between 0 and ${notation.max_point}`
+      );
+    }
+  }
+
+  // *************** calculate average
+  const total = task_input.marks.reduce(
+    (sum, markEntry) => sum + markEntry.mark,
+    0
+  );
+  const average = (total / task_input.marks.length).toFixed(2);
+
+  // *************** build student test result
+  const newStudentTestResult = new StudentTestResultModel({
+    student_id: task_input.student_id,
+    test_id: task_input.test_id,
+    task_id: _id,
+    mark_validator_id: task_input.user_id,
+    marks: task_input.marks,
+    average_mark: average,
+    mark_entry_date: new Date(),
+    created_by: userIdCreate,
+  });
+
+  // *************** save result
+  await newStudentTestResult.save();
+
+  // *************** determine if task is completed
+  const isComplete = task_input.marks.length === notations.length;
+
+  taskData.task_status = isComplete ? 'COMPLETED' : 'IN_PROGRESS';
+  taskData.updated_by.push({
+    user_id: userIdCreate,
+    updated_at: new Date(),
+  });
+
+  await taskData.save();
+
+  // *************** if task is completed, create VALIDATE_MARKS task
+  if (isComplete) {
+    const validateTask = new TaskModel({
+      test_id: task_input.test_id,
+      user_id: task_input.user_id,
+      type: 'VALIDATE_MARKS',
+      created_at: new Date(),
+      created_by: userIdCreate,
+    });
+    await validateTask.save();
+
+    return validateTask._id;
+  }
+
+  // *************** if not completed, return current task
+  return taskData._id;
+}
+
+/**
+ * Mutation resolver to validate a student's test result and complete the associated validation task.
+ * Updates the student test result's `validation_status` to `VALIDATED` and sets the task status to `COMPLETED`.
+ *
+ * @async
+ * @function ValidateMarks
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the VALIDATE_MARKS task to be marked as completed.
+ * @param {Object} args.task_input - Input object containing the student test result ID.
+ * @param {string} args.task_input.studentTestResult_id - The ID of the student test result to validate.
+ * @returns {Promise<string>} - A Promise that resolves to the task ID after successful completion.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - Either `_id` or `studentTestResult_id` is not a valid MongoDB ObjectId.
+ * - The student test result is not found or already validated.
+ * - The task is not found, not active, or not in PENDING status.
+ */
+async function ValidateMarks(_, { _id, task_input }) {
+  // *************** validate id and input id
+  ValidateIdMongoose(_id);
+  ValidateIdMongoose(task_input.studentTestResult_id);
+
+  // *************** student test result data
+  const getStudentTestResultData = await StudentTestResultModel.findOne({
+    _id: task_input.studentTestResult_id,
+    status: 'ACTIVE',
+    validation_status: 'NOT_VALIDATED',
+  });
+
+  if (!getStudentTestResultData) {
+    throw new ApolloError('Student test result not found');
+  }
+
+  // *************** get task data
+  const getTaskData = await TaskModel.findOne({
+    _id: _id,
+    type: 'VALIDATE_MARKS',
+    status: 'ACTIVE',
+    task_status: 'PENDING',
+  });
+  if (!getTaskData) {
+    throw new ApolloError('Task not found');
+  }
+
+  // *************** update student test result
+  await StudentTestResultModel.updateOne(
+    { _id: task_input.studentTestResult_id },
+    { validation_status: 'VALIDATED' }
+  );
+
+  // *************** update task
+  await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
+
+  return _id;
+}
+
+/**
  * Field resolver to retrieve student data for a student test result based on its student_id.
  *
  * @async
@@ -313,6 +528,8 @@ module.exports = {
   Mutation: {
     UpdateMarksForStudentTestResult,
     DeleteStudentTestResult,
+    EnterMarksForStudentTestResult,
+    ValidateMarks,
   },
   StudentTestResult: {
     student_id: student_id,
