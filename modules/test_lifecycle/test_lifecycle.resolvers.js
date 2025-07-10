@@ -152,11 +152,13 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   // *************** get one user
   const userIdCreate = '686b93d2cb55171e10da8c00';
 
+  // *************** validate id input
   ValidateIdMongoose(_id);
   ValidateIdMongoose(task_input.test_id, 'test_id');
   ValidateIdMongoose(task_input.user_id, 'user_id');
   ValidateIdMongoose(task_input.student_id, 'student_id');
 
+  // *************** get task based on criteria
   const taskData = await TaskModel.findOne({
     _id: _id,
     type: 'ENTER_MARKS',
@@ -168,6 +170,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     throw new ApolloError('Task not found');
   }
 
+  // *************** check if there student and test combination
   const isStudentTestResultCombiationExists =
     await StudentTestResultModel.exists({
       test_id: task_input.test_id,
@@ -180,6 +183,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     throw new ApolloError('Combination test and student already exists');
   }
 
+  // *************** check user exists in database
   const isUserExists = await UserModel.exists({
     _id: task_input.user_id,
     status: 'active',
@@ -189,6 +193,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     throw new ApolloError('User not found');
   }
 
+  // *************** get test data based on criteria
   const testData = await TestModel.findOne({
     _id: task_input.test_id,
     status: 'ACTIVE',
@@ -223,8 +228,11 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   }
 
   // *************** calculate average
-  const sum = task_input.marks.reduce((acc, m) => acc + m.mark, 0);
-  const average = sum / task_input.marks.length;
+  const total = task_input.marks.reduce(
+    (sum, markEntry) => sum + markEntry.mark,
+    0
+  );
+  const average = (total / task_input.marks.length, toFixed(2));
 
   // *************** build student test result
   const newStudentTestResult = new StudentTestResultModel({

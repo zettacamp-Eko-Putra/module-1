@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// *************** MODEL Schema: Block ***************
+// *************** MODEL Schema: Student Test Result ***************
 const StudentTestResultSchema = new Schema(
   {
     // student id student_test_result belong to

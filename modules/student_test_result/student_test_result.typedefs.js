@@ -1,7 +1,7 @@
 // *************** IMPORT LIBRARY ***************
 const { gql } = require('apollo-server');
 
-// *************** Subject Type
+// *************** Student Test Result Type
 const studentTestResultTypeDefs = gql`
   type StudentTestResult {
     _id: ID!
