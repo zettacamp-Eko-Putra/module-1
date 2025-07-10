@@ -10,6 +10,20 @@ const {
   ValidateArrayIdMongoose,
 } = require(`../../utilities/common-validator/mongo-validator.js`);
 
+/**
+ * Batch function to load user data by a list of user IDs using DataLoader.
+ * Validates the input IDs, queries the database, maps results by ID,
+ * and returns them in the same order as the input, preserving null for missing users.
+ *
+ * @async
+ * @function UserBatch
+ * @param {string[]} user_ids - An array of MongoDB ObjectIds representing user IDs.
+ * @returns {Promise<(Object|null)[]>} - A Promise that resolves to an array of user objects or nulls,
+ *   in the same order as the input `user_ids`.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - Any of the IDs are invalid MongoDB ObjectIds.
+ */
 async function UserBatch(user_ids) {
   // *************** validate all user_ids
   ValidateArrayIdMongoose(user_ids, 'userIds');
@@ -29,6 +43,13 @@ async function UserBatch(user_ids) {
   return result;
 }
 
+/**
+ * Initializes a new DataLoader instance for batching and caching user data fetches.
+ * Uses the `UserBatch` function to batch load user data by their IDs.
+ *
+ * @function UserLoader
+ * @returns {DataLoader<string, Object|null>} - A DataLoader instance for user data.
+ */
 const UserLoader = () => {
   // *************** creating dataloader using batch UserBatch
   const loader = new DataLoader(UserBatch);
