@@ -373,16 +373,13 @@ async function PublishTest(_, { task_input }) {
     await getTestData.save();
 
     // *************** creating ASSIGN_CORRECTOR task for the responsible user
-    const createAssignCorrectorTask = new TaskModel({
+    const createAssignCorrectorTask = await TaskModel.create({
       test_id: task_input.test_id,
       user_id: task_input.user_id,
       type: 'ASSIGN_CORRECTOR',
       created_at: new Date(),
       created_by: publishTestUserId,
     });
-
-    // *************** saving the task to the database
-    await createAssignCorrectorTask.save();
 
     // *************** returning the test _id after publishing
     return getTestData._id;
@@ -454,15 +451,13 @@ async function AssignCorrector(_, { _id, task_input }) {
   }
 
   // *************** create enter marks task
-  const createEnterMarksTask = new TaskModel({
+  const createEnterMarksTask = await TaskModel.create({
     type: 'ENTER_MARKS',
     test_id: getTaskData.test_id,
     user_id: task_input.user_id,
     created_at: new Date(),
     created_by: assignCorrectorUserId,
   });
-  // *************** saving the new ENTER_MARKS task
-  await createEnterMarksTask.save();
 
   // *************** get test data
   const testData = await TestModel.findOne({
