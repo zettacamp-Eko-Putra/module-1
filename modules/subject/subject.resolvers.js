@@ -1,5 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
+require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const SubjectModel = require('../subject/subject.models.js');
@@ -93,7 +94,7 @@ async function GetOneSubject(_, { _id }) {
 async function CreateSubject(_, { subject_input }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const createUserId = process.env.DEFAULT_USER_ID;
 
     // *************** validate subject_input
     ValidateSubjectInput(subject_input);
@@ -130,7 +131,7 @@ async function CreateSubject(_, { subject_input }) {
       name: inputName,
       description: subject_input.description,
       coefficient: subject_input.coefficient,
-      created_by: user_id,
+      created_by: createUserId,
     };
 
     // *************** creating new subject based on the subjectData
@@ -170,7 +171,7 @@ async function CreateSubject(_, { subject_input }) {
 async function UpdateSubject(_, { _id, subject_input }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const updateUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating subject id and subject input
     ValidateIdMongoose(_id, 'UpdateSubject');
@@ -227,7 +228,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
         $set: subjectData,
         $push: {
           updated_by: {
-            user_id: user_id,
+            user_id: updateUserId,
             updated_at: new Date(),
           },
         },
@@ -265,7 +266,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
 async function DeleteSubject(_, { _id }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const deleteUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Subject id is valid
     ValidateIdMongoose(_id, 'DeleteSubject');
@@ -287,7 +288,7 @@ async function DeleteSubject(_, { _id }) {
       {
         // *************** changing status field to DELETED and adding timestamp
         status: 'DELETED',
-        deleted_by: user_id,
+        deleted_by: deleteUserId,
         deleted_at: new Date(),
       },
       { new: true }
@@ -309,7 +310,7 @@ async function DeleteSubject(_, { _id }) {
       {
         status: 'DELETED',
         deleted_at: new Date(),
-        deleted_by: user_id,
+        deleted_by: deleteUserId,
       }
     );
 

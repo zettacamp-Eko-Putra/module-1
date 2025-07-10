@@ -1,5 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
+require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('./student_test_result.models.js');
@@ -117,7 +118,7 @@ async function UpdateMarksForStudentTestResult(
 ) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const UpdateMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and student test result input
     ValidateIdMongoose(_id, 'UpdateStudentTestResult');
@@ -194,7 +195,7 @@ async function UpdateMarksForStudentTestResult(
           $set: studentTestResultData,
           $push: {
             updated_by: {
-              user_id: user_id,
+              user_id: UpdateMarksForStudentTestResultUserId,
               updated_at: new Date(),
             },
           },
@@ -234,7 +235,7 @@ async function UpdateMarksForStudentTestResult(
 async function DeleteStudentTestResult(_, { _id }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const DeleteStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Student test Result id is valid
     ValidateIdMongoose(_id, 'DeleteStudentTestResult');
@@ -246,7 +247,7 @@ async function DeleteStudentTestResult(_, { _id }) {
         {
           // *************** changing status field to DELETED and adding timestamp
           status: 'DELETED',
-          deleted_by: user_id,
+          deleted_by: DeleteStudentTestResultUserId,
           deleted_at: new Date(),
         }
       ).lean();
@@ -292,8 +293,8 @@ async function DeleteStudentTestResult(_, { _id }) {
  * - Mark value is out of allowed range or notation is not recognized.
  */
 async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
-  // *************** get one user
-  const userIdCreate = '686b93d2cb55171e10da8c00';
+  // *************** get one user id
+  const EnterMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
   // *************** validate id input
   ValidateIdMongoose(_id);
@@ -372,7 +373,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     marks: task_input.marks,
     average_mark: average,
     mark_entry_date: new Date(),
-    created_by: userIdCreate,
+    created_by: EnterMarksForStudentTestResultUserId,
   });
 
   // *************** determine if task is completed
@@ -380,7 +381,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 
   taskData.task_status = isComplete ? 'COMPLETED' : 'IN_PROGRESS';
   taskData.updated_by.push({
-    user_id: userIdCreate,
+    user_id: EnterMarksForStudentTestResultUserId,
     updated_at: new Date(),
   });
 
@@ -393,7 +394,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
       user_id: task_input.user_id,
       type: 'VALIDATE_MARKS',
       created_at: new Date(),
-      created_by: userIdCreate,
+      created_by: EnterMarksForStudentTestResultUserId,
     });
 
     return validateTask._id;

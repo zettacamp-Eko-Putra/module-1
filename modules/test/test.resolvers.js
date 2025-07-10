@@ -1,6 +1,7 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 const SendEmail = require('../../utilities/send-email');
+require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const TestModel = require('./test.models.js');
@@ -107,7 +108,7 @@ async function GetOneTest(_, { _id }) {
 async function CreateTest(_, { test_input }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const createUserId = process.env.DEFAULT_USER_ID;
 
     // *************** validate test_input
     ValidateTestInput(test_input);
@@ -145,7 +146,7 @@ async function CreateTest(_, { test_input }) {
       description: test_input.description,
       weight: test_input.weight,
       notations: test_input.notations,
-      created_by: user_id,
+      created_by: createUserId,
     };
 
     // *************** creating new test based on the testData
@@ -186,7 +187,7 @@ async function CreateTest(_, { test_input }) {
 async function UpdateTest(_, { _id, test_input }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const updateUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and test input
     ValidateIdMongoose(_id, 'UpdateTest');
@@ -236,7 +237,7 @@ async function UpdateTest(_, { _id, test_input }) {
         $set: testData,
         $push: {
           updated_by: {
-            user_id: user_id,
+            user_id: updateUserId,
             updated_at: new Date(),
           },
         },
@@ -274,7 +275,7 @@ async function UpdateTest(_, { _id, test_input }) {
 async function DeleteTest(_, { _id }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const deleteUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the test id is valid
     ValidateIdMongoose(_id, 'DeleteTest');
@@ -285,7 +286,7 @@ async function DeleteTest(_, { _id }) {
       {
         // *************** changing status field to DELETED and adding timestamp
         status: 'DELETED',
-        deleted_by: user_id,
+        deleted_by: deleteUserId,
         deleted_at: new Date(),
       },
       { new: true }
@@ -331,8 +332,8 @@ async function DeleteTest(_, { _id }) {
  */
 async function PublishTest(_, { task_input }) {
   try {
-    // *************** get one user
-    const userIdCreate = '686b93d2cb55171e10da8c00';
+    // *************** get one user id
+    const publishTestUserId = process.env.DEFAULT_USER_ID;
 
     // *************** validating test_id and user_id
     ValidateIdMongoose(task_input.test_id);
@@ -377,7 +378,7 @@ async function PublishTest(_, { task_input }) {
       user_id: task_input.user_id,
       type: 'ASSIGN_CORRECTOR',
       created_at: new Date(),
-      created_by: userIdCreate,
+      created_by: publishTestUserId,
     });
 
     // *************** saving the task to the database
@@ -413,7 +414,7 @@ async function PublishTest(_, { task_input }) {
  */
 async function AssignCorrector(_, { _id, task_input }) {
   // *************** get one user id
-  const user_id = '686b93d2cb55171e10da8c00';
+  const assignCorrectorUserId = process.env.DEFAULT_USER_ID;
 
   // *************** validate id and task input user id
   ValidateIdMongoose(_id);
@@ -440,7 +441,7 @@ async function AssignCorrector(_, { _id, task_input }) {
       task_status: 'COMPLETED',
       $push: {
         updated_by: {
-          user_id: user_id,
+          user_id: assignCorrectorUserId,
           updated_at: new Date(),
         },
       },
@@ -458,7 +459,7 @@ async function AssignCorrector(_, { _id, task_input }) {
     test_id: getTaskData.test_id,
     user_id: task_input.user_id,
     created_at: new Date(),
-    created_by: user_id,
+    created_by: assignCorrectorUserId,
   });
   // *************** saving the new ENTER_MARKS task
   await createEnterMarksTask.save();
