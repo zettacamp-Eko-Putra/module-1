@@ -1,11 +1,13 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
+const SendEmail = require('../../utilities/send-email');
 
 // *************** IMPORT MODULE ***************
 const TestModel = require('./test.models.js');
 const SubjectModel = require('../subject/subject.models.js');
 const TaskModel = require('../task/task.models.js');
 const UserModel = require('../user/user.models.js');
+const StudentModel = require('../student/student.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateTestInput } = require('./test.validator.js');
@@ -417,13 +419,13 @@ async function AssignCorrector(_, { _id, task_input }) {
   ValidateIdMongoose(_id);
   ValidateIdMongoose(task_input.user_id);
 
-  // *************** check user exists in database
-  const isUserExists = await UserModel.exists({
+  // *************** get user data in database
+  const userData = await UserModel.findOne({
     _id: task_input.user_id,
     status: 'active',
   });
 
-  if (!isUserExists) {
+  if (!userData) {
     throw new ApolloError('User not found');
   }
 
@@ -474,18 +476,24 @@ async function AssignCorrector(_, { _id, task_input }) {
   // *************** email that being send to corrector
   const emailSubject = 'You have been assigned as a Test Corrector!';
   const emailBody = `
-    You have been assigned to correct the test:
-      - Test Name: ${testData.name}
-      - Subject: ${testData.subject_id.name}
-      - Description: ${testData.description}
+  Hello ${userData.first_name} ${userData.last_name},
 
-       You will be correcting tests for the following students:
-      ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
-      `;
+  You have been assigned to correct the test:
+    - Test Name: ${testData.name}
+    - Subject: ${testData.subject_id.name}
+    - Description: ${testData.description}
+
+    You will be correcting tests for the following students:
+    ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
+      
+    Thank you
+    `;
 
   // *************** send to console
   console.log(`Subject: ${emailSubject}`);
   console.log(`Body:\n${emailBody}`);
+
+  await SendEmail(userData.email, emailSubject, emailBody);
 
   // *************** return enter marks id
   return createEnterMarksTask._id;
