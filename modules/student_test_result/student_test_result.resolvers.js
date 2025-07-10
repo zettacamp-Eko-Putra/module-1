@@ -135,6 +135,7 @@ async function UpdateMarksForStudentTestResult(
       throw new ApolloError('Student test result not found');
     }
 
+    // *************** get test data
     const test = await TestModel.findById(
       currentStudentTestResult.test_id
     ).lean();
