@@ -6,10 +6,10 @@ const UserTypeDefs = require('../modules/user/user.typedefs');
 const StudentTypeDefs = require('../modules/student/student.typedefs');
 const SchoolTypeDefs = require('../modules/school/school.typedefs');
 const BlockTypeDefs = require('../modules/block/block.typedefs');
-const subjectTypeDefs = require('../modules/subject/subject.typedefs');
-const testTypeDefs = require('../modules/test/test.typedefs');
-const studentTestResultTypeDefs = require('../modules/student_test_result/student_test_result.typedefs');
-const taskTypeDefs = require('../modules/task/task.typedefs');
+const SubjectTypeDefs = require('../modules/subject/subject.typedefs');
+const TestTypeDefs = require('../modules/test/test.typedefs');
+const StudentTestResultTypeDefs = require('../modules/student_test_result/student_test_result.typedefs');
+const TaskTypeDefs = require('../modules/task/task.typedefs');
 
 // *************** Define global helper type definitions
 const baseTypeDefs = gql`
@@ -33,11 +33,11 @@ const typeDefs = [
   StudentTypeDefs,
   SchoolTypeDefs,
   BlockTypeDefs,
-  subjectTypeDefs,
-  testTypeDefs,
+  SubjectTypeDefs,
+  TestTypeDefs,
   baseTypeDefs,
-  studentTestResultTypeDefs,
-  taskTypeDefs,
+  StudentTestResultTypeDefs,
+  TaskTypeDefs,
 ];
 
 // *************** EXPORT MODULE ***************
