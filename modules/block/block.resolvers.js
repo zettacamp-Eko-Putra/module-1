@@ -164,13 +164,13 @@ async function UpdateBlock(_, { _id, block_input }) {
       throw new ApolloError('block not found');
     }
 
-    // *************** Remove leading and trailing spaces from block legal name
+    // *************** Remove leading and trailing spaces from block name
     const inputName = block_input.name.trim();
 
-    // *************** Take current block legal name
+    // *************** Take current block name
     const currentBlockName = currentBlock.name.trim();
 
-    // *************** Only check duplication if legal name changed
+    // *************** Only check duplication if name changed
     if (inputName !== currentBlockName) {
       const isBlockNameAlreadyExists = await BlockModel.exists({
         name: { $regex: `^${inputName}$`, $options: 'i' },
