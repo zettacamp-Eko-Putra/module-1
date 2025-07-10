@@ -239,14 +239,10 @@ async function DeleteBlock(_, { _id }) {
     ValidateIdMongoose(_id, 'DeleteBlock');
 
     // *************** finding Subject
-    const subjectIds = await SubjectModel.find({
+    const subjectIdList = await SubjectModel.distinct('_id', {
       block_id: _id,
       status: 'ACTIVE',
-    })
-      .select('_id')
-      .lean();
-
-    const subjectIdList = subjectIds.map((subject) => subject._id);
+    });
 
     // *************** check if there test already published
     const hasPublishedTest = await TestModel.exists({
