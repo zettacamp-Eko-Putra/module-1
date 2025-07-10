@@ -10,17 +10,31 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+/**
+ * Query resolver to retrieve all tasks with status "ACTIVE",
+ * optionally filtered by task type and task status.
+ *
+ * @async
+ * @function GetAllTasks
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} [args.type] - Optional filter to match task type (e.g., "ENTER_MARKS", "VALIDATE_MARKS").
+ * @param {string} [args.task_status] - Optional filter to match task status (e.g., "PENDING", "IN_PROGRESS", "COMPLETED").
+ * @returns {Promise<Object[]>} - A Promise that resolves to an array of task objects.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if fetching tasks fails.
+ */
 async function GetAllTasks(_, { type, task_status }) {
   try {
     // *************** Create filter to find only task with status ACTIVE
     const activeFilter = { status: 'ACTIVE' };
 
-    // *************** Add type to filter if provided by client
+    // *************** Add type to filter if provided
     if (type) {
       activeFilter.type = type;
     }
 
-    // *************** Add task_status to filter if provided by client
+    // *************** Add task_status to filter if provided
     if (task_status) {
       activeFilter.task_status = task_status;
     }
@@ -36,6 +50,21 @@ async function GetAllTasks(_, { type, task_status }) {
   }
 }
 
+/**
+ * Query resolver to retrieve a single task by its ID with status "ACTIVE".
+ *
+ * @async
+ * @function GetOneTask
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL query arguments.
+ * @param {string} args._id - The ID of the task to retrieve.
+ * @returns {Promise<Object>} - A Promise that resolves to the task object if found.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The ID is invalid.
+ * - The task with the given ID and status "ACTIVE" is not found.
+ * - Any unexpected error occurs during retrieval.
+ */
 async function GetOneTask(_, { _id }) {
   try {
     // *************** Validating task ID
@@ -60,6 +89,26 @@ async function GetOneTask(_, { _id }) {
   }
 }
 
+/**
+ * Mutation resolver to update a task by its ID if it is still in "PENDING" status.
+ *
+ * @async
+ * @function UpdateTask
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the task to update.
+ * @param {Object} args.task_input - Input object containing updated task fields.
+ * @param {string} args.task_input.test_id - ID of the test associated with the task.
+ * @param {string} args.task_input.user_id - ID of the user assigned to the task.
+ * @param {Date} args.task_input.due_date - The new due date for the task.
+ * @returns {Promise<Object>} - A Promise that resolves to the updated task object.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The `_id` is invalid.
+ * - The task is not found or not in PENDING status.
+ * - The new user does not exist or is not active.
+ * - An error occurs during the update process.
+ */
 async function UpdateTask(_, { _id, task_input }) {
   try {
     // *************** get one user id
@@ -80,12 +129,13 @@ async function UpdateTask(_, { _id, task_input }) {
       throw new ApolloError('Task not found');
     }
 
-    const isNewUserInDatabase = await UserModel.exists({
+    // *************** Find new user exists
+    const isNewUserExists = await UserModel.exists({
       _id: task_input.user_id,
       status: 'ACTIVE',
     });
 
-    if (!isNewUserInDatabase) {
+    if (!isNewUserExists) {
       throw new ApolloError('New user not found');
     }
 
@@ -124,6 +174,22 @@ async function UpdateTask(_, { _id, task_input }) {
   }
 }
 
+/**
+ * Mutation resolver to soft delete a task by setting its status to "DELETED".
+ * Only allows deletion if the task is still in "PENDING" status.
+ *
+ * @async
+ * @function DeleteTask
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the task to delete.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the deleted task.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The task ID is invalid.
+ * - The task is not found, not active, or not in "PENDING" status.
+ * - An error occurs during the deletion process.
+ */
 async function DeleteTask(_, { _id }) {
   try {
     // *************** get one user id
@@ -148,7 +214,7 @@ async function DeleteTask(_, { _id }) {
       throw new ApolloError('Task not found');
     }
 
-    // *************** returning test deleted id to user
+    // *************** returning task deleted id to user
     return _id;
   } catch (error) {
     // *************** Throw error message
@@ -156,20 +222,42 @@ async function DeleteTask(_, { _id }) {
   }
 }
 
+/**
+ * Field resolver to retrieve test data for a task based on its test_id.
+ *
+ * @async
+ * @function test_id
+ * @param {Object} parent - Parent object containing test_id field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.TestLoader - DataLoader for loading test by ID.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the test object, or null if test_id is not present.
+ */
 async function test_id(parent, _, ctx) {
-  // *************** creating if to check if the subject array empty
+  // *************** creating if to check if the test_id array empty
   if (!parent.test_id)
-    // *************** retuning value if subject array empty
+    // *************** retuning value if test_id array empty
     return null;
 
   // *************** retuning the result to the caller
   return await ctx.loaders.TestLoader.load(parent.test_id);
 }
 
+/**
+ * Field resolver to retrieve user data for a task based on its user_id.
+ *
+ * @async
+ * @function user_id
+ * @param {Object} parent - Parent object containing user_id field.
+ * @param {any} _ - Unused GraphQL argument.
+ * @param {Object} ctx - GraphQL context containing DataLoader instances.
+ * @param {DataLoader<string, Object|null>} ctx.loaders.UserLoader - DataLoader for loading user by ID.
+ * @returns {Promise<Object|null>} - A Promise that resolves to the user object, or null if user_id is not present.
+ */
 async function user_id(parent, _, ctx) {
-  // *************** creating if to check if the subject array empty
+  // *************** creating if to check if the user_id array empty
   if (!parent.user_id)
-    // *************** retuning value if subject array empty
+    // *************** retuning value if user_id array empty
     return null;
 
   // *************** retuning the result to the caller
