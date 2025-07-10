@@ -354,22 +354,22 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 }
 
 /**
- * Mutation resolver to validate the marks of a student's test result.
- * Marks the student test result as VALIDATED and completes the corresponding VALIDATE_MARKS task.
+ * Mutation resolver to validate a student's test result and complete the associated validation task.
+ * Updates the student test result's `validation_status` to `VALIDATED` and sets the task status to `COMPLETED`.
  *
  * @async
  * @function ValidateMarks
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL mutation arguments.
- * @param {string} args._id - The ID of the VALIDATE_MARKS task to complete.
- * @param {Object} args.task_input - Input object containing student test result ID.
+ * @param {string} args._id - The ID of the VALIDATE_MARKS task to be marked as completed.
+ * @param {Object} args.task_input - Input object containing the student test result ID.
  * @param {string} args.task_input.studentTestResult_id - The ID of the student test result to validate.
- * @returns {Promise<string>} - A Promise that resolves to the completed task ID.
+ * @returns {Promise<string>} - A Promise that resolves to the task ID after successful completion.
  *
  * @throws {ApolloError} - Throws an ApolloError if:
- * - Any ID is invalid.
- * - Student test result is not found or already validated.
- * - Task is not found, not active, or not in PENDING status.
+ * - Either `_id` or `studentTestResult_id` is not a valid MongoDB ObjectId.
+ * - The student test result is not found or already validated.
+ * - The task is not found, not active, or not in PENDING status.
  */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
@@ -377,42 +377,34 @@ async function ValidateMarks(_, { _id, task_input }) {
   ValidateIdMongoose(task_input.studentTestResult_id);
 
   // *************** student test result data
-  const getStudentTestResultData = await StudentTestResultModel.findOne(
-    {
-      _id: task_input.studentTestResult_id,
-      status: 'ACTIVE',
-      validation_status: 'NOT_VALIDATED',
-    },
-    {
-      validation_status: 'VALIDATED',
-    }
-  );
+  const getStudentTestResultData = await StudentTestResultModel.findOne({
+    _id: task_input.studentTestResult_id,
+    status: 'ACTIVE',
+    validation_status: 'NOT_VALIDATED',
+  });
 
   if (!getStudentTestResultData) {
     throw new ApolloError('Student test result not found');
   }
 
   // *************** get task data
-  const getTaskData = await TaskModel.findOne(
-    {
-      _id: _id,
-      type: 'VALIDATE_MARKS',
-      status: 'ACTIVE',
-      task_status: 'PENDING',
-    },
-    {
-      task_status: 'COMPLETED',
-    }
-  );
+  const getTaskData = await TaskModel.findOne({
+    _id: _id,
+    type: 'VALIDATE_MARKS',
+    status: 'ACTIVE',
+    task_status: 'PENDING',
+  });
   if (!getTaskData) {
     throw new ApolloError('Task not found');
   }
 
+  // *************** update student test result
   await StudentTestResultModel.updateOne(
     { _id: task_input.studentTestResult_id },
     { validation_status: 'VALIDATED' }
   );
 
+  // *************** update task
   await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
 
   return _id;
