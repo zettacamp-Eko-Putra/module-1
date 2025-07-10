@@ -353,12 +353,30 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   return taskData._id;
 }
 
+/**
+ * Mutation resolver to validate the marks of a student's test result.
+ * Marks the student test result as VALIDATED and completes the corresponding VALIDATE_MARKS task.
+ *
+ * @async
+ * @function ValidateMarks
+ * @param {any} _ - Unused parent resolver argument.
+ * @param {Object} args - GraphQL mutation arguments.
+ * @param {string} args._id - The ID of the VALIDATE_MARKS task to complete.
+ * @param {Object} args.task_input - Input object containing student test result ID.
+ * @param {string} args.task_input.studentTestResult_id - The ID of the student test result to validate.
+ * @returns {Promise<string>} - A Promise that resolves to the completed task ID.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - Any ID is invalid.
+ * - Student test result is not found or already validated.
+ * - Task is not found, not active, or not in PENDING status.
+ */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
   ValidateIdMongoose(_id);
   ValidateIdMongoose(task_input.studentTestResult_id);
 
-  // *************** get one user
+  // *************** student test result data
   const getStudentTestResultData =
     await StudentTestResultModel.findOneAndUpdate(
       {
@@ -375,6 +393,7 @@ async function ValidateMarks(_, { _id, task_input }) {
     throw new ApolloError('Student test result not found');
   }
 
+  // *************** get task data
   const getTaskData = await TaskModel.findOneAndUpdate(
     {
       _id: _id,
