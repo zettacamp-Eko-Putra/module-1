@@ -167,6 +167,12 @@ async function UpdateMarksForStudentTestResult(
       mark_entry_date: new Date(),
     };
 
+    // *************** validate if marks exceed notation
+    const notations = test.notations;
+    if (studentTestResult_input.marks.length > notations.length) {
+      throw new ApolloError('Number of marks must not exceed notations');
+    }
+
     // *************** Check if all marks entered
     if (studentTestResult_input.marks.length === test.notations.length) {
       // *************** Update ENTER_MARKS task to COMPLETED
