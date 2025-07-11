@@ -119,7 +119,7 @@ async function UpdateMarksForStudentTestResult(
 ) {
   try {
     // *************** get one user id
-    const UpdateMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
+    const updateMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and student test result input
     ValidateIdMongoose(_id, 'Student Test Result');
@@ -197,7 +197,7 @@ async function UpdateMarksForStudentTestResult(
           $set: studentTestResultData,
           $push: {
             updated_by: {
-              user_id: UpdateMarksForStudentTestResultUserId,
+              user_id: updateMarksForStudentTestResultUserId,
               updated_at: new Date(),
             },
           },

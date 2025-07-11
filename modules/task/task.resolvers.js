@@ -10,6 +10,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+const { ValidateTaskInput } = require('./task.validator.js');
 // *************** QUERY ***************
 /**
  * Query resolver to retrieve all tasks with status "ACTIVE",

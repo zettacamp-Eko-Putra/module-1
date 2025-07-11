@@ -21,21 +21,19 @@ const {
  * - test_id or user_id is not a valid ObjectId.
  * - due_date is provided and is not a future date.
  */
-function ValidateTask(task_input) {
+function ValidateTaskInput(task_input) {
   // *************** Validate test id
-  ValidateIdMongoose(task_input.test_id, 'Test ID');
+  if (task_input.test_id) {
+    ValidateIdMongoose(task_input.test_id, 'Test ID');
+  }
 
   // *************** Validate test id
   ValidateIdMongoose(task_input.user_id, 'User Id');
 
-  // *************** Check if due_date is changed and still in the future
-  if (
-    task_input.due_date &&
-    new Date(task_input.due_date).getTime() !==
-      new Date(currentTask.due_date).getTime()
-  ) {
-    const now = new Date();
+  // *************** Check if due_date is future date
+  if (task_input.due_date) {
     const dueDate = new Date(task_input.due_date);
+    const now = new Date();
     if (dueDate <= now) {
       throw new ApolloError('Due date must be in the future');
     }
@@ -44,5 +42,5 @@ function ValidateTask(task_input) {
 
 // *************** EXPORT MODULE ***************
 module.exports = {
-  ValidateTask,
+  ValidateTaskInput,
 };
