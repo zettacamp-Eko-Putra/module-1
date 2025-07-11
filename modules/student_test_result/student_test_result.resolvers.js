@@ -1,6 +1,5 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
-require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('./student_test_result.models.js');
@@ -169,12 +168,6 @@ async function UpdateMarksForStudentTestResult(
       average_mark: average,
       mark_entry_date: new Date(),
     };
-
-    // *************** validate if marks exceed notation
-    const notations = test.notations;
-    if (studentTestResult_input.marks.length > notations.length) {
-      throw new ApolloError('Number of marks must not exceed notations');
-    }
 
     // *************** Check if all marks entered
     if (studentTestResult_input.marks.length === notations.length) {

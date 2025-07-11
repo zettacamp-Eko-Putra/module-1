@@ -1,6 +1,5 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
-require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const BlockModel = require('../block/block.models.js');

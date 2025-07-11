@@ -41,18 +41,27 @@ function ValidateStudentTestResultInput(StudentTestResult_input) {
 }
 
 /**
- * Validates that each mark entry corresponds to a valid notation
- * and does not exceed the maximum point defined for that notation.
+ * Validates marks against the corresponding test notations.
+ *
+ * - Ensures that the number of marks does not exceed the number of notations.
+ * - Ensures that each `notation_text` in marks exists in the test notations.
+ * - Ensures that each mark is between 0 and the maximum allowed point.
  *
  * @function ValidateMarksAgainstNotations
- * @param {Array<{notation_text: string, mark: number}>} marks - Array of mark entries to validate.
- * @param {Array<{notation_text: string, max_point: number}>} notations - Array of available notations and their max points.
+ * @param {Array<{ notation_text: string, mark: number }>} marks - List of marks to be validated.
+ * @param {Array<{ notation_text: string, max_point: number }>} notations - List of test notations with max points.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - A `notation_text` in marks is not found in the test's notations.
- * - A `mark` exceeds the corresponding notation's max point.
+ * @throws {ApolloError} If:
+ * - The number of marks exceeds notations.
+ * - A `notation_text` in marks is not found in the notations.
+ * - A mark is not within the valid range (0 to max_point).
  */
 function ValidateMarksAgainstNotations(marks, notations) {
+  // *************** Validate if mark dont exceed notations
+  if (marks.length > notations.length) {
+    throw new ApolloError('Marks cannot exceed notations');
+  }
+
   const notationMap = {};
   notations.forEach((notation) => {
     notationMap[notation.notation_text] = notation.max_point;

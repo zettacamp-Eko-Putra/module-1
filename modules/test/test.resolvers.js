@@ -1,7 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 const SendEmail = require('../../utilities/send-email');
-require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const TestModel = require('./test.models.js');
