@@ -11,7 +11,7 @@ const StudentTestResultModel = require('./student_test_result.models.js');
  * @param {string[]} testIds - List of Test IDs
  * @returns {Promise<Array<Array<Object>>>} - List of student test result arrays per test
  */
-async function batchStudentTestResultsByTestId(testIds) {
+async function BatchStudentTestResultsByTestId(testIds) {
   // *************** find all student test results with given test ids
   const results = await StudentTestResultModel.find({
     test_id: { $in: testIds },
@@ -31,7 +31,7 @@ async function batchStudentTestResultsByTestId(testIds) {
  * @returns {DataLoader<string, Object[]>} - A DataLoader instance
  */
 const StudentTestResultLoader = () => {
-  const loader = new DataLoader(batchStudentTestResultsByTestId);
+  const loader = new DataLoader(BatchStudentTestResultsByTestId);
   return loader;
 };
 
