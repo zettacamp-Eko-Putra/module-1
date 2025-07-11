@@ -9,8 +9,11 @@ const UserModel = require('../user/user.models.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
-
 const { ValidateTaskInput } = require('./task.validator.js');
+
+// *************** GLOBAL VARIABLE ***************
+const defaultUser = process.env.DEFAULT_USER_ID;
+
 // *************** QUERY ***************
 /**
  * Query resolver to retrieve all tasks with status "ACTIVE",
@@ -114,9 +117,6 @@ async function GetOneTask(_, { _id }) {
  */
 async function UpdateTask(_, { _id, task_input }) {
   try {
-    // *************** get one user id
-    const updateTaskUserId = process.env.DEFAULT_USER_ID;
-
     // *************** Validating test id and Task input
     ValidateIdMongoose(_id, 'Task Id');
     ValidateTaskInput(task_input);
@@ -156,7 +156,7 @@ async function UpdateTask(_, { _id, task_input }) {
         $set: taskData,
         $push: {
           updated_by: {
-            user_id: updateTaskUserId,
+            user_id: defaultUser,
             updated_at: new Date(),
           },
         },
@@ -195,9 +195,6 @@ async function UpdateTask(_, { _id, task_input }) {
  */
 async function DeleteTask(_, { _id }) {
   try {
-    // *************** get one user id
-    const deleteTaskUserId = process.env.DEFAULT_USER_ID;
-
     // *************** checking if the Task id is valid
     ValidateIdMongoose(_id, 'Task Id');
 
@@ -207,7 +204,7 @@ async function DeleteTask(_, { _id }) {
       {
         // *************** changing status field to DELETED and adding timestamp
         status: 'DELETED',
-        deleted_by: deleteTaskUserId,
+        deleted_by: defaultUser,
         deleted_at: new Date(),
       }
     ).lean();

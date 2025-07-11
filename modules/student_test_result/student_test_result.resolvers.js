@@ -18,6 +18,9 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** GLOBAL VARIABLE ***************
+const defaultUser = process.env.DEFAULT_USER_ID;
+
 // *************** QUERY ***************
 /**
  * Query resolver to retrieve all student test results with status "ACTIVE",
@@ -118,9 +121,6 @@ async function UpdateMarksForStudentTestResult(
   { _id, studentTestResult_input }
 ) {
   try {
-    // *************** get one user id
-    const updateMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
-
     // *************** Validating test id and student test result input
     ValidateIdMongoose(_id, 'Student Test Result');
     ValidateStudentTestResultInput(studentTestResult_input);
@@ -197,7 +197,7 @@ async function UpdateMarksForStudentTestResult(
           $set: studentTestResultData,
           $push: {
             updated_by: {
-              user_id: updateMarksForStudentTestResultUserId,
+              user_id: defaultUser,
               updated_at: new Date(),
             },
           },
@@ -236,9 +236,6 @@ async function UpdateMarksForStudentTestResult(
  */
 async function DeleteStudentTestResult(_, { _id }) {
   try {
-    // *************** get one user id
-    const DeleteStudentTestResultUserId = process.env.DEFAULT_USER_ID;
-
     // *************** checking if the Student test Result id is valid
     ValidateIdMongoose(_id, 'Student Test Result');
 
@@ -249,7 +246,7 @@ async function DeleteStudentTestResult(_, { _id }) {
         {
           // *************** changing status field to DELETED and adding timestamp
           status: 'DELETED',
-          deleted_by: DeleteStudentTestResultUserId,
+          deleted_by: defaultUser,
           deleted_at: new Date(),
         }
       ).lean();
@@ -295,9 +292,6 @@ async function DeleteStudentTestResult(_, { _id }) {
  * - Mark value is out of allowed range or notation is not recognized.
  */
 async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
-  // *************** get one user id
-  const EnterMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
-
   // *************** validate id input
   ValidateIdMongoose(_id, 'Student Test Result');
   ValidateIdMongoose(task_input.test_id, 'test id');
@@ -375,7 +369,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     marks: task_input.marks,
     average_mark: average,
     mark_entry_date: new Date(),
-    created_by: EnterMarksForStudentTestResultUserId,
+    created_by: defaultUser,
   });
 
   // *************** determine if task is completed
@@ -383,7 +377,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 
   taskData.task_status = isComplete ? 'COMPLETED' : 'IN_PROGRESS';
   taskData.updated_by.push({
-    user_id: EnterMarksForStudentTestResultUserId,
+    user_id: defaultUser,
     updated_at: new Date(),
   });
 
@@ -396,7 +390,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
       user_id: task_input.user_id,
       type: 'VALIDATE_MARKS',
       created_at: new Date(),
-      created_by: EnterMarksForStudentTestResultUserId,
+      created_by: defaultUser,
     });
 
     return validateTask._id;

@@ -15,6 +15,9 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** GLOBAL VARIABLE ***************
+const defaultUser = process.env.DEFAULT_USER_ID;
+
 // *************** QUERY ***************
 /**
  * Query resolver to retrieve all tests with status "ACTIVE", optionally filtered by published_status.
@@ -108,9 +111,6 @@ async function GetOneTest(_, { _id }) {
  */
 async function CreateTest(_, { test_input }) {
   try {
-    // *************** get one user id
-    const createUserId = process.env.DEFAULT_USER_ID;
-
     // *************** validate test_input
     ValidateTestInput(test_input);
 
@@ -147,7 +147,7 @@ async function CreateTest(_, { test_input }) {
       description: test_input.description,
       weight: test_input.weight,
       notations: test_input.notations,
-      created_by: createUserId,
+      created_by: defaultUser,
     };
 
     // *************** creating new test based on the testData
@@ -187,9 +187,6 @@ async function CreateTest(_, { test_input }) {
  */
 async function UpdateTest(_, { _id, test_input }) {
   try {
-    // *************** get one user id
-    const updateUserId = process.env.DEFAULT_USER_ID;
-
     // *************** Validating test id and test input
     ValidateIdMongoose(_id, 'Test Id');
     ValidateTestInput(test_input);
@@ -238,7 +235,7 @@ async function UpdateTest(_, { _id, test_input }) {
         $set: testData,
         $push: {
           updated_by: {
-            user_id: updateUserId,
+            user_id: defaultUser,
             updated_at: new Date(),
           },
         },
@@ -275,9 +272,6 @@ async function UpdateTest(_, { _id, test_input }) {
  */
 async function DeleteTest(_, { _id }) {
   try {
-    // *************** get one user id
-    const deleteUserId = process.env.DEFAULT_USER_ID;
-
     // *************** checking if the test id is valid
     ValidateIdMongoose(_id, 'Test Id');
 
@@ -287,7 +281,7 @@ async function DeleteTest(_, { _id }) {
       {
         // *************** changing status field to DELETED and adding timestamp
         status: 'DELETED',
-        deleted_by: deleteUserId,
+        deleted_by: defaultUser,
         deleted_at: new Date(),
       },
       { new: true }
@@ -333,9 +327,6 @@ async function DeleteTest(_, { _id }) {
  */
 async function PublishTest(_, { task_input }) {
   try {
-    // *************** get one user id
-    const publishTestUserId = process.env.DEFAULT_USER_ID;
-
     // *************** validating test_id and user_id
     ValidateIdMongoose(task_input.test_id, 'Test Id');
     ValidateIdMongoose(task_input.user_id, 'User Id');
@@ -379,7 +370,7 @@ async function PublishTest(_, { task_input }) {
       user_id: task_input.user_id,
       type: 'ASSIGN_CORRECTOR',
       created_at: new Date(),
-      created_by: publishTestUserId,
+      created_by: defaultUser,
     });
 
     // *************** returning the test _id after publishing
@@ -411,9 +402,6 @@ async function PublishTest(_, { task_input }) {
  * - The test is not found or not published and active.
  */
 async function AssignCorrector(_, { _id, task_input }) {
-  // *************** get one user id
-  const assignCorrectorUserId = process.env.DEFAULT_USER_ID;
-
   // *************** validate id and task input user id
   ValidateIdMongoose(_id, 'Task Id');
   ValidateIdMongoose(task_input.user_id, 'User Id');
@@ -439,7 +427,7 @@ async function AssignCorrector(_, { _id, task_input }) {
       task_status: 'COMPLETED',
       $push: {
         updated_by: {
-          user_id: assignCorrectorUserId,
+          user_id: defaultUser,
           updated_at: new Date(),
         },
       },
@@ -457,7 +445,7 @@ async function AssignCorrector(_, { _id, task_input }) {
     test_id: getTaskData.test_id,
     user_id: task_input.user_id,
     created_at: new Date(),
-    created_by: assignCorrectorUserId,
+    created_by: defaultUser,
   });
 
   // *************** get test data
