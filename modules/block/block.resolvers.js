@@ -12,6 +12,9 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** GLOBAL VARIABLE ***************
+const defaultUser = process.env.DEFAULT_USER_ID;
+
 // *************** QUERY ***************
 /**
  * Query resolver to retrieve all blocks with status "ACTIVE".
@@ -92,9 +95,6 @@ async function GetOneBlock(_, { _id }) {
  */
 async function CreateBlock(_, { block_input }) {
   try {
-    // *************** get one user id
-    const createUserId = process.env.DEFAULT_USER_ID;
-
     // *************** validate block_input
     ValidateBlockInput(block_input);
 
@@ -116,7 +116,7 @@ async function CreateBlock(_, { block_input }) {
     const blockData = {
       name: inputName,
       description: block_input.description,
-      created_by: createUserId,
+      created_by: defaultUser,
     };
 
     // *************** creating new block based on the blockData
@@ -148,9 +148,6 @@ async function CreateBlock(_, { block_input }) {
  */
 async function UpdateBlock(_, { _id, block_input }) {
   try {
-    // *************** get one user id
-    const updateUserId = process.env.DEFAULT_USER_ID;
-
     // *************** Validating block id and block input
     ValidateIdMongoose(_id, 'Block id');
     ValidateBlockInput(block_input);
@@ -197,7 +194,7 @@ async function UpdateBlock(_, { _id, block_input }) {
         $set: blockData,
         $push: {
           updated_by: {
-            user_id: updateUserId,
+            user_id: defaultUser,
             updated_at: new Date(),
           },
         },
@@ -234,9 +231,6 @@ async function UpdateBlock(_, { _id, block_input }) {
  */
 async function DeleteBlock(_, { _id }) {
   try {
-    // *************** get one user id
-    const deleteUserId = process.env.DEFAULT_USER_ID;
-
     // *************** checking if the block id is valid
     ValidateIdMongoose(_id, 'Block id');
 
@@ -270,7 +264,7 @@ async function DeleteBlock(_, { _id }) {
     const deleteBlock = await BlockModel.findByIdAndUpdate(_id, {
       // *************** changing status field to DELETED and adding timestamp
       status: 'DELETED',
-      deleted_by: deleteUserId,
+      deleted_by: defaultUser,
       deleted_at: new Date(),
     });
 
@@ -285,7 +279,7 @@ async function DeleteBlock(_, { _id }) {
       {
         status: 'DELETED',
         deleted_at: new Date(),
-        deleted_by: deleteUserId,
+        deleted_by: defaultUser,
       }
     );
 
@@ -295,7 +289,7 @@ async function DeleteBlock(_, { _id }) {
       {
         status: 'DELETED',
         deleted_at: new Date(),
-        deleted_by: deleteUserId,
+        deleted_by: defaultUser,
       }
     );
 
