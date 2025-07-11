@@ -1,5 +1,6 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
+require('dotenv').config();
 
 // *************** IMPORT MODULE ***************
 const TaskModel = require('./task.models.js');
@@ -112,7 +113,7 @@ async function GetOneTask(_, { _id }) {
 async function UpdateTask(_, { _id, task_input }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const updateTaskUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and Task input
     ValidateIdMongoose(_id, 'UpdateTask');
@@ -153,7 +154,7 @@ async function UpdateTask(_, { _id, task_input }) {
         $set: taskData,
         $push: {
           updated_by: {
-            user_id: user_id,
+            user_id: updateTaskUserId,
             updated_at: new Date(),
           },
         },
@@ -193,7 +194,7 @@ async function UpdateTask(_, { _id, task_input }) {
 async function DeleteTask(_, { _id }) {
   try {
     // *************** get one user id
-    const user_id = '686b93d2cb55171e10da8c00';
+    const deleteTaskUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Task id is valid
     ValidateIdMongoose(_id, 'DeleteTask');
@@ -204,7 +205,7 @@ async function DeleteTask(_, { _id }) {
       {
         // *************** changing status field to DELETED and adding timestamp
         status: 'DELETED',
-        deleted_by: user_id,
+        deleted_by: deleteTaskUserId,
         deleted_at: new Date(),
       }
     ).lean();
