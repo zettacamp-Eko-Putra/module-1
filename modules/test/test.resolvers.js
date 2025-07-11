@@ -516,6 +516,16 @@ async function subject_id(parent, _, ctx) {
   return await ctx.loaders.SubjectLoader.load(parent.subject_id);
 }
 
+async function studentTestResults(parent, _, ctx) {
+  // *************** creating if to check if the test id empty
+  if (!parent._id)
+    // *************** returning value if test id is empty
+    return [];
+
+  // *************** returning the result to the caller using custom loader
+  return await ctx.loaders.StudentTestResultLoader.load(parent._id);
+}
+
 module.exports = {
   Query: {
     GetAllTests,
@@ -530,5 +540,6 @@ module.exports = {
   },
   Test: {
     subject: subject_id,
+    studentTestResults: studentTestResults,
   },
 };

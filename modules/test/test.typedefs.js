@@ -14,6 +14,7 @@ const testTypeDefs = gql`
     notations: [Notation]!
     status: TestStatus!
     published_status: PublishedStatus!
+    studentTestResults: [StudentTestResult]
     created_at: Date
     created_by: ID
     updated_by: [UpdatedBy]
