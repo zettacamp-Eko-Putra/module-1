@@ -373,7 +373,7 @@ async function PublishTest(_, { task_input }) {
     await getTestData.save();
 
     // *************** creating ASSIGN_CORRECTOR task for the responsible user
-    const createAssignCorrectorTask = await TaskModel.create({
+    await TaskModel.create({
       test_id: task_input.test_id,
       user_id: task_input.user_id,
       type: 'ASSIGN_CORRECTOR',

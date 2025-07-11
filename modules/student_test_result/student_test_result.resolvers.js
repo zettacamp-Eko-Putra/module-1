@@ -372,7 +372,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   const average = parseFloat((total / task_input.marks.length).toFixed(2));
 
   // *************** create student test result
-  const newStudentTestResult = await StudentTestResultModel.create({
+  await StudentTestResultModel.create({
     student_id: task_input.student_id,
     test_id: task_input.test_id,
     task_id: _id,
