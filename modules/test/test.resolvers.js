@@ -16,6 +16,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** QUERY ***************
 /**
  * Query resolver to retrieve all tests with status "ACTIVE", optionally filtered by published_status.
  *
@@ -65,7 +66,7 @@ async function GetAllTests(_, { published_status }) {
 async function GetOneTest(_, { _id }) {
   try {
     // *************** Validating test ID
-    ValidateIdMongoose(_id, 'GetOneTest');
+    ValidateIdMongoose(_id, 'Test Id');
 
     // *************** finding test based on id and status ACTIVE
     const test = await TestModel.findOne({
@@ -86,6 +87,7 @@ async function GetOneTest(_, { _id }) {
   }
 }
 
+// *************** MUTATION ***************
 /**
  * Mutation resolver to create a new test under a specific subject.
  *
@@ -190,7 +192,7 @@ async function UpdateTest(_, { _id, test_input }) {
     const updateUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and test input
-    ValidateIdMongoose(_id, 'UpdateTest');
+    ValidateIdMongoose(_id, 'Test Id');
     ValidateTestInput(test_input);
 
     // *************** Remove leading and trailing spaces from test name
@@ -278,7 +280,7 @@ async function DeleteTest(_, { _id }) {
     const deleteUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the test id is valid
-    ValidateIdMongoose(_id, 'DeleteTest');
+    ValidateIdMongoose(_id, 'Test Id');
 
     // *************** finding test and update the data
     const deleteTest = await TestModel.findOneAndUpdate(
@@ -336,8 +338,8 @@ async function PublishTest(_, { task_input }) {
     const publishTestUserId = process.env.DEFAULT_USER_ID;
 
     // *************** validating test_id and user_id
-    ValidateIdMongoose(task_input.test_id);
-    ValidateIdMongoose(task_input.user_id);
+    ValidateIdMongoose(task_input.test_id, 'Test Id');
+    ValidateIdMongoose(task_input.user_id, 'User Id');
 
     // *************** find the test with status ACTIVE and NOT_PUBLISHED
     const getTestData = await TestModel.findOne({
@@ -414,8 +416,8 @@ async function AssignCorrector(_, { _id, task_input }) {
   const assignCorrectorUserId = process.env.DEFAULT_USER_ID;
 
   // *************** validate id and task input user id
-  ValidateIdMongoose(_id);
-  ValidateIdMongoose(task_input.user_id);
+  ValidateIdMongoose(_id, 'Task Id');
+  ValidateIdMongoose(task_input.user_id, 'User Id');
 
   // *************** get user data in database
   const userData = await UserModel.findOne({
@@ -495,6 +497,7 @@ async function AssignCorrector(_, { _id, task_input }) {
   return createEnterMarksTask._id;
 }
 
+// *************** LOADER ***************
 /**
  * Field resolver to retrieve subject data for a test based on its subject_id.
  *
@@ -533,6 +536,7 @@ async function studentTestResults(parent, _, ctx) {
   return await ctx.loaders.StudentTestResultLoader.load(parent._id);
 }
 
+// *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
     GetAllTests,

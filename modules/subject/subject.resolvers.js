@@ -13,6 +13,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** QUERY ***************
 /**
  * Query resolver to retrieve all subjects with status "ACTIVE".
  *
@@ -53,7 +54,7 @@ async function GetAllSubjects(_, args) {
 async function GetOneSubject(_, { _id }) {
   try {
     // *************** Validating Subject ID
-    ValidateIdMongoose(_id, 'GetOneSubject');
+    ValidateIdMongoose(_id, 'Subject id');
 
     // *************** finding Subject based on id and status ACTIVE
     const subject = await SubjectModel.findOne({
@@ -74,6 +75,7 @@ async function GetOneSubject(_, { _id }) {
   }
 }
 
+// *************** MUTATION ***************
 /**
  * Mutation resolver to create a new subject under a specified block.
  *
@@ -174,7 +176,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
     const updateUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating subject id and subject input
-    ValidateIdMongoose(_id, 'UpdateSubject');
+    ValidateIdMongoose(_id, 'Subject Id');
     ValidateSubjectInput(subject_input);
 
     // *************** Remove leading and trailing spaces from subject legal name
@@ -269,7 +271,7 @@ async function DeleteSubject(_, { _id }) {
     const deleteUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Subject id is valid
-    ValidateIdMongoose(_id, 'DeleteSubject');
+    ValidateIdMongoose(_id, 'Subject Id');
 
     // *************** checking if the Subject has published test
     const hasPublishedTest = await TestModel.exists({
@@ -321,6 +323,7 @@ async function DeleteSubject(_, { _id }) {
   }
 }
 
+// *************** LOADER ***************
 /**
  * Field resolver to retrieve block data for a subject based on its block_id.
  *
@@ -364,6 +367,7 @@ async function test_ids(parent, _, ctx) {
   return await ctx.loaders.TestLoader.loadMany(parent.test_ids);
 }
 
+// *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
     GetAllSubjects,

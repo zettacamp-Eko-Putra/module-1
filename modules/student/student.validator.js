@@ -104,7 +104,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  ValidateIdMongoose(student_input.school_id, 'school_id');
+  ValidateIdMongoose(student_input.school_id, 'school id');
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

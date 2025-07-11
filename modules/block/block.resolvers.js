@@ -13,6 +13,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** QUERY ***************
 /**
  * Query resolver to retrieve all blocks with status "ACTIVE".
  *
@@ -53,7 +54,7 @@ async function GetAllBlocks(_, args) {
 async function GetOneBlock(_, { _id }) {
   try {
     // *************** Validating block ID
-    ValidateIdMongoose(_id, 'GetOneBlock');
+    ValidateIdMongoose(_id, 'Block Id');
 
     // *************** finding block based on id and status ACTIVE
     const block = await BlockModel.findOne({
@@ -74,6 +75,7 @@ async function GetOneBlock(_, { _id }) {
   }
 }
 
+// *************** MUTATION ***************
 /**
  * Mutation resolver to create a new block if the name does not already exist.
  *
@@ -151,7 +153,7 @@ async function UpdateBlock(_, { _id, block_input }) {
     const updateUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating block id and block input
-    ValidateIdMongoose(_id, 'UpdateBlock');
+    ValidateIdMongoose(_id, 'Block id');
     ValidateBlockInput(block_input);
 
     // *************** find block data
@@ -237,7 +239,7 @@ async function DeleteBlock(_, { _id }) {
     const deleteUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the block id is valid
-    ValidateIdMongoose(_id, 'DeleteBlock');
+    ValidateIdMongoose(_id, 'Block id');
 
     // *************** check if block exists
     const isBlockExists = await BlockModel.exists({
@@ -306,6 +308,7 @@ async function DeleteBlock(_, { _id }) {
   }
 }
 
+// *************** LOADER ***************
 /**
  * Field resolver to retrieve subject data for a block based on subject_ids array.
  *

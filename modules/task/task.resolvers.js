@@ -11,6 +11,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** QUERY ***************
 /**
  * Query resolver to retrieve all tasks with status "ACTIVE",
  * optionally filtered by task type and task status.
@@ -69,7 +70,7 @@ async function GetAllTasks(_, { type, task_status }) {
 async function GetOneTask(_, { _id }) {
   try {
     // *************** Validating task ID
-    ValidateIdMongoose(_id, 'GetOneTask');
+    ValidateIdMongoose(_id, 'Task Id');
 
     // *************** finding task based on id and status ACTIVE
     const taskResult = await TaskModel.findOne({
@@ -90,6 +91,7 @@ async function GetOneTask(_, { _id }) {
   }
 }
 
+// *************** MUTATION ***************
 /**
  * Mutation resolver to update a task by its ID if it is still in "PENDING" status.
  *
@@ -116,7 +118,7 @@ async function UpdateTask(_, { _id, task_input }) {
     const updateTaskUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and Task input
-    ValidateIdMongoose(_id, 'UpdateTask');
+    ValidateIdMongoose(_id, 'Task Id');
     ValidateTaskInput(task_input);
 
     // *************** Find current Task by id
@@ -197,7 +199,7 @@ async function DeleteTask(_, { _id }) {
     const deleteTaskUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Task id is valid
-    ValidateIdMongoose(_id, 'DeleteTask');
+    ValidateIdMongoose(_id, 'Task Id');
 
     // *************** finding Task and update the data
     const deleteTask = await TaskModel.findOneAndUpdate(
@@ -223,6 +225,7 @@ async function DeleteTask(_, { _id }) {
   }
 }
 
+// *************** LOADER ***************
 /**
  * Field resolver to retrieve test data for a task based on its test_id.
  *
@@ -265,6 +268,7 @@ async function user_id(parent, _, ctx) {
   return await ctx.loaders.UserLoader.load(parent.user_id);
 }
 
+// *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
     GetAllTasks,

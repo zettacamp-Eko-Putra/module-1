@@ -49,7 +49,7 @@ async function GetAllSchools(_, args) {
 async function GetOneSchool(_, { _id }) {
   try {
     // *************** Validating school id
-    ValidateIdMongoose(_id, 'GetOneSchool');
+    ValidateIdMongoose(_id, 'School Id');
 
     // *************** finding school based on id and status
     const school = await SchoolModel.findOne({ _id, status: 'active' }).lean();
@@ -132,7 +132,7 @@ async function CreateSchool(_, { school_input }) {
 async function UpdateSchool(_, { _id, school_input }) {
   try {
     // *************** Validating school id and school input
-    ValidateIdMongoose(_id, 'UpdateSchool');
+    ValidateIdMongoose(_id, 'School Id');
     ValidateSchoolInput(school_input);
 
     // *************** Remove leading and trailing spaces from school legal name
@@ -205,7 +205,7 @@ async function UpdateSchool(_, { _id, school_input }) {
 async function DeleteSchool(_, { _id }) {
   try {
     // *************** checking if the school id is valid
-    ValidateIdMongoose(_id, 'DeleteSchool');
+    ValidateIdMongoose(_id, 'School Id');
 
     // *************** finding school and update the data
     const deleteSchool = await SchoolModel.findOneAndUpdate(

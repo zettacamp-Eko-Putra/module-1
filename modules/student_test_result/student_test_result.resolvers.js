@@ -19,6 +19,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** QUERY ***************
 /**
  * Query resolver to retrieve all student test results with status "ACTIVE",
  * optionally filtered by validation status.
@@ -71,7 +72,7 @@ async function GetAllStudentTestResults(_, { validation_status }) {
 async function GetOneStudentTestResult(_, { _id }) {
   try {
     // *************** Validating student test result ID
-    ValidateIdMongoose(_id, 'GetOneStudentTestResult');
+    ValidateIdMongoose(_id, 'Student Test Result');
 
     // *************** finding student test result based on id and status ACTIVE
     const studentTestResult = await StudentTestResultModel.findOne({
@@ -92,6 +93,7 @@ async function GetOneStudentTestResult(_, { _id }) {
   }
 }
 
+// *************** MUTATION ***************
 /**
  * Mutation resolver to update marks for a student test result.
  * Also updates task status if all marks are entered, and creates a validation task.
@@ -121,7 +123,7 @@ async function UpdateMarksForStudentTestResult(
     const UpdateMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
     // *************** Validating test id and student test result input
-    ValidateIdMongoose(_id, 'UpdateStudentTestResult');
+    ValidateIdMongoose(_id, 'Student Test Result');
     ValidateStudentTestResultInput(studentTestResult_input);
 
     // *************** Find current student Test Result by id
@@ -245,7 +247,7 @@ async function DeleteStudentTestResult(_, { _id }) {
     const DeleteStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
     // *************** checking if the Student test Result id is valid
-    ValidateIdMongoose(_id, 'DeleteStudentTestResult');
+    ValidateIdMongoose(_id, 'Student Test Result');
 
     // *************** finding Student test Result and update the data
     const deletedStudentTestResult =
@@ -304,10 +306,10 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   const EnterMarksForStudentTestResultUserId = process.env.DEFAULT_USER_ID;
 
   // *************** validate id input
-  ValidateIdMongoose(_id);
-  ValidateIdMongoose(task_input.test_id, 'test_id');
-  ValidateIdMongoose(task_input.user_id, 'user_id');
-  ValidateIdMongoose(task_input.student_id, 'student_id');
+  ValidateIdMongoose(_id, 'Student Test Result');
+  ValidateIdMongoose(task_input.test_id, 'test id');
+  ValidateIdMongoose(task_input.user_id, 'user id');
+  ValidateIdMongoose(task_input.student_id, 'student id');
 
   // *************** get task based on criteria
   const taskData = await TaskModel.findOne({
@@ -431,8 +433,8 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
  */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
-  ValidateIdMongoose(_id);
-  ValidateIdMongoose(task_input.studentTestResult_id);
+  ValidateIdMongoose(_id, 'Task');
+  ValidateIdMongoose(task_input.studentTestResult_id, 'Student Test Result');
 
   // *************** student test result data
   const getStudentTestResultData = await StudentTestResultModel.findOne({
@@ -468,6 +470,7 @@ async function ValidateMarks(_, { _id, task_input }) {
   return _id;
 }
 
+// *************** LOADER ***************
 /**
  * Field resolver to retrieve student data for a student test result based on its student_id.
  *

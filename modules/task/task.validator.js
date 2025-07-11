@@ -23,10 +23,10 @@ const {
  */
 function ValidateTask(task_input) {
   // *************** Validate test id
-  ValidateIdMongoose(task_input.test_id);
+  ValidateIdMongoose(task_input.test_id, 'Test ID');
 
   // *************** Validate test id
-  ValidateIdMongoose(task_input.user_id);
+  ValidateIdMongoose(task_input.user_id, 'User Id');
 
   // *************** Check if due_date is changed and still in the future
   if (
