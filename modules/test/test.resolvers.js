@@ -516,6 +516,13 @@ async function subject_id(parent, _, ctx) {
   return await ctx.loaders.SubjectLoader.load(parent.subject_id);
 }
 
+/**
+ * Initializes a new DataLoader instance for batching and caching student test result data fetches.
+ * Uses the `StudentTestResultBatch` function to batch load student test results by their IDs.
+ *
+ * @function StudentTestResultBatchLoader
+ * @returns {DataLoader<string, Object|null>} - A DataLoader instance for student test result data.
+ */
 async function studentTestResults(parent, _, ctx) {
   // *************** creating if to check if the test id empty
   if (!parent._id)
