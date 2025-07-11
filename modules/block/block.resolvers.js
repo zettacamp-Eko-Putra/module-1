@@ -206,7 +206,7 @@ async function UpdateBlock(_, { _id, block_input }) {
 
     // ***************  showing error message if the block id cannot be found in database
     if (!updatedBlock) {
-      throw new ApolloError('block not Found');
+      throw new ApolloError('Block not Found');
     }
 
     // *************** returning block updated data to user
@@ -273,6 +273,11 @@ async function DeleteBlock(_, { _id }) {
       deleted_at: new Date(),
     });
 
+    // *************** showing error message if block already deleted
+    if (!deleteBlock) {
+      throw new ApolloError('Block not found');
+    }
+
     // *************** Delete all subjects under this block
     await SubjectModel.updateMany(
       { block_id: _id, status: 'ACTIVE' },
@@ -292,11 +297,6 @@ async function DeleteBlock(_, { _id }) {
         deleted_by: deleteUserId,
       }
     );
-
-    // *************** showing error message if block already deleted
-    if (!deleteBlock) {
-      throw new ApolloError('block not found');
-    }
 
     // *************** returning block deleted id to user
     return _id;
