@@ -433,7 +433,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
  */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
-  ValidateIdMongoose(_id, 'Task');
+  ValidateIdMongoose(_id, 'Task Id');
   ValidateIdMongoose(task_input.studentTestResult_id, 'Student Test Result');
 
   // *************** student test result data
