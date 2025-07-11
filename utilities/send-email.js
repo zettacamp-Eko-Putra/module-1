@@ -40,4 +40,5 @@ async function SendEmail(to, subject, bodyText) {
   }
 }
 
+// *************** EXPORT MODULE ***************
 module.exports = SendEmail;
