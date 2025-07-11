@@ -20,7 +20,7 @@ async function SendEmail(to, subject, bodyText) {
   // *************** Construct the email message object
   const msg = {
     to,
-    from: 'eko.putra@zettacamp.pro',
+    from: process.env.EMAIL_SENDER,
     subject,
     text: bodyText,
     html: `<pre>${bodyText}</pre>`,
