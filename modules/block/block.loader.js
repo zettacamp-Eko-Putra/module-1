@@ -23,7 +23,7 @@ const {
  */
 async function BlockBatch(blockIds) {
   // *************** validate all blockId
-  ValidateArrayIdMongoose(blockIds, 'blockIds');
+  ValidateArrayIdMongoose(blockIds, 'Block Id');
 
   // *************** find block data based on id
   const blocks = await BlockModel.find({

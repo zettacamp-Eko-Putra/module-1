@@ -23,7 +23,7 @@ const {
  */
 async function TestBatch(testIds) {
   // *************** validate all testids
-  ValidateArrayIdMongoose(testIds, 'testIds');
+  ValidateArrayIdMongoose(testIds, 'Test Ids');
 
   // *************** find test data based on id
   const tests = await TestModel.find({

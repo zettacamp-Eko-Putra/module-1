@@ -26,7 +26,7 @@ const {
  */
 async function UserBatch(user_ids) {
   // *************** validate all user_ids
-  ValidateArrayIdMongoose(user_ids, 'userIds');
+  ValidateArrayIdMongoose(user_ids, 'User Ids');
 
   // *************** find user data based on id
   const users = await UserModel.find({

@@ -23,7 +23,7 @@ const {
  */
 async function SubjectBatch(subjectIds) {
   // *************** validate all subjectIds
-  ValidateArrayIdMongoose(subjectIds, 'subjectIds');
+  ValidateArrayIdMongoose(subjectIds, 'Subject Ids');
 
   // *************** find subject data based on id
   const subjects = await SubjectModel.find({

@@ -16,7 +16,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY);
  *
  * @throws {Error} - Will not throw but logs the error if email sending fails.
  */
-async function sendEmail(to, subject, bodyText) {
+async function SendEmail(to, subject, bodyText) {
   // *************** Construct the email message object
   const msg = {
     to,
@@ -40,4 +40,4 @@ async function sendEmail(to, subject, bodyText) {
   }
 }
 
-module.exports = sendEmail;
+module.exports = SendEmail;

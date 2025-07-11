@@ -25,7 +25,7 @@ const {
  */
 async function SchoolBatch(schoolIds) {
   // *************** validate all schoolIDs
-  ValidateArrayIdMongoose(schoolIds, 'schoolIds');
+  ValidateArrayIdMongoose(schoolIds, 'School Id');
 
   // *************** find school based on id
   const schools = await SchoolModel.find({

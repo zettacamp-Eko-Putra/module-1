@@ -12,6 +12,9 @@ const StudentTestResultModel = require('./student_test_result.models.js');
  * @returns {Promise<Array<Array<Object>>>} - List of student test result arrays per test
  */
 async function BatchStudentTestResultsByTestId(testIds) {
+  // *************** validate all studentIDs
+  ValidateArrayIdMongoose(testIds, 'Test Ids');
+
   // *************** find all student test results with given test ids
   const results = await StudentTestResultModel.find({
     test_id: { $in: testIds },
