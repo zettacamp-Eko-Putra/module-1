@@ -290,8 +290,7 @@ async function DeleteSubject(_, { _id }) {
         status: 'DELETED',
         deleted_by: deleteUserId,
         deleted_at: new Date(),
-      },
-      { new: true }
+      }
     ).lean();
 
     // *************** showing error message if subject already deleted
