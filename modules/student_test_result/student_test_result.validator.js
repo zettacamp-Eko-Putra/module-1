@@ -54,8 +54,8 @@ function ValidateStudentTestResultInput(StudentTestResult_input) {
  */
 function ValidateMarksAgainstNotations(marks, notations) {
   const notationMap = {};
-  notations.forEach((n) => {
-    notationMap[n.notation_text] = n.max_point;
+  notations.forEach((notation) => {
+    notationMap[notation.notation_text] = notation.max_point;
   });
 
   marks.forEach((markEntry) => {
