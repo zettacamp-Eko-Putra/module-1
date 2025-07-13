@@ -344,13 +344,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     throw new ApolloError('Test not found');
   }
 
-  // *************** validate marks count
-  const notations = testData.notations;
-  if (task_input.marks.length > notations.length) {
-    throw new ApolloError('Number of marks must not exceed notations');
-  }
-
-  // *************** validate individual marks
+  // *************** validate marks against notations
   ValidateMarksAgainstNotations(task_input.marks, testData.notations);
 
   // *************** calculate average
@@ -401,38 +395,28 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 }
 
 /**
- * Mutation resolver to validate a student's test result and complete the associated validation task.
- * Updates the student test result's `validation_status` to `VALIDATED` and sets the task status to `COMPLETED`.
+ * Mutation resolver to validate marks for a student test result.
+ * This mutation marks the `VALIDATE_MARKS` task as completed and updates the corresponding
+ * student test result's validation status to `VALIDATED`.
  *
  * @async
  * @function ValidateMarks
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL mutation arguments.
- * @param {string} args._id - The ID of the VALIDATE_MARKS task to be marked as completed.
- * @param {Object} args.task_input - Input object containing the student test result ID.
- * @param {string} args.task_input.studentTestResult_id - The ID of the student test result to validate.
- * @returns {Promise<string>} - A Promise that resolves to the task ID after successful completion.
+ * @param {string} args._id - The ID of the `VALIDATE_MARKS` task.
+ * @param {Object} args.task_input - The input object containing required data.
+ * @param {string} args.task_input.studentTestResult_id - The ID of the student test result to be validated.
+ * @returns {Promise<string>} - A Promise that resolves to the ID of the completed task.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - Either `_id` or `studentTestResult_id` is not a valid MongoDB ObjectId.
- * - The student test result is not found or already validated.
- * - The task is not found, not active, or not in PENDING status.
+ * @throws {ApolloError} - Throws if:
+ * - Task ID or studentTestResult ID is invalid.
+ * - Task is not found, not pending, or not of type `VALIDATE_MARKS`.
+ * - Student test result is not found, not active, or already validated.
  */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
   ValidateIdMongoose(_id, 'Task Id');
   ValidateIdMongoose(task_input.studentTestResult_id, 'Student Test Result');
-
-  // *************** student test result data
-  const getStudentTestResultData = await StudentTestResultModel.findOne({
-    _id: task_input.studentTestResult_id,
-    status: 'ACTIVE',
-    validation_status: 'NOT_VALIDATED',
-  });
-
-  if (!getStudentTestResultData) {
-    throw new ApolloError('Student test result not found');
-  }
 
   // *************** get task data
   const getTaskData = await TaskModel.findOne({
@@ -443,6 +427,17 @@ async function ValidateMarks(_, { _id, task_input }) {
   });
   if (!getTaskData) {
     throw new ApolloError('Task not found');
+  }
+
+  // *************** student test result data
+  const getStudentTestResultData = await StudentTestResultModel.findOne({
+    _id: task_input.studentTestResult_id,
+    status: 'ACTIVE',
+    validation_status: 'NOT_VALIDATED',
+  });
+
+  if (!getStudentTestResultData) {
+    throw new ApolloError('Student test result not found');
   }
 
   // *************** update student test result
