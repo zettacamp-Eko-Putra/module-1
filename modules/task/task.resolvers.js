@@ -96,24 +96,24 @@ async function GetOneTask(_, { _id }) {
 
 // *************** MUTATION ***************
 /**
- * Mutation resolver to update a task by its ID if it is still in "PENDING" status.
+ * Mutation resolver to update task details such as test ID, user assignment, and due date.
+ * Ensures the task exists and is still pending, and the assigned user is active.
  *
  * @async
  * @function UpdateTask
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL mutation arguments.
- * @param {string} args._id - The ID of the task to update.
- * @param {Object} args.task_input - Input object containing updated task fields.
- * @param {string} args.task_input.test_id - ID of the test associated with the task.
- * @param {string} args.task_input.user_id - ID of the user assigned to the task.
- * @param {Date} args.task_input.due_date - The new due date for the task.
- * @returns {Promise<Object>} - A Promise that resolves to the updated task object.
+ * @param {string} args._id - The ID of the task to be updated.
+ * @param {Object} args.task_input - Input data for updating the task.
+ * @param {string} args.task_input.test_id - The ID of the test associated with the task.
+ * @param {string} args.task_input.user_id - The ID of the user assigned to the task.
+ * @param {Date} args.task_input.due_date - The due date for the task.
+ * @returns {Promise<Object>} - A Promise that resolves to the updated task data.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - The `_id` is invalid.
- * - The task is not found or not in PENDING status.
- * - The new user does not exist or is not active.
- * - An error occurs during the update process.
+ * @throws {ApolloError} - Throws if:
+ * - The task ID or input is invalid.
+ * - The task is not found or is not in pending status.
+ * - The user does not exist or is not active.
  */
 async function UpdateTask(_, { _id, task_input }) {
   try {
@@ -121,14 +121,14 @@ async function UpdateTask(_, { _id, task_input }) {
     ValidateIdMongoose(_id, 'Task Id');
     ValidateTaskInput(task_input);
 
-    // *************** Find current Task by id
-    const currentTask = await TaskModel.findOne({
+    // *************** Check if task exists
+    const isTaskExists = await TaskModel.exists({
       _id,
       status: 'ACTIVE',
       task_status: 'PENDING',
-    }).lean();
+    });
 
-    if (!currentTask) {
+    if (!isTaskExists) {
       throw new ApolloError('Task not found');
     }
 
@@ -150,8 +150,8 @@ async function UpdateTask(_, { _id, task_input }) {
     };
 
     // *************** finding Task based on id and overwrite it with new data and saving it to database
-    const updatedTask = await TaskModel.findOneAndUpdate(
-      { _id, status: 'ACTIVE', task_status: 'PENDING' },
+    const updatedTask = await TaskModel.findByIdAndUpdate(
+      _id,
       {
         $set: taskData,
         $push: {
