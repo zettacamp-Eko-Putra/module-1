@@ -306,24 +306,22 @@ async function DeleteTest(_, { _id }) {
 }
 
 /**
- * Mutation resolver to publish a test and create an ASSIGN_CORRECTOR task.
- * Publishes a test if it's active and not yet published,
- * and assigns a user to the next step in the workflow.
+ * Mutation resolver to publish a test by updating its status and creating an ASSIGN_CORRECTOR task.
+ * Ensures the test exists, is not already published, and the assigned user is valid and active.
  *
  * @async
  * @function PublishTest
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL mutation arguments.
- * @param {Object} args.task_input - Input containing test and user information.
+ * @param {Object} args.task_input - Input data for publishing the test.
  * @param {string} args.task_input.test_id - The ID of the test to publish.
  * @param {string} args.task_input.user_id - The ID of the user to assign as corrector.
- * @returns {Promise<string>} - A Promise that resolves to the published test's ID.
+ * @returns {Promise<string>} - A Promise that resolves to the published test ID.
  *
  * @throws {ApolloError} - Throws an ApolloError if:
- * - test_id or user_id is invalid.
- * - The test is not found, already published, or not active.
- * - The user is not found or not active.
- * - Any error occurs during update or task creation.
+ * - The test or user ID is invalid.
+ * - The test is not found or already published.
+ * - The assigned user does not exist or is not active.
  */
 async function PublishTest(_, { task_input }) {
   try {
@@ -354,15 +352,14 @@ async function PublishTest(_, { task_input }) {
       throw new ApolloError('User not found');
     }
 
-    // *************** preparing test update data with publish info
-    const updateTestData = {
-      published_date: new Date(),
-      published_status: 'PUBLISHED',
-    };
-
-    // *************** applying the update to the test document
-    getTestData.set(updateTestData);
-    await getTestData.save();
+    // *************** update Test Data
+    await TestModel.updateOne(
+      { _id: task_input.test_id },
+      {
+        published_date: new Date(),
+        published_status: 'PUBLISHED',
+      }
+    );
 
     // *************** creating ASSIGN_CORRECTOR task for the responsible user
     await TaskModel.create({
