@@ -248,7 +248,9 @@ async function UpdateSubject(_, { _id, subject_input }) {
 }
 
 /**
- * Mutation resolver to soft delete a subject by setting its status to "DELETED".
+ * Mutation resolver to delete a subject safely by performing validation and soft deletion.
+ * Ensures the subject exists, is not linked to any published test, and cleans up related data.
+ * Also removes the subject reference from its associated block and soft deletes its tests.
  *
  * @async
  * @function DeleteSubject
@@ -257,14 +259,25 @@ async function UpdateSubject(_, { _id, subject_input }) {
  * @param {string} args._id - The ID of the subject to delete.
  * @returns {Promise<string>} - A Promise that resolves to the deleted subject's ID.
  *
- * @throws {ApolloError} - Throws an ApolloError if the subject ID is invalid,
- *   a published test exists for the subject, the subject is not found,
- *   or any error occurs during the deletion process.
+ * @throws {ApolloError} - Throws an ApolloError if:
+ * - The subject ID is invalid.
+ * - The subject is not found or already deleted.
+ * - The subject has any published test associated with it.
  */
 async function DeleteSubject(_, { _id }) {
   try {
     // *************** checking if the Subject id is valid
     ValidateIdMongoose(_id, 'Subject Id');
+
+    // *************** checking if the Subject exists
+    const isSubjectExists = await SubjectModel.exists({
+      _id: _id,
+      status: 'ACTIVE',
+    });
+
+    if (!isSubjectExists) {
+      throw new ApolloError('Subject not found');
+    }
 
     // *************** checking if the Subject has published test
     const hasPublishedTest = await TestModel.exists({
@@ -278,15 +291,12 @@ async function DeleteSubject(_, { _id }) {
     }
 
     // *************** finding Subject and update the data
-    const deleteSubject = await SubjectModel.findOneAndUpdate(
-      { _id, status: 'ACTIVE' },
-      {
-        // *************** changing status field to DELETED and adding timestamp
-        status: 'DELETED',
-        deleted_by: defaultUser,
-        deleted_at: new Date(),
-      }
-    ).lean();
+    const deleteSubject = await SubjectModel.findByIdAndUpdate(_id, {
+      // *************** changing status field to DELETED and adding timestamp
+      status: 'DELETED',
+      deleted_by: defaultUser,
+      deleted_at: new Date(),
+    }).lean();
 
     // *************** showing error message if subject already deleted
     if (!deleteSubject) {
