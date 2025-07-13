@@ -382,29 +382,40 @@ async function PublishTest(_, { task_input }) {
 }
 
 /**
- * Mutation resolver to assign a corrector for a test by completing the ASSIGN_CORRECTOR task
+ * Mutation resolver to assign a corrector for a test by updating the ASSIGN_CORRECTOR task
  * and creating a new ENTER_MARKS task for the assigned user.
- * Also logs a simulated email notification to the console.
+ * Sends an email notification to the assigned corrector with relevant test and student info.
  *
  * @async
  * @function AssignCorrector
  * @param {any} _ - Unused parent resolver argument.
  * @param {Object} args - GraphQL mutation arguments.
- * @param {string} args._id - The ID of the task (ASSIGN_CORRECTOR) to complete.
- * @param {Object} args.task_input - Input object containing user_id to assign as corrector.
- * @param {string} args.task_input.user_id - The ID of the user who will enter marks.
- * @returns {Promise<string>} - A Promise that resolves to the ID of the newly created ENTER_MARKS task.
+ * @param {string} args._id - The ID of the ASSIGN_CORRECTOR task to complete.
+ * @param {Object} args.task_input - The input object containing the new corrector's user ID.
+ * @param {string} args.task_input.user_id - The ID of the user to assign as the corrector.
+ * @returns {Promise<string>} - A Promise that resolves to the newly created ENTER_MARKS task ID.
  *
  * @throws {ApolloError} - Throws an ApolloError if:
  * - The task ID or user ID is invalid.
- * - The user does not exist or is not active.
- * - The task is not found or not in PENDING status.
- * - The test is not found or not published and active.
+ * - The ASSIGN_CORRECTOR task doesn't exist or isn't pending.
+ * - The user doesn't exist or is not active.
+ * - The test data is not found or already unpublished/deleted.
  */
 async function AssignCorrector(_, { _id, task_input }) {
   // *************** validate id and task input user id
   ValidateIdMongoose(_id, 'Task Id');
   ValidateIdMongoose(task_input.user_id, 'User Id');
+
+  // *************** check if task exists
+  const isTaskExists = await TaskModel.exists({
+    _id: _id,
+    type: 'ASSIGN_CORRECTOR',
+    task_status: 'PENDING',
+  });
+
+  if (!isTaskExists) {
+    throw new ApolloError('Task not found');
+  }
 
   // *************** get user data in database
   const userData = await UserModel.findOne({
@@ -417,12 +428,8 @@ async function AssignCorrector(_, { _id, task_input }) {
   }
 
   // *************** get task data
-  const getTaskData = await TaskModel.findOneAndUpdate(
-    {
-      _id: _id,
-      type: 'ASSIGN_CORRECTOR',
-      task_status: 'PENDING',
-    },
+  const getTaskData = await TaskModel.findByIdAndUpdate(
+    _id,
     {
       task_status: 'COMPLETED',
       $push: {
@@ -454,6 +461,10 @@ async function AssignCorrector(_, { _id, task_input }) {
     published_status: 'PUBLISHED',
     status: 'ACTIVE',
   }).populate('subject_id');
+
+  if (!testData) {
+    throw new ApolloError('Test not found');
+  }
 
   // *************** get active student
   const students = await StudentModel.find({ status: 'active' });
