@@ -1,6 +1,50 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 
+/**
+ * Utility function to validate the published status value.
+ *
+ * Ensures that the given `published_status` is either `'PUBLISHED'` or `'NOT_PUBLISHED'`.
+ *
+ * @function ValidatePublishedStatus
+ * @param {string} published_status - The status string to validate.
+ *
+ * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
+ */
+function ValidatePublishedStatus(published_status) {
+  // *************** default value of published status
+  const publishedStatus = ['PUBLISHED', 'NOT_PUBLISHED'];
+
+  if (!publishedStatus.includes(published_status)) {
+    throw new ApolloError(
+      `Published status must be one of: ${publishedStatus}`
+    );
+  }
+}
+
+/**
+ * Utility function to validate test input object.
+ *
+ * This function validates the structure and data types of a test input object
+ * including its name, description, weight, and notations array.
+ *
+ * Validation Rules:
+ * - `name` is required, must be a string, and cannot contain special characters.
+ * - `description` is required and must be a string.
+ * - `weight` must be a number between 0 and 1.
+ * - `notations` must be a non-empty array of objects with:
+ *    - `notation_text`: non-empty string.
+ *    - `max_point`: non-negative number.
+ *
+ * @function ValidateTestInput
+ * @param {Object} test_input - The input object for creating or updating a test.
+ * @param {string} test_input.name - The name of the test.
+ * @param {string} test_input.description - The description of the test.
+ * @param {number} test_input.weight - The weight of the test (0–1).
+ * @param {Array<{ notation_text: string, max_point: number }>} test_input.notations - List of test notations.
+ *
+ * @throws {ApolloError} - Throws an error if any of the validation rules are violated.
+ */
 function ValidateTestInput(test_input) {
   // *************** validate test name
   if (!test_input.name || typeof test_input.name !== 'string') {
@@ -52,4 +96,4 @@ function ValidateTestInput(test_input) {
   });
 }
 // *************** EXPORT MODULE ***************
-module.exports = { ValidateTestInput };
+module.exports = { ValidateTestInput, ValidatePublishedStatus };

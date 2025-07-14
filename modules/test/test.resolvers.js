@@ -11,6 +11,7 @@ const StudentModel = require('../student/student.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateTestInput } = require('./test.validator.js');
+const { ValidatePublishedStatus } = require('./test.validator.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
@@ -33,6 +34,9 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllTests(_, { published_status }) {
   try {
+    // *************** Validate published status input
+    if (published_status) ValidatePublishedStatus(published_status);
+
     // *************** Create filter to find only tests with status ACTIVE
     const filter = { status: 'ACTIVE' };
 
