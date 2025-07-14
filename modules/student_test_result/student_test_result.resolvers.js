@@ -124,12 +124,12 @@ async function GetOneStudentTestResult(_, { _id }) {
  */
 async function UpdateMarksForStudentTestResult(
   _,
-  { _id, studentTestResult_input }
+  { _id, student_test_result_input }
 ) {
   try {
     // *************** Validating test id and student test result input
     ValidateIdMongoose(_id, '_id');
-    ValidateStudentTestResultInput(studentTestResult_input);
+    ValidateStudentTestResultInput(student_test_result_input);
 
     // *************** Find current student Test Result by id
     const currentStudentTestResult = await StudentTestResultModel.findOne({
@@ -153,30 +153,30 @@ async function UpdateMarksForStudentTestResult(
 
     // *************** validate mark against notations
     ValidateMarksAgainstNotations(
-      studentTestResult_input.marks,
+      student_test_result_input.marks,
       test.notations
     );
 
     // *************** get total mark value
-    const total = studentTestResult_input.marks.reduce(
+    const total = student_test_result_input.marks.reduce(
       (sum, markEntry) => sum + markEntry.mark,
       0
     );
 
     // *************** count average
     const average = parseFloat(
-      (total / studentTestResult_input.marks.length).toFixed(2)
+      (total / student_test_result_input.marks.length).toFixed(2)
     );
 
     // *************** save marks and the average
     const studentTestResultData = {
-      marks: studentTestResult_input.marks,
+      marks: student_test_result_input.marks,
       average_mark: average,
       mark_entry_date: new Date(),
     };
 
     // *************** Check if all marks entered
-    if (studentTestResult_input.marks.length === test.notations.length) {
+    if (student_test_result_input.marks.length === test.notations.length) {
       // *************** Update ENTER_MARKS task to COMPLETED
       await TaskModel.updateOne(
         {
@@ -443,10 +443,10 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
  * - Task is not found, not pending, or not of type `VALIDATE_MARKS`.
  * - Student test result is not found, not active, or already validated.
  */
-async function ValidateMarks(_, { _id, task_input }) {
+async function ValidateMarks(_, { _id, student_test_result_id }) {
   // *************** validate id and input id
   ValidateIdMongoose(_id, '_id');
-  ValidateIdMongoose(task_input.studentTestResult_id, 'StudentTestResult_id');
+  ValidateIdMongoose(student_test_result_id, 'StudentTestResult_id');
 
   // *************** get task data
   const getTaskData = await TaskModel.findOne({
@@ -461,7 +461,7 @@ async function ValidateMarks(_, { _id, task_input }) {
 
   // *************** student test result data
   const getStudentTestResultData = await StudentTestResultModel.findOne({
-    _id: task_input.studentTestResult_id,
+    _id: student_test_result_id,
     status: 'ACTIVE',
     validation_status: 'NOT_VALIDATED',
   });
@@ -472,7 +472,7 @@ async function ValidateMarks(_, { _id, task_input }) {
 
   // *************** update student test result
   await StudentTestResultModel.updateOne(
-    { _id: task_input.studentTestResult_id },
+    { _id: student_test_result_id },
     { validation_status: 'VALIDATED' }
   );
 
