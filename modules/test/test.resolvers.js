@@ -404,10 +404,10 @@ async function PublishTest(_, { task_input }) {
  * - The user doesn't exist or is not active.
  * - The test data is not found or already unpublished/deleted.
  */
-async function AssignCorrector(_, { _id, task_input }) {
+async function AssignCorrector(_, { _id, user_id }) {
   // *************** validate id and task input user id
   ValidateIdMongoose(_id, '_id');
-  ValidateIdMongoose(task_input.user_id, 'user_id');
+  ValidateIdMongoose(user_id, 'user_id');
 
   // *************** check if task exists
   const isTaskExists = await TaskModel.exists({
@@ -422,7 +422,7 @@ async function AssignCorrector(_, { _id, task_input }) {
 
   // *************** get user data in database
   const userData = await UserModel.findOne({
-    _id: task_input.user_id,
+    _id: user_id,
     status: 'active',
   });
 
@@ -434,7 +434,7 @@ async function AssignCorrector(_, { _id, task_input }) {
   const updatedTask = await TaskModel.findByIdAndUpdate(
     _id,
     {
-      task_status: 'COMPLETED',
+      $set: { task_status: 'COMPLETED' },
       $push: {
         updated_by: {
           user_id: defaultUser,
@@ -453,7 +453,7 @@ async function AssignCorrector(_, { _id, task_input }) {
   const createEnterMarksTask = await TaskModel.create({
     type: 'ENTER_MARKS',
     test_id: updatedTask.test_id,
-    user_id: task_input.user_id,
+    user_id: user_id,
     created_at: new Date(),
     created_by: defaultUser,
   });

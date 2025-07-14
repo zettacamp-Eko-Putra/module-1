@@ -55,10 +55,6 @@ const testTypeDefs = gql`
     max_point: Float!
   }
 
-  input AssignCorrectorInput {
-    user_id: ID!
-  }
-
   extend type Query {
     GetAllTests(published_status: PublishedStatus): [Test]
     GetOneTest(_id: ID!): Test
@@ -68,7 +64,7 @@ const testTypeDefs = gql`
     CreateTest(test_input: TestInput): Test!
     UpdateTest(_id: ID!, test_input: TestInput): Test
     PublishTest(task_input: PublishTestInput!): ID
-    AssignCorrector(_id: ID!, task_input: AssignCorrectorInput!): ID
+    AssignCorrector(_id: ID!, user_id: ID!): ID
     DeleteTest(_id: ID!): ID
   }
 `;
