@@ -191,11 +191,15 @@ async function UpdateTest(_, { _id, test_input }) {
     ValidateIdMongoose(_id, '_id');
     ValidateTestInput(test_input);
 
+    // *************** Find current test by id and status
+    const currentTest = await TestModel.findOne({ _id: _id, status: 'ACTIVE' });
+
+    if (!currentTest) {
+      throw new ApolloError('Test not found');
+    }
+
     // *************** Remove leading and trailing spaces from test name
     const inputName = test_input.name.trim();
-
-    // *************** Find current test by id
-    const currentTest = await TestModel.findById(_id).lean();
 
     // *************** If already published, prevent update
     if (currentTest.published_status === 'PUBLISHED') {
