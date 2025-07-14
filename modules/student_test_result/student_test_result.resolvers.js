@@ -40,14 +40,12 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllStudentTestResults(_, { validation_status }) {
   try {
-    // *************** validate validation status input
-    if (ValidateValidationStatus) ValidateValidationStatus(validation_status);
-
     // *************** Create filter to student test results only student test results with status ACTIVE
     const filter = { status: 'ACTIVE' };
 
     // *************** Add validation_status to filter if provided
     if (validation_status) {
+      ValidateValidationStatus(validation_status);
       filter.validation_status = validation_status;
     }
 

@@ -33,20 +33,18 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllTasks(_, { type, task_status }) {
   try {
-    // *************** Validate type and status
-    if (type) ValidateType(type);
-    if (task_status) ValidateStatus(task_status);
-
     // *************** Create filter to find only task with status ACTIVE
     const filter = { status: 'ACTIVE' };
 
     // *************** Add type to filter if provided
     if (type) {
+      ValidateType(type);
       filter.type = type;
     }
 
     // *************** Add task_status to filter if provided
     if (task_status) {
+      ValidateStatus(task_status);
       filter.task_status = task_status;
     }
 

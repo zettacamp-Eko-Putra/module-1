@@ -34,14 +34,12 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllTests(_, { published_status }) {
   try {
-    // *************** Validate published status input
-    if (published_status) ValidatePublishedStatus(published_status);
-
     // *************** Create filter to find only tests with status ACTIVE
     const filter = { status: 'ACTIVE' };
 
     // *************** Add published_status to filter if provided by client
     if (published_status) {
+      ValidatePublishedStatus(published_status);
       filter.published_status = published_status;
     }
 
