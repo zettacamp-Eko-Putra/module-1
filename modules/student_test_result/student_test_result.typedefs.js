@@ -62,12 +62,10 @@ const studentTestResultTypeDefs = gql`
       _id: ID!
       task_input: EnterStudentTestResultInput!
     ): StudentTestResult
-
     UpdateMarksForStudentTestResult(
       _id: ID!
       student_test_result_input: UpdateStudentTestResultInput!
     ): StudentTestResult
-
     ValidateMarks(_id: ID!, student_test_result_id: ID!): ID
     DeleteStudentTestResult(_id: ID!): ID
   }
