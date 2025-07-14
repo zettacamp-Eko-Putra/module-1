@@ -141,7 +141,7 @@ async function UpdateTask(_, { _id, task_input }) {
     // *************** Find new user exists
     const isNewUserExists = await UserModel.exists({
       _id: task_input.user_id,
-      status: 'ACTIVE',
+      status: 'active',
     });
 
     if (!isNewUserExists) {
