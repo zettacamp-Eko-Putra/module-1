@@ -11,13 +11,13 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
  */
-function ValidateValidationStatus(validation_status) {
+function ValidateValidationStatus(validationStatus) {
   // *************** default value of published status
-  const validationStatus = ['VALIDATED', 'NOT_VALIDATED'];
+  const validationStatusEnum = ['VALIDATED', 'NOT_VALIDATED'];
 
-  if (!validationStatus.includes(validation_status)) {
+  if (!validationStatusEnum.includes(validationStatus)) {
     throw new ApolloError(
-      `Validation status must be one of: ${validationStatus}`
+      `Validation status must be one of: ${validationStatusEnum}`
     );
   }
 }
@@ -34,18 +34,18 @@ function ValidateValidationStatus(validation_status) {
  * - Any `notation_text` is not a non-empty string.
  * - Any `mark` is not a number or is less than 0.
  */
-function ValidateStudentTestResultInput(student_test_result_input) {
+function ValidateStudentTestResultInput(studentTestResultInput) {
   // *************** Validate marks
   if (
-    !Array.isArray(student_test_result_input.marks) ||
-    !student_test_result_input.marks.length
+    !Array.isArray(studentTestResultInput.marks) ||
+    !studentTestResultInput.marks.length
   ) {
     // *************** error message if the input not valid
     throw new ApolloError('Marks is required.');
   }
 
   // *************** Validate each marks
-  student_test_result_input.marks.forEach((marks, index) => {
+  studentTestResultInput.marks.forEach((marks, index) => {
     // *************** Validate if notation text string
     if (
       typeof marks.notation_text !== 'string' ||

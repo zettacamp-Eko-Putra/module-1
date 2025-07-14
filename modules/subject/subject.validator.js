@@ -15,23 +15,23 @@ const { ApolloError } = require('apollo-server');
  * - The description is missing or not a string.
  * - The coefficient is missing, not a number, or is negative.
  */
-function ValidateSubjectInput(subject_input) {
+function ValidateSubjectInput(subjectInput) {
   // *************** validate subject name
-  if (!subject_input.name || typeof subject_input.name !== 'string') {
+  if (!subjectInput.name || typeof subjectInput.name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('name is required and must be string');
   }
 
   // *************** validate if school school_legal_name has special character
   const specialRegexCharacter = /[^a-zA-Z0-9\s\-.]/;
-  if (specialRegexCharacter.test(subject_input.name)) {
+  if (specialRegexCharacter.test(subjectInput.name)) {
     throw new ApolloError(`Name must not contain special character`);
   }
 
   // *************** validate subject description
   if (
-    !subject_input.description ||
-    typeof subject_input.description !== 'string'
+    !subjectInput.description ||
+    typeof subjectInput.description !== 'string'
   ) {
     // *************** error message if the input not valid
     throw new ApolloError('description is required and must be string');
@@ -39,9 +39,9 @@ function ValidateSubjectInput(subject_input) {
 
   // *************** validate subject description
   if (
-    !subject_input.coefficient ||
-    typeof subject_input.coefficient !== 'number' ||
-    subject_input.coefficient < 0
+    !subjectInput.coefficient ||
+    typeof subjectInput.coefficient !== 'number' ||
+    subjectInput.coefficient < 0
   ) {
     // *************** error message if the input not valid
     throw new ApolloError(

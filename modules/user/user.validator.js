@@ -25,15 +25,15 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If any field fails validation.
  */
-async function ValidateUserInput(user_input) {
+async function ValidateUserInput(userInput) {
   // *************** validate user first_name
-  if (!user_input.first_name || typeof user_input.first_name !== 'string') {
+  if (!userInput.first_name || typeof userInput.first_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('first name is required and must be string');
   }
 
   // *************** validate user last_name
-  if (!user_input.last_name || typeof user_input.last_name !== 'string') {
+  if (!userInput.last_name || typeof userInput.last_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('last name is required and must be string');
   }
@@ -41,25 +41,25 @@ async function ValidateUserInput(user_input) {
   // *************** set value of civilities
   const civilities = ['Mr', 'Mrs'];
   // *************** validate user civility
-  if (!user_input.civility || !civilities.includes(user_input.civility)) {
+  if (!userInput.civility || !civilities.includes(userInput.civility)) {
     // *************** error message if the input not valid
     throw new ApolloError(`Civility must be one of: ${civilities.join(', ')}`);
   }
 
   // *************** validate user office_phone
-  if (user_input.office_phone && user_input.office_phone.length > 12) {
+  if (userInput.office_phone && userInput.office_phone.length > 12) {
     // *************** error message if the input not valid
     throw new ApolloError('Office phone cannot exceed 12 characters.');
   }
 
   // *************** validate user direct_line
-  if (user_input.direct_line && user_input.direct_line.length > 12) {
+  if (userInput.direct_line && userInput.direct_line.length > 12) {
     // *************** error message if the input not valid
     throw new ApolloError('Direct line cannot exceed 12 characters.');
   }
 
   // *************** validate user mobile_phone
-  if (!user_input.mobile_phone || user_input.mobile_phone.length > 12) {
+  if (!userInput.mobile_phone || userInput.mobile_phone.length > 12) {
     // *************** error message if the input not valid
     throw new ApolloError(
       'Mobile phone is required and must not exceed 12 characters.'
@@ -69,18 +69,18 @@ async function ValidateUserInput(user_input) {
   // *************** set value of entity
   const entities = ['ADMTC', 'Academic', 'Company'];
   // *************** validate user entitiy
-  if (!user_input.entity || !entities.includes(user_input.entity)) {
+  if (!userInput.entity || !entities.includes(userInput.entity)) {
     // *************** error message if the input not valid
     throw new ApolloError(`Entity must be one of: ${entities.join(', ')}`);
   }
 
   // *************** validate user address
-  if (!Array.isArray(user_input.address) || !user_input.address.length) {
+  if (!Array.isArray(userInput.address) || !userInput.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
   }
   // *************** validate each address array
-  user_input.address.forEach((addr, index) => {
+  userInput.address.forEach((addr, index) => {
     if (typeof addr.street !== 'string' || addr.street.trim() === '') {
       throw new ApolloError(`Street at index ${index} not valid`);
     }
@@ -100,13 +100,13 @@ async function ValidateUserInput(user_input) {
 
   // *************** validate user email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!user_input.email || !emailRegex.test(user_input.email)) {
+  if (!userInput.email || !emailRegex.test(userInput.email)) {
     // *************** error message if the input not valid
     throw new ApolloError('A valid email is required.');
   }
 
   // *************** validate user password
-  if (!user_input.password || user_input.password.length < 6) {
+  if (!userInput.password || userInput.password.length < 6) {
     // *************** error message if the input not valid
     throw new ApolloError(
       'Password is required and must be at least 6 characters.'
@@ -114,7 +114,7 @@ async function ValidateUserInput(user_input) {
   }
 
   // *************** validate user role
-  if (!user_input.role || typeof user_input.role !== 'string') {
+  if (!userInput.role || typeof userInput.role !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('Role is required.');
   }

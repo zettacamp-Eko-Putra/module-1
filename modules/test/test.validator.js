@@ -11,13 +11,13 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
  */
-function ValidatePublishedStatus(published_status) {
+function ValidatePublishedStatus(publishedStatus) {
   // *************** default value of published status
-  const publishedStatus = ['PUBLISHED', 'NOT_PUBLISHED'];
+  const publishedStatusEnum = ['PUBLISHED', 'NOT_PUBLISHED'];
 
-  if (!publishedStatus.includes(published_status)) {
+  if (!publishedStatusEnum.includes(publishedStatus)) {
     throw new ApolloError(
-      `Published status must be one of: ${publishedStatus}`
+      `Published status must be one of: ${publishedStatusEnum}`
     );
   }
 }
@@ -45,30 +45,30 @@ function ValidatePublishedStatus(published_status) {
  *
  * @throws {ApolloError} - Throws an error if any of the validation rules are violated.
  */
-function ValidateTestInput(test_input) {
+function ValidateTestInput(testInput) {
   // *************** validate test name
-  if (!test_input.name || typeof test_input.name !== 'string') {
+  if (!testInput.name || typeof testInput.name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('name is required and must be string');
   }
 
   // *************** validate if name has special character
   const specialRegexCharacter = /[^a-zA-Z0-9\s\-.]/;
-  if (specialRegexCharacter.test(test_input.name)) {
+  if (specialRegexCharacter.test(testInput.name)) {
     throw new ApolloError(`Name must not contain special character`);
   }
 
   // *************** validate test description
-  if (!test_input.description || typeof test_input.description !== 'string') {
+  if (!testInput.description || typeof testInput.description !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('description is required and must be string');
   }
 
   // *************** validate test weight
   if (
-    typeof test_input.weight !== 'number' ||
-    test_input.weight < 0 ||
-    test_input.weight > 1
+    typeof testInput.weight !== 'number' ||
+    testInput.weight < 0 ||
+    testInput.weight > 1
   ) {
     // *************** error message if the input not valid
     throw new ApolloError(
@@ -77,12 +77,12 @@ function ValidateTestInput(test_input) {
   }
 
   // *************** Validate notations
-  if (!Array.isArray(test_input.notations) || !test_input.notations.length) {
+  if (!Array.isArray(testInput.notations) || !testInput.notations.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Notations is required.');
   }
 
-  test_input.notations.forEach((notation, index) => {
+  testInput.notations.forEach((notation, index) => {
     if (
       typeof notation.notation_text !== 'string' ||
       notation.notation_text.trim() === ''

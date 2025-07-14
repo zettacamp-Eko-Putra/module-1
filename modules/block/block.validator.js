@@ -14,21 +14,21 @@ const { ApolloError } = require('apollo-server');
  * - The name contains special characters (only letters, numbers, spaces, hyphens, and dots are allowed).
  * - The description is missing or not a string.
  */
-function ValidateBlockInput(block_input) {
+function ValidateBlockInput(blockInput) {
   // *************** validate block name
-  if (!block_input.name || typeof block_input.name !== 'string') {
+  if (!blockInput.name || typeof blockInput.name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('name is required and must be string');
   }
 
   // *************** validate if school school_legal_name has special character
   const specialRegexCharacter = /[^a-zA-Z0-9\s\-.]/;
-  if (specialRegexCharacter.test(block_input.name)) {
+  if (specialRegexCharacter.test(blockInput.name)) {
     throw new ApolloError(`Name must not contain special character`);
   }
 
   // *************** validate block description
-  if (!block_input.description || typeof block_input.description !== 'string') {
+  if (!blockInput.description || typeof blockInput.description !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('description is required and must be string');
   }

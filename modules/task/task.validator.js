@@ -37,13 +37,13 @@ function ValidateType(type) {
  *
  * @throws {ApolloError} - Throws an ApolloError if `task_status` is not a valid status.
  */
-function ValidateStatus(task_status) {
+function ValidateStatus(taskStatus) {
   // *************** default value of taskStatus
-  const taskStatus = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
+  const taskStatusEnum = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
 
-  if (!taskStatus.includes(task_status)) {
+  if (!taskStatusEnum.includes(taskStatus)) {
     throw new ApolloError(
-      `Task status must be one of: ${taskStatus.join(', ')}`
+      `Task status must be one of: ${taskStatusEnum.join(', ')}`
     );
   }
 }
@@ -63,18 +63,18 @@ function ValidateStatus(task_status) {
  * - test_id or user_id is not a valid ObjectId.
  * - due_date is provided and is not a future date.
  */
-function ValidateTaskInput(task_input) {
+function ValidateTaskInput(taskInput) {
   // *************** Validate test id
-  if (task_input.test_id) {
-    ValidateIdMongoose(task_input.test_id, 'test_id');
+  if (taskInput.test_id) {
+    ValidateIdMongoose(taskInput.test_id, 'test_id');
   }
 
   // *************** Validate test id
-  ValidateIdMongoose(task_input.user_id, 'user_id');
+  ValidateIdMongoose(taskInput.user_id, 'user_id');
 
   // *************** Check if due_date is future date
-  if (task_input.due_date) {
-    const dueDate = new Date(task_input.due_date);
+  if (taskInput.due_date) {
+    const dueDate = new Date(taskInput.due_date);
     const now = new Date();
     if (dueDate <= now) {
       throw new ApolloError('Due date must be in the future');

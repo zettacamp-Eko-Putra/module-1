@@ -28,33 +28,30 @@ const {
  *
  * @throws {ApolloError} If any field fails validation.
  */
-function ValidateStudentInput(student_input) {
+function ValidateStudentInput(studentInput) {
   // *************** validate student first_name
-  if (
-    !student_input.first_name ||
-    typeof student_input.first_name !== 'string'
-  ) {
+  if (!studentInput.first_name || typeof studentInput.first_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('first name is required and must be string');
   }
 
   // *************** validate student last_name
-  if (!student_input.last_name || typeof student_input.last_name !== 'string') {
+  if (!studentInput.last_name || typeof studentInput.last_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('last name is required and must be string');
   }
 
   // *************** validate student civility
   const civilities = ['Mr', 'Mrs'];
-  if (!student_input.civility || !civilities.includes(student_input.civility)) {
+  if (!studentInput.civility || !civilities.includes(studentInput.civility)) {
     // *************** error message if the input not valid
     throw new ApolloError(`Civility must be one of: ${civilities.join(', ')}`);
   }
 
   // *************** validate student postal_code_of_birth
   if (
-    !student_input.postal_code_of_birth ||
-    typeof student_input.postal_code_of_birth !== 'string'
+    !studentInput.postal_code_of_birth ||
+    typeof studentInput.postal_code_of_birth !== 'string'
   ) {
     // *************** error message if the input not valid
     throw new ApolloError(
@@ -63,7 +60,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate user mobile_phone
-  if (!student_input.mobile_phone || student_input.mobile_phone.length > 12) {
+  if (!studentInput.mobile_phone || studentInput.mobile_phone.length > 12) {
     // *************** error message if the input not valid
     throw new ApolloError(
       'Mobile phone is required and must not exceed 12 characters.'
@@ -71,12 +68,12 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate student address
-  if (!Array.isArray(student_input.address) || !student_input.address.length) {
+  if (!Array.isArray(studentInput.address) || !studentInput.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
   }
   // *************** validate each address array
-  student_input.address.forEach((addr, index) => {
+  studentInput.address.forEach((addr, index) => {
     if (typeof addr.street !== 'string' || addr.street.trim() === '') {
       throw new ApolloError(`Street at index ${index} not valid`);
     }
@@ -95,8 +92,8 @@ function ValidateStudentInput(student_input) {
   });
 
   // *************** validate date_of_birth
-  if (student_input.date_of_birth) {
-    const date = new Date(student_input.date_of_birth);
+  if (studentInput.date_of_birth) {
+    const date = new Date(studentInput.date_of_birth);
     if (isNaN(date.getTime())) {
       // *************** error message if the input not valid
       throw new ApolloError('Date of birth must be a valid date.');
@@ -104,11 +101,11 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  ValidateIdMongoose(student_input.school_id, 'school_id');
+  ValidateIdMongoose(studentInput.school_id, 'school_id');
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!student_input.email || !emailRegex.test(student_input.email)) {
+  if (!studentInput.email || !emailRegex.test(studentInput.email)) {
     // *************** error message if the input not valid
     throw new ApolloError('A valid email is required.');
   }

@@ -17,11 +17,11 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If any required field is missing or improperly formatted.
  */
-function ValidateSchoolInput(school_input) {
+function ValidateSchoolInput(schoolInput) {
   // *************** validate school school_legal_name
   if (
-    !school_input.school_legal_name ||
-    typeof school_input.school_legal_name !== 'string'
+    !schoolInput.school_legal_name ||
+    typeof schoolInput.school_legal_name !== 'string'
   ) {
     // *************** error message if the input not valid
     throw new ApolloError('school legal name is required and must be string');
@@ -29,7 +29,7 @@ function ValidateSchoolInput(school_input) {
 
   // *************** validate if school school_legal_name has special character
   const specialRegexCharacter = /[^a-zA-Z0-9\s]/;
-  if (specialRegexCharacter.test(school_input.school_legal_name)) {
+  if (specialRegexCharacter.test(schoolInput.school_legal_name)) {
     throw new ApolloError(
       `School legal name must not contain special character`
     );
@@ -37,8 +37,8 @@ function ValidateSchoolInput(school_input) {
 
   // *************** validate school school_commercial_name
   if (
-    !school_input.school_commercial_name ||
-    typeof school_input.school_commercial_name !== 'string'
+    !schoolInput.school_commercial_name ||
+    typeof schoolInput.school_commercial_name !== 'string'
   ) {
     // *************** error message if the input not valid
     throw new ApolloError(
@@ -47,12 +47,12 @@ function ValidateSchoolInput(school_input) {
   }
 
   // *************** validate school address
-  if (!Array.isArray(school_input.address) || !school_input.address.length) {
+  if (!Array.isArray(schoolInput.address) || !schoolInput.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
   }
   // *************** validate each address array
-  school_input.address.forEach((addr, index) => {
+  schoolInput.address.forEach((addr, index) => {
     if (typeof addr.street !== 'string' || addr.street.trim() === '') {
       throw new ApolloError(`Street at index ${index} not valid`);
     }
