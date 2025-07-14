@@ -318,7 +318,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   }
 
   // *************** check if there student and test combination
-  const isStudentTestResultCombiationExists =
+  const isStudentTestResultCombinationExists =
     await StudentTestResultModel.exists({
       test_id: task_input.test_id,
       student_id: task_input.student_id,
@@ -326,7 +326,7 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
       validation_status: 'VALIDATED',
     });
 
-  if (isStudentTestResultCombiationExists) {
+  if (isStudentTestResultCombinationExists) {
     throw new ApolloError('Combination test and student already exists');
   }
 
