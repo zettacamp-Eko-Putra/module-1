@@ -38,16 +38,16 @@ const defaultUser = process.env.DEFAULT_USER_ID;
 async function GetAllStudentTestResults(_, { validation_status }) {
   try {
     // *************** Create filter to student test results only student test results with status ACTIVE
-    const activeFilter = { status: 'ACTIVE' };
+    const filter = { status: 'ACTIVE' };
 
     // *************** Add validation_status to filter if provided
     if (validation_status) {
-      activeFilter.validation_status = validation_status;
+      filter.validation_status = validation_status;
     }
 
     // *************** Find student test results from database using the filter
     const activeStudentTestResults = await StudentTestResultModel.find(
-      activeFilter
+      filter
     ).lean();
 
     // *************** returning subject data with status ACTIVE

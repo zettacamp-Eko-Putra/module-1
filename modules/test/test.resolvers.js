@@ -34,15 +34,15 @@ const defaultUser = process.env.DEFAULT_USER_ID;
 async function GetAllTests(_, { published_status }) {
   try {
     // *************** Create filter to find only tests with status ACTIVE
-    const activeFilter = { status: 'ACTIVE' };
+    const filter = { status: 'ACTIVE' };
 
     // *************** Add published_status to filter if provided by client
     if (published_status) {
-      activeFilter.published_status = published_status;
+      filter.published_status = published_status;
     }
 
-    // *************** Find test data from database using the activeFilter
-    const activeTests = await TestModel.find(activeFilter).lean();
+    // *************** Find test data from database using the filter
+    const activeTests = await TestModel.find(filter).lean();
 
     // *************** returning subject data with status ACTIVE
     return activeTests;
@@ -518,23 +518,6 @@ async function subject_id(parent, _, ctx) {
   return await ctx.loaders.SubjectLoader.load(parent.subject_id);
 }
 
-/**
- * Initializes a new DataLoader instance for batching and caching student test result data fetches.
- * Uses the `StudentTestResultBatch` function to batch load student test results by their IDs.
- *
- * @function StudentTestResultBatchLoader
- * @returns {DataLoader<string, Object|null>} - A DataLoader instance for student test result data.
- */
-async function studentTestResults(parent, _, ctx) {
-  // *************** creating if to check if the test id empty
-  if (!parent._id)
-    // *************** returning value if test id is empty
-    return [];
-
-  // *************** returning the result to the caller using custom loader
-  return await ctx.loaders.StudentTestResultLoader.load(parent._id);
-}
-
 // *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
@@ -550,6 +533,5 @@ module.exports = {
   },
   Test: {
     subject: subject_id,
-    studentTestResults: studentTestResults,
   },
 };

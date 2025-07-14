@@ -32,22 +32,22 @@ const defaultUser = process.env.DEFAULT_USER_ID;
 async function GetAllTasks(_, { type, task_status }) {
   try {
     // *************** Create filter to find only task with status ACTIVE
-    const activeFilter = { status: 'ACTIVE' };
+    const filter = { status: 'ACTIVE' };
 
     // *************** Add type to filter if provided
     if (type) {
-      activeFilter.type = type;
+      filter.type = type;
     }
 
     // *************** Add task_status to filter if provided
     if (task_status) {
-      activeFilter.task_status = task_status;
+      filter.task_status = task_status;
     }
 
     // *************** Find task from database using the filter
-    const activeTasks = await TaskModel.find(activeFilter).lean();
+    const activeTasks = await TaskModel.find(filter).lean();
 
-    // *************** returning subject data with status ACTIVE
+    // *************** returning task data with status ACTIVE
     return activeTasks;
   } catch (error) {
     // *************** Throw error message
