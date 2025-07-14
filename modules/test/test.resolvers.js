@@ -426,8 +426,8 @@ async function AssignCorrector(_, { _id, task_input }) {
     throw new ApolloError('User not found');
   }
 
-  // *************** get task data
-  const getTaskData = await TaskModel.findByIdAndUpdate(
+  // *************** update task data
+  const updatedTask = await TaskModel.findByIdAndUpdate(
     _id,
     {
       task_status: 'COMPLETED',
@@ -441,14 +441,14 @@ async function AssignCorrector(_, { _id, task_input }) {
     { new: true }
   );
 
-  if (!getTaskData) {
+  if (!updatedTask) {
     throw new ApolloError('Task not found');
   }
 
   // *************** create enter marks task
   const createEnterMarksTask = await TaskModel.create({
     type: 'ENTER_MARKS',
-    test_id: getTaskData.test_id,
+    test_id: updatedTask.test_id,
     user_id: task_input.user_id,
     created_at: new Date(),
     created_by: defaultUser,
@@ -456,7 +456,7 @@ async function AssignCorrector(_, { _id, task_input }) {
 
   // *************** get test data
   const testData = await TestModel.findOne({
-    _id: getTaskData.test_id,
+    _id: updatedTask.test_id,
     published_status: 'PUBLISHED',
     status: 'ACTIVE',
   }).populate('subject_id');
@@ -479,7 +479,9 @@ async function AssignCorrector(_, { _id, task_input }) {
     - Description: ${testData.description}
 
     You will be correcting tests for the following students:
-    ${students.map((s) => `- ${s.first_name} ${s.last_name}`).join('\n')}
+    ${students
+      .map((student) => `- ${student.first_name} ${student.last_name}`)
+      .join('\n')}
       
     Thank you
     `;
