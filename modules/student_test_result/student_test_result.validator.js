@@ -2,6 +2,27 @@
 const { ApolloError } = require('apollo-server');
 
 /**
+ * Utility function to validate the validation status value.
+ *
+ * Ensures that the given `validation_status` is either `'VALIDATED'` or `'NOT_VALIDATED'`.
+ *
+ * @function ValidateValidationStatus
+ * @param {string} validation_status - The validation status string to validate.
+ *
+ * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
+ */
+function ValidateValidationStatus(validation_status) {
+  // *************** default value of published status
+  const validationStatus = ['VALIDATED', 'NOT_VALIDATED'];
+
+  if (!validationStatus.includes(validation_status)) {
+    throw new ApolloError(
+      `Validation status must be one of: ${validationStatus}`
+    );
+  }
+}
+
+/**
  * Validates the input object for updating student test result marks.
  *
  * @function ValidateStudentTestResultInput
@@ -90,4 +111,5 @@ function ValidateMarksAgainstNotations(marks, notations) {
 module.exports = {
   ValidateStudentTestResultInput,
   ValidateMarksAgainstNotations,
+  ValidateValidationStatus,
 };

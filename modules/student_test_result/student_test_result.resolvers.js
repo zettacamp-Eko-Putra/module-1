@@ -15,6 +15,9 @@ const {
   ValidateMarksAgainstNotations,
 } = require('./student_test_result.validator.js');
 const {
+  ValidateValidationStatus,
+} = require('./student_test_result.validator.js');
+const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
@@ -37,6 +40,9 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllStudentTestResults(_, { validation_status }) {
   try {
+    // *************** validate validation status input
+    if (ValidateValidationStatus) ValidateValidationStatus(validation_status);
+
     // *************** Create filter to student test results only student test results with status ACTIVE
     const filter = { status: 'ACTIVE' };
 
