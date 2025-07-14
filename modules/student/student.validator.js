@@ -7,54 +7,60 @@ const {
 } = require('../../utilities/common-validator/mongo-validator.js');
 
 /**
- * Validates the student input object for required fields and proper data formats.
- * Throws an ApolloError if any validation rule is violated.
+ * Utility function to validate input object for creating or updating a Student.
+ *
+ * This function ensures that:
+ * - `first_name`, `last_name` must be strings and are required.
+ * - `civility` must be one of: 'Mr', 'Mrs'.
+ * - `postal_code_of_birth` must be a string and is required.
+ * - `mobile_phone` must be present and not exceed 12 characters.
+ * - `address` must be a non-empty array, and each address must contain valid `street`, `city`, `province`, and `postal_code`.
+ * - `date_of_birth` must be a valid date if provided.
+ * - `school_id` must be a valid MongoDB ObjectId.
+ * - `email` must follow valid email format.
  *
  * @function ValidateStudentInput
- * @param {Object} student_input - The student input data to validate.
- * @param {string} student_input.first_name - Required. Must be a non-empty string.
- * @param {string} student_input.last_name - Required. Must be a non-empty string.
- * @param {string} student_input.civility - Required. Must be one of: "Mr", "Mrs".
- * @param {string} student_input.postal_code_of_birth - Required. Must be a non-empty string.
- * @param {string} student_input.mobile_phone - Required. Must not exceed 12 characters.
- * @param {Array<Object>} student_input.address - Required. Must contain at least one address object.
- * @param {string} student_input.address[].street - Required. Must be a non-empty string.
- * @param {string} student_input.address[].city - Required. Must be a non-empty string.
- * @param {string} student_input.address[].province - Required. Must be a non-empty string.
- * @param {string} student_input.address[].postal_code - Required. Must be a non-empty string.
- * @param {string} [student_input.date_of_birth] - Optional. If provided, must be a valid date string.
- * @param {string} student_input.school_id - Required. Must be a non-empty string.
- * @param {string} student_input.email - Required. Must be a valid email address.
+ * @param {Object} studentInput - The input object for the student.
+ * @param {string} studentInput.first_name - First name of the student.
+ * @param {string} studentInput.last_name - Last name of the student.
+ * @param {string} studentInput.civility - Civility title, either 'Mr' or 'Mrs'.
+ * @param {string} studentInput.postal_code_of_birth - Postal code of student's birth location.
+ * @param {string} studentInput.mobile_phone - Student's mobile phone number (max 12 characters).
+ * @param {Array<Object>} studentInput.address - Array of address objects.
+ * @param {string} studentInput.address[].street - Street name.
+ * @param {string} studentInput.address[].city - City name.
+ * @param {string} studentInput.address[].province - Province name.
+ * @param {string} studentInput.address[].postal_code - Postal code.
+ * @param {string} [studentInput.date_of_birth] - Optional date of birth (ISO string).
+ * @param {string} studentInput.school_id - MongoDB ObjectId of the school.
+ * @param {string} studentInput.email - Valid email address.
  *
- * @throws {ApolloError} If any field fails validation.
+ * @throws {ApolloError} If any required field is missing or invalid.
  */
-function ValidateStudentInput(student_input) {
+function ValidateStudentInput(studentInput) {
   // *************** validate student first_name
-  if (
-    !student_input.first_name ||
-    typeof student_input.first_name !== 'string'
-  ) {
+  if (!studentInput.first_name || typeof studentInput.first_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('first name is required and must be string');
   }
 
   // *************** validate student last_name
-  if (!student_input.last_name || typeof student_input.last_name !== 'string') {
+  if (!studentInput.last_name || typeof studentInput.last_name !== 'string') {
     // *************** error message if the input not valid
     throw new ApolloError('last name is required and must be string');
   }
 
   // *************** validate student civility
   const civilities = ['Mr', 'Mrs'];
-  if (!student_input.civility || !civilities.includes(student_input.civility)) {
+  if (!studentInput.civility || !civilities.includes(studentInput.civility)) {
     // *************** error message if the input not valid
     throw new ApolloError(`Civility must be one of: ${civilities.join(', ')}`);
   }
 
   // *************** validate student postal_code_of_birth
   if (
-    !student_input.postal_code_of_birth ||
-    typeof student_input.postal_code_of_birth !== 'string'
+    !studentInput.postal_code_of_birth ||
+    typeof studentInput.postal_code_of_birth !== 'string'
   ) {
     // *************** error message if the input not valid
     throw new ApolloError(
@@ -63,7 +69,7 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate user mobile_phone
-  if (!student_input.mobile_phone || student_input.mobile_phone.length > 12) {
+  if (!studentInput.mobile_phone || studentInput.mobile_phone.length > 12) {
     // *************** error message if the input not valid
     throw new ApolloError(
       'Mobile phone is required and must not exceed 12 characters.'
@@ -71,12 +77,12 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate student address
-  if (!Array.isArray(student_input.address) || !student_input.address.length) {
+  if (!Array.isArray(studentInput.address) || !studentInput.address.length) {
     // *************** error message if the input not valid
     throw new ApolloError('Address is required.');
   }
   // *************** validate each address array
-  student_input.address.forEach((addr, index) => {
+  studentInput.address.forEach((addr, index) => {
     if (typeof addr.street !== 'string' || addr.street.trim() === '') {
       throw new ApolloError(`Street at index ${index} not valid`);
     }
@@ -95,8 +101,8 @@ function ValidateStudentInput(student_input) {
   });
 
   // *************** validate date_of_birth
-  if (student_input.date_of_birth) {
-    const date = new Date(student_input.date_of_birth);
+  if (studentInput.date_of_birth) {
+    const date = new Date(studentInput.date_of_birth);
     if (isNaN(date.getTime())) {
       // *************** error message if the input not valid
       throw new ApolloError('Date of birth must be a valid date.');
@@ -104,11 +110,11 @@ function ValidateStudentInput(student_input) {
   }
 
   // *************** validate school_id
-  ValidateIdMongoose(student_input.school_id, 'school_id');
+  ValidateIdMongoose(studentInput.school_id, 'school_id');
 
   // *************** validate student email
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-  if (!student_input.email || !emailRegex.test(student_input.email)) {
+  if (!studentInput.email || !emailRegex.test(studentInput.email)) {
     // *************** error message if the input not valid
     throw new ApolloError('A valid email is required.');
   }

@@ -12,13 +12,18 @@ const {
 
 // *************** QUERY ***************
 /**
- * Retrieves all users with active status from the database.
+ * Query resolver to retrieve all users with status "active".
+ *
+ * This query fetches all User documents from the database
+ * where the `status` field is equal to `'active'`.
  *
  * @async
- * @function GetAllUser
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
+ * @function GetAllUsers
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active user documents.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs during the query.
  */
-async function GetAllUsers(_, args) {
+async function GetAllUsers() {
   try {
     // *************** find user data with status active
     const activeUsers = await UserModel.find({ status: 'active' }).lean();
@@ -48,7 +53,7 @@ async function GetAllUsers(_, args) {
 async function GetOneUser(_, { _id }) {
   try {
     // *************** validate Id
-    ValidateIdMongoose(_id, 'GetOneUser');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding user based on id
     const user = await UserModel.findOne({ _id, status: 'active' }).lean();
@@ -167,7 +172,7 @@ async function CreateUser(_, { user_input }) {
 async function UpdateUser(_, { _id, user_input }) {
   try {
     // *************** validate Id and user_input
-    ValidateIdMongoose(_id, 'UpdateUser');
+    ValidateIdMongoose(_id, '_id');
     ValidateUserInput(user_input);
 
     // *************** Take user data
@@ -252,7 +257,7 @@ async function UpdateUser(_, { _id, user_input }) {
 async function DeleteUser(_, { _id }) {
   try {
     // *************** validate Id
-    ValidateIdMongoose(_id, 'DeleteUser');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding user based on id and update the data
     const deleteUser = await UserModel.findOneAndUpdate(

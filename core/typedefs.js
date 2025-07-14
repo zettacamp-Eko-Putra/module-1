@@ -5,6 +5,11 @@ const { gql } = require('apollo-server');
 const UserTypeDefs = require('../modules/user/user.typedefs');
 const StudentTypeDefs = require('../modules/student/student.typedefs');
 const SchoolTypeDefs = require('../modules/school/school.typedefs');
+const BlockTypeDefs = require('../modules/block/block.typedefs');
+const SubjectTypeDefs = require('../modules/subject/subject.typedefs');
+const TestTypeDefs = require('../modules/test/test.typedefs');
+const StudentTestResultTypeDefs = require('../modules/student_test_result/student_test_result.typedefs');
+const TaskTypeDefs = require('../modules/task/task.typedefs');
 
 // *************** Define global helper type definitions
 const baseTypeDefs = gql`
@@ -16,10 +21,24 @@ const baseTypeDefs = gql`
   type Mutation {
     _empty: String
   }
+  type UpdatedBy {
+    user_id: ID
+    updated_at: Date
+  }
 `;
 
 // *************** Combine all type definitions
-const typeDefs = [UserTypeDefs, StudentTypeDefs, SchoolTypeDefs, baseTypeDefs];
+const typeDefs = [
+  UserTypeDefs,
+  StudentTypeDefs,
+  SchoolTypeDefs,
+  BlockTypeDefs,
+  SubjectTypeDefs,
+  TestTypeDefs,
+  baseTypeDefs,
+  StudentTestResultTypeDefs,
+  TaskTypeDefs,
+];
 
 // *************** EXPORT MODULE ***************
 module.exports = typeDefs;

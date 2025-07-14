@@ -12,15 +12,18 @@ const {
 
 // *************** QUERY ***************
 /**
- * Retrieves all school documents from the database with a status of "active".
- * This function uses `.lean()` for improved performance by returning plain JavaScript objects.
+ * Query resolver to retrieve all schools with status "active".
+ *
+ * This query fetches all School documents from the database
+ * where the `status` field is equal to `'active'`.
  *
  * @async
  * @function GetAllSchools
- * @returns {Promise<Object[]>} - A promise that resolves to an array of active school objects.
- * @throws {ApolloError} - Throws an ApolloError if the database query fails.
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active school documents.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs.
  */
-async function GetAllSchools(_, args) {
+async function GetAllSchools() {
   try {
     // *************** find school data with status active
     const activeSchools = await SchoolModel.find({ status: 'active' }).lean();
@@ -49,7 +52,7 @@ async function GetAllSchools(_, args) {
 async function GetOneSchool(_, { _id }) {
   try {
     // *************** Validating school id
-    ValidateIdMongoose(_id, 'GetOneSchool');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding school based on id and status
     const school = await SchoolModel.findOne({ _id, status: 'active' }).lean();
@@ -132,7 +135,7 @@ async function CreateSchool(_, { school_input }) {
 async function UpdateSchool(_, { _id, school_input }) {
   try {
     // *************** Validating school id and school input
-    ValidateIdMongoose(_id, 'UpdateSchool');
+    ValidateIdMongoose(_id, '_id');
     ValidateSchoolInput(school_input);
 
     // *************** Remove leading and trailing spaces from school legal name
@@ -205,7 +208,7 @@ async function UpdateSchool(_, { _id, school_input }) {
 async function DeleteSchool(_, { _id }) {
   try {
     // *************** checking if the school id is valid
-    ValidateIdMongoose(_id, 'DeleteSchool');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding school and update the data
     const deleteSchool = await SchoolModel.findOneAndUpdate(
