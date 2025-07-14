@@ -401,15 +401,18 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   }
 
   // *************** update task if enter marks not completed
-  await TaskModel.updateOne({_id}, {
-    task_status: 'IN_PROGRESS',
-    $push: {
-      updated_by: {
-        user_id: defaultUser,
-        updated_at: new Date(),
+  await TaskModel.updateOne(
+    { _id },
+    {
+      task_status: 'IN_PROGRESS',
+      $push: {
+        updated_by: {
+          user_id: defaultUser,
+          updated_at: new Date(),
+        },
       },
-    },
-  });
+    }
+  );
 
   // *************** if not completed, return current task
   return taskData._id;

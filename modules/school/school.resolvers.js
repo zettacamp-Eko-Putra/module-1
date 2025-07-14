@@ -12,15 +12,18 @@ const {
 
 // *************** QUERY ***************
 /**
- * Retrieves all school documents from the database with a status of "active".
- * This function uses `.lean()` for improved performance by returning plain JavaScript objects.
+ * Query resolver to retrieve all schools with status "active".
+ *
+ * This query fetches all School documents from the database
+ * where the `status` field is equal to `'active'`.
  *
  * @async
  * @function GetAllSchools
- * @returns {Promise<Object[]>} - A promise that resolves to an array of active school objects.
- * @throws {ApolloError} - Throws an ApolloError if the database query fails.
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active school documents.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs.
  */
-async function GetAllSchools(_, args) {
+async function GetAllSchools() {
   try {
     // *************** find school data with status active
     const activeSchools = await SchoolModel.find({ status: 'active' }).lean();

@@ -19,15 +19,16 @@ const defaultUser = process.env.DEFAULT_USER_ID;
 /**
  * Query resolver to retrieve all subjects with status "ACTIVE".
  *
+ * This query fetches all Subject documents from the database
+ * where the `status` field is equal to `'ACTIVE'`.
+ *
  * @async
  * @function GetAllSubjects
- * @param {any} _ - Unused parent resolver argument.
- * @param {Object} args - GraphQL query arguments (not used in this function).
- * @returns {Promise<Object[]>} - A Promise that resolves to an array of subject objects with status "ACTIVE".
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active subject documents.
  *
- * @throws {ApolloError} - Throws an ApolloError if fetching subjects fails.
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs during the query.
  */
-async function GetAllSubjects(_, args) {
+async function GetAllSubjects() {
   try {
     // *************** find subject data with status ACTIVE
     const activeSubjects = await SubjectModel.find({ status: 'ACTIVE' }).lean();

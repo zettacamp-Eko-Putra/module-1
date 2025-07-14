@@ -12,13 +12,18 @@ const {
 
 // *************** QUERY ***************
 /**
- * Retrieves all users with active status from the database.
+ * Query resolver to retrieve all users with status "active".
+ *
+ * This query fetches all User documents from the database
+ * where the `status` field is equal to `'active'`.
  *
  * @async
- * @function GetAllUser
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of active user objects.
+ * @function GetAllUsers
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active user documents.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs during the query.
  */
-async function GetAllUsers(_, args) {
+async function GetAllUsers() {
   try {
     // *************** find user data with status active
     const activeUsers = await UserModel.find({ status: 'active' }).lean();

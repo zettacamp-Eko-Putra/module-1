@@ -19,15 +19,16 @@ const defaultUser = process.env.DEFAULT_USER_ID;
 /**
  * Query resolver to retrieve all blocks with status "ACTIVE".
  *
+ * This query fetches all Block documents from the database
+ * that have the `status` set to `'ACTIVE'`.
+ *
  * @async
  * @function GetAllBlocks
- * @param {any} _ - Unused parent resolver argument.
- * @param {Object} args - GraphQL query arguments (not used in this function).
- * @returns {Promise<Object[]>} - A Promise that resolves to an array of block objects with status "ACTIVE".
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active block documents.
  *
- * @throws {ApolloError} - Throws an ApolloError if fetching blocks fails.
+ * @throws {ApolloError} - Throws if a database error occurs.
  */
-async function GetAllBlocks(_, args) {
+async function GetAllBlocks() {
   try {
     // *************** find block data with status ACTIVE
     const activeBlocks = await BlockModel.find({ status: 'ACTIVE' }).lean();

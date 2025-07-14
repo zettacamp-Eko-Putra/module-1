@@ -14,13 +14,18 @@ const {
 
 // *************** QUERY ***************
 /**
- * Retrieves all students whose status is set to "active".
+ * Query resolver to retrieve all students with status "active".
+ *
+ * This query fetches all Student documents from the database
+ * where the `status` field is equal to `'active'`.
  *
  * @async
  * @function GetAllStudents
- * @returns {Promise<Array<object>>} - A promise that resolves to an array of active student objects.
+ * @returns {Promise<Array<Object>>} - A promise that resolves to an array of active student documents.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if a database error occurs during the query.
  */
-async function GetAllStudents(_, args) {
+async function GetAllStudents() {
   try {
     // *************** find student data with status active
     const activeStudents = await StudentModel.find({ status: 'active' }).lean();
