@@ -24,11 +24,11 @@ const {
 function ValidateTaskInput(task_input) {
   // *************** Validate test id
   if (task_input.test_id) {
-    ValidateIdMongoose(task_input.test_id, 'Test ID');
+    ValidateIdMongoose(task_input.test_id, 'test_id');
   }
 
   // *************** Validate test id
-  ValidateIdMongoose(task_input.user_id, 'User Id');
+  ValidateIdMongoose(task_input.user_id, 'user_id');
 
   // *************** Check if due_date is future date
   if (task_input.due_date) {

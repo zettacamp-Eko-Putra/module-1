@@ -73,7 +73,7 @@ async function GetAllTasks(_, { type, task_status }) {
 async function GetOneTask(_, { _id }) {
   try {
     // *************** Validating task ID
-    ValidateIdMongoose(_id, 'Task Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding task based on id and status ACTIVE
     const taskResult = await TaskModel.findOne({
@@ -118,7 +118,7 @@ async function GetOneTask(_, { _id }) {
 async function UpdateTask(_, { _id, task_input }) {
   try {
     // *************** Validating test id and Task input
-    ValidateIdMongoose(_id, 'Task Id');
+    ValidateIdMongoose(_id, '_id');
     ValidateTaskInput(task_input);
 
     // *************** Check if task exists
@@ -196,7 +196,7 @@ async function UpdateTask(_, { _id, task_input }) {
 async function DeleteTask(_, { _id }) {
   try {
     // *************** checking if the Task id is valid
-    ValidateIdMongoose(_id, 'Task Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding Task and update the data
     const deleteTask = await TaskModel.findOneAndUpdate(

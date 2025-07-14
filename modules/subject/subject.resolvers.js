@@ -56,7 +56,7 @@ async function GetAllSubjects(_, args) {
 async function GetOneSubject(_, { _id }) {
   try {
     // *************** Validating Subject ID
-    ValidateIdMongoose(_id, 'Subject id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding Subject based on id and status ACTIVE
     const subject = await SubjectModel.findOne({
@@ -172,7 +172,7 @@ async function CreateSubject(_, { subject_input }) {
 async function UpdateSubject(_, { _id, subject_input }) {
   try {
     // *************** Validating subject id and subject input
-    ValidateIdMongoose(_id, 'Subject Id');
+    ValidateIdMongoose(_id, '_id');
     ValidateSubjectInput(subject_input);
 
     // *************** Remove leading and trailing spaces from subject legal name
@@ -267,7 +267,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
 async function DeleteSubject(_, { _id }) {
   try {
     // *************** checking if the Subject id is valid
-    ValidateIdMongoose(_id, 'Subject Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** checking if the Subject exists
     const isSubjectExists = await SubjectModel.exists({

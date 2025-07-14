@@ -74,7 +74,7 @@ async function GetAllStudentTestResults(_, { validation_status }) {
 async function GetOneStudentTestResult(_, { _id }) {
   try {
     // *************** Validating student test result ID
-    ValidateIdMongoose(_id, 'Student Test Result');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding student test result based on id and status ACTIVE
     const studentTestResult = await StudentTestResultModel.findOne({
@@ -122,7 +122,7 @@ async function UpdateMarksForStudentTestResult(
 ) {
   try {
     // *************** Validating test id and student test result input
-    ValidateIdMongoose(_id, 'Student Test Result');
+    ValidateIdMongoose(_id, '_id');
     ValidateStudentTestResultInput(studentTestResult_input);
 
     // *************** Find current student Test Result by id
@@ -237,7 +237,7 @@ async function UpdateMarksForStudentTestResult(
 async function DeleteStudentTestResult(_, { _id }) {
   try {
     // *************** checking if the Student test Result id is valid
-    ValidateIdMongoose(_id, 'Student Test Result');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding Student test Result and update the data
     const deletedStudentTestResult =
@@ -293,10 +293,10 @@ async function DeleteStudentTestResult(_, { _id }) {
  */
 async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
   // *************** validate id input
-  ValidateIdMongoose(_id, 'Student Test Result');
-  ValidateIdMongoose(task_input.test_id, 'test id');
-  ValidateIdMongoose(task_input.user_id, 'user id');
-  ValidateIdMongoose(task_input.student_id, 'student id');
+  ValidateIdMongoose(_id, '_id');
+  ValidateIdMongoose(task_input.test_id, 'test_id');
+  ValidateIdMongoose(task_input.user_id, 'user_id');
+  ValidateIdMongoose(task_input.student_id, 'student_id');
 
   // *************** get task based on criteria
   const taskData = await TaskModel.findOne({
@@ -415,8 +415,8 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
  */
 async function ValidateMarks(_, { _id, task_input }) {
   // *************** validate id and input id
-  ValidateIdMongoose(_id, 'Task Id');
-  ValidateIdMongoose(task_input.studentTestResult_id, 'Student Test Result');
+  ValidateIdMongoose(_id, '_id');
+  ValidateIdMongoose(task_input.studentTestResult_id, 'StudentTestResult_id');
 
   // *************** get task data
   const getTaskData = await TaskModel.findOne({

@@ -56,7 +56,7 @@ async function GetAllBlocks(_, args) {
 async function GetOneBlock(_, { _id }) {
   try {
     // *************** Validating block ID
-    ValidateIdMongoose(_id, 'Block Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding block based on id and status ACTIVE
     const block = await BlockModel.findOne({
@@ -149,7 +149,7 @@ async function CreateBlock(_, { block_input }) {
 async function UpdateBlock(_, { _id, block_input }) {
   try {
     // *************** Validating block id and block input
-    ValidateIdMongoose(_id, 'Block id');
+    ValidateIdMongoose(_id, '_id');
     ValidateBlockInput(block_input);
 
     // *************** find block data
@@ -232,7 +232,7 @@ async function UpdateBlock(_, { _id, block_input }) {
 async function DeleteBlock(_, { _id }) {
   try {
     // *************** checking if the block id is valid
-    ValidateIdMongoose(_id, 'Block id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** check if block exists
     const isBlockExists = await BlockModel.exists({

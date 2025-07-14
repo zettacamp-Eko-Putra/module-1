@@ -68,7 +68,7 @@ async function GetAllTests(_, { published_status }) {
 async function GetOneTest(_, { _id }) {
   try {
     // *************** Validating test ID
-    ValidateIdMongoose(_id, 'Test Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding test based on id and status ACTIVE
     const test = await TestModel.findOne({
@@ -188,7 +188,7 @@ async function CreateTest(_, { test_input }) {
 async function UpdateTest(_, { _id, test_input }) {
   try {
     // *************** Validating test id and test input
-    ValidateIdMongoose(_id, 'Test Id');
+    ValidateIdMongoose(_id, '_id');
     ValidateTestInput(test_input);
 
     // *************** Remove leading and trailing spaces from test name
@@ -273,7 +273,7 @@ async function UpdateTest(_, { _id, test_input }) {
 async function DeleteTest(_, { _id }) {
   try {
     // *************** checking if the test id is valid
-    ValidateIdMongoose(_id, 'Test Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding test and update the data
     const deleteTest = await TestModel.findOneAndUpdate(
@@ -326,8 +326,8 @@ async function DeleteTest(_, { _id }) {
 async function PublishTest(_, { task_input }) {
   try {
     // *************** validating test_id and user_id
-    ValidateIdMongoose(task_input.test_id, 'Test Id');
-    ValidateIdMongoose(task_input.user_id, 'User Id');
+    ValidateIdMongoose(task_input.test_id, 'test_id');
+    ValidateIdMongoose(task_input.user_id, 'user_id');
 
     // *************** find the test with status ACTIVE and NOT_PUBLISHED
     const getTestData = await TestModel.findOne({
@@ -400,8 +400,8 @@ async function PublishTest(_, { task_input }) {
  */
 async function AssignCorrector(_, { _id, task_input }) {
   // *************** validate id and task input user id
-  ValidateIdMongoose(_id, 'Task Id');
-  ValidateIdMongoose(task_input.user_id, 'User Id');
+  ValidateIdMongoose(_id, '_id');
+  ValidateIdMongoose(task_input.user_id, 'user_id');
 
   // *************** check if task exists
   const isTaskExists = await TaskModel.exists({

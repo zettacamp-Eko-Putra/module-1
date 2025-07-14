@@ -47,7 +47,7 @@ async function GetAllStudents(_, args) {
 async function GetOneStudent(_, { _id }) {
   try {
     // *************** Validating student ID
-    ValidateIdMongoose(_id, 'Student Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding student based on id and status active
     const student = await StudentModel.findOne({
@@ -180,7 +180,7 @@ async function CreateStudent(_, { student_input }) {
 async function UpdateStudent(_, { _id, student_input }) {
   try {
     // *************** Validating student ID and student input
-    ValidateIdMongoose(_id, 'Student Id');
+    ValidateIdMongoose(_id, '_id');
     ValidateStudentInput(student_input);
 
     // *************** Find the student data
@@ -297,7 +297,7 @@ async function UpdateStudent(_, { _id, student_input }) {
 async function DeleteStudent(_, { _id }) {
   try {
     // *************** Validating student ID
-    ValidateIdMongoose(_id, 'Student Id');
+    ValidateIdMongoose(_id, '_id');
 
     // *************** finding student based on id and status and update the data
     const deleteStudent = await StudentModel.findOneAndUpdate(
