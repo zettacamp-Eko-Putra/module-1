@@ -34,18 +34,18 @@ function ValidateValidationStatus(validation_status) {
  * - Any `notation_text` is not a non-empty string.
  * - Any `mark` is not a number or is less than 0.
  */
-function ValidateStudentTestResultInput(StudentTestResult_input) {
+function ValidateStudentTestResultInput(student_test_result_input) {
   // *************** Validate marks
   if (
-    !Array.isArray(StudentTestResult_input.marks) ||
-    !StudentTestResult_input.marks.length
+    !Array.isArray(student_test_result_input.marks) ||
+    !student_test_result_input.marks.length
   ) {
     // *************** error message if the input not valid
     throw new ApolloError('Marks is required.');
   }
 
   // *************** Validate each marks
-  StudentTestResult_input.marks.forEach((marks, index) => {
+  student_test_result_input.marks.forEach((marks, index) => {
     // *************** Validate if notation text string
     if (
       typeof marks.notation_text !== 'string' ||
