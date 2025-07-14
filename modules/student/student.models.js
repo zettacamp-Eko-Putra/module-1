@@ -17,7 +17,7 @@ const StudentAddressSchema = new Schema({
   postal_code: String,
 });
 
-// *************** MODEL Schema: Student ***************
+// *************** MODEL Schema: Student
 
 const StudentSchema = new Schema(
   {

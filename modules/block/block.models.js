@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// *************** MODEL Schema: Block ***************
+// *************** MODEL Schema: Block
 const BlockSchema = new Schema(
   {
     // Name for the block

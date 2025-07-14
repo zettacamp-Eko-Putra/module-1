@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// *************** MODEL Schema: Task ***************
+// *************** MODEL Schema: Task
 const TaskSchema = new Schema(
   {
     // test id task belong to

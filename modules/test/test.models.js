@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-// *************** MODEL Schema: Test ***************
+// *************** MODEL Schema: Test
 const TestSchema = new Schema(
   {
     // subject id test belong to
