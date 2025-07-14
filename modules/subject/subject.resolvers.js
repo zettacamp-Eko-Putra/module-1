@@ -12,7 +12,7 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
-// *************** GLOBAL VARIABLE
+// *************** GLOBAL VARIABLE ***************
 const defaultUser = process.env.DEFAULT_USER_ID;
 
 // *************** QUERY ***************
