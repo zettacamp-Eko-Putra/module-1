@@ -1,7 +1,7 @@
 // *************** IMPORT LIBRARY ***************
 const { gql } = require('apollo-server');
 
-// *************** Subject Task
+// *************** Task typedef
 const taskTypeDefs = gql`
   type Task {
     _id: ID!

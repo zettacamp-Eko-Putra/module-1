@@ -192,7 +192,11 @@ async function UpdateTest(_, { _id, test_input }) {
     ValidateTestInput(test_input);
 
     // *************** Find current test by id and status
-    const currentTest = await TestModel.findOne({ _id: _id, status: 'ACTIVE' });
+    const currentTest = await TestModel.findOne({
+      _id: _id,
+      status: 'ACTIVE',
+      published_status: 'NOT_PUBLISHED',
+    });
 
     if (!currentTest) {
       throw new ApolloError('Test not found');
@@ -201,13 +205,8 @@ async function UpdateTest(_, { _id, test_input }) {
     // *************** Remove leading and trailing spaces from test name
     const inputName = test_input.name.trim();
 
-    // *************** If already published, prevent update
-    if (currentTest.published_status === 'PUBLISHED') {
-      throw new ApolloError('Test is already published and cannot be edited');
-    }
-
     // *************** Take current test legal name
-    const currentTestName = currentTest.name.trim().toLowerCase();
+    const currentTestName = currentTest.name.trim();
 
     // *************** Only check duplication if name changed
     if (inputName !== currentTestName) {
@@ -225,7 +224,6 @@ async function UpdateTest(_, { _id, test_input }) {
 
     // *************** prepare test data for database
     const testData = {
-      subject_id: test_input.subject_id,
       name: inputName,
       description: test_input.description,
       weight: test_input.weight,
@@ -233,8 +231,8 @@ async function UpdateTest(_, { _id, test_input }) {
     };
 
     // *************** finding test based on id and overwrite it with new data and saving it to database
-    const updatedTest = await TestModel.findOneAndUpdate(
-      { _id, status: 'ACTIVE' },
+    const updatedTest = await TestModel.findByIdAndUpdate(
+      _id,
       {
         $set: testData,
         $push: {

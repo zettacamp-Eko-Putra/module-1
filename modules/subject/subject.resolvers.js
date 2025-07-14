@@ -176,11 +176,18 @@ async function UpdateSubject(_, { _id, subject_input }) {
     ValidateIdMongoose(_id, '_id');
     ValidateSubjectInput(subject_input);
 
+    // *************** Find current subject by id and status
+    const currentSubject = await SubjectModel.findOne({
+      _id,
+      status: 'ACTIVE',
+    }).lean();
+
+    if (!currentSubject) {
+      throw new ApolloError('Subject not found');
+    }
+
     // *************** Remove leading and trailing spaces from subject legal name
     const inputName = subject_input.name.trim();
-
-    // *************** Find current subject by id
-    const currentSubject = await SubjectModel.findById(_id).lean();
 
     if (subject_input.coefficient !== currentSubject.coefficient) {
       // *************** checking if the Subject has published test
@@ -197,7 +204,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
     }
 
     // *************** Take current subject legal name
-    const currentSubjectName = currentSubject.name.trim().toLowerCase();
+    const currentSubjectName = currentSubject.name.trim();
 
     // *************** Only check duplication if name changed
     if (inputName !== currentSubjectName) {
@@ -221,8 +228,8 @@ async function UpdateSubject(_, { _id, subject_input }) {
     };
 
     // *************** finding subject based on id and overwrite it with new data and saving it to database
-    const updatedSubject = await SubjectModel.findOneAndUpdate(
-      { _id, status: 'ACTIVE' },
+    const updatedSubject = await SubjectModel.findByIdAndUpdate(
+      _id,
       {
         $set: subjectData,
         $push: {
