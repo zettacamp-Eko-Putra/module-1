@@ -15,7 +15,7 @@ const {
   ValidateMarksAgainstNotations,
 } = require('./student_test_result.validator.js');
 const {
-  ValidateValidationStatus,
+  ValidateStudentTestResultValidationStatus,
 } = require('./student_test_result.validator.js');
 const {
   ValidateIdMongoose,
@@ -45,7 +45,7 @@ async function GetAllStudentTestResults(_, { validation_status }) {
 
     // *************** Add validation_status to filter if provided
     if (validation_status) {
-      ValidateValidationStatus(validation_status);
+      ValidateStudentTestResultValidationStatus(validation_status);
       filter.validation_status = validation_status;
     }
 

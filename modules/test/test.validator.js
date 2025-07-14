@@ -6,7 +6,7 @@ const { ApolloError } = require('apollo-server');
  *
  * Ensures the provided status is one of the allowed enum values: 'PUBLISHED' or 'NOT_PUBLISHED'.
  *
- * @function ValidatePublishedStatus
+ * @function ValidateTestPublishedStatus
  * @param {string} publishedStatus - The published status to validate.
  *
  * @throws {ApolloError} If the published status is not one of the allowed values.

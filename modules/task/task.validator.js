@@ -34,7 +34,7 @@ function ValidateTaskType(type) {
  * - 'IN_PROGRESS'
  * - 'COMPLETED'
  *
- * @function ValidateStatus
+ * @function ValidateTaskStatus
  * @param {string} taskStatus - The task status to validate.
  *
  * @throws {ApolloError} If the task status is not one of the allowed values.

@@ -8,12 +8,12 @@ const { ApolloError } = require('apollo-server');
  * - 'VALIDATED'
  * - 'NOT_VALIDATED'
  *
- * @function ValidateValidationStatus
+ * @function ValidateStudentTestResultValidationStatus
  * @param {string} validationStatus - The validation status to validate.
  *
  * @throws {ApolloError} If the provided status is not one of the allowed values.
  */
-function ValidateValidationStatus(validationStatus) {
+function ValidateStudentTestResultValidationStatus(validationStatus) {
   // *************** default value of published status
   const validationStatusEnum = ['VALIDATED', 'NOT_VALIDATED'];
 
@@ -118,5 +118,5 @@ function ValidateMarksAgainstNotations(marks, notations) {
 module.exports = {
   ValidateStudentTestResultInput,
   ValidateMarksAgainstNotations,
-  ValidateValidationStatus,
+  ValidateStudentTestResultValidationStatus,
 };
