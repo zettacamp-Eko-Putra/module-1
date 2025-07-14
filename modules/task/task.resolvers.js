@@ -10,6 +10,8 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 const { ValidateTaskInput } = require('./task.validator.js');
+const { ValidateType } = require('./task.validator.js');
+const { ValidateStatus } = require('./task.validator.js');
 
 // *************** GLOBAL VARIABLE ***************
 const defaultUser = process.env.DEFAULT_USER_ID;
@@ -31,6 +33,10 @@ const defaultUser = process.env.DEFAULT_USER_ID;
  */
 async function GetAllTasks(_, { type, task_status }) {
   try {
+    // *************** Validate type and status
+    if (type) ValidateType(type);
+    if (task_status) ValidateStatus(task_status);
+
     // *************** Create filter to find only task with status ACTIVE
     const filter = { status: 'ACTIVE' };
 

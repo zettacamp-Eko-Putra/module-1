@@ -7,6 +7,48 @@ const {
 } = require('../../utilities/common-validator/mongo-validator.js');
 
 /**
+ * Utility function to validate task type value.
+ *
+ * This function checks whether the given `type` is one of the predefined
+ * task types: `'ASSIGN_CORRECTOR'`, `'ENTER_MARKS'`, or `'VALIDATE_MARKS'`.
+ *
+ * @function ValidateType
+ * @param {string} type - The task type to be validated.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if the `type` is not valid.
+ */
+function ValidateType(type) {
+  // *************** default value of typeTask
+  const typeTask = ['ASSIGN_CORRECTOR', 'ENTER_MARKS', 'VALIDATE_MARKS'];
+
+  if (!typeTask.includes(type)) {
+    throw new ApolloError(`Type must be one of: ${typeTask.join(', ')}`);
+  }
+}
+
+/**
+ * Utility function to validate task status value.
+ *
+ * This function ensures that the provided `task_status`
+ * is one of the allowed values: `'PENDING'`, `'IN_PROGRESS'`, or `'COMPLETED'`.
+ *
+ * @function ValidateStatus
+ * @param {string} task_status - The status value to be validated.
+ *
+ * @throws {ApolloError} - Throws an ApolloError if `task_status` is not a valid status.
+ */
+function ValidateStatus(task_status) {
+  // *************** default value of taskStatus
+  const taskStatus = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
+
+  if (!taskStatus.includes(task_status)) {
+    throw new ApolloError(
+      `Task status must be one of: ${taskStatus.join(', ')}`
+    );
+  }
+}
+
+/**
  * Validates the task input object before updating or creating a task.
  * Ensures the test_id and user_id are valid MongoDB ObjectIds,
  * and that the due_date (if changed) is a future date.
@@ -43,4 +85,6 @@ function ValidateTaskInput(task_input) {
 // *************** EXPORT MODULE ***************
 module.exports = {
   ValidateTaskInput,
+  ValidateType,
+  ValidateStatus,
 };
