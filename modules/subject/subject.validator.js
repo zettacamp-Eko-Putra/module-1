@@ -39,6 +39,7 @@ function ValidateSubjectInput(subject_input) {
 
   // *************** validate subject description
   if (
+    !subject_input.coefficient ||
     typeof subject_input.coefficient !== 'number' ||
     subject_input.coefficient < 0
   ) {
