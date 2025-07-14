@@ -170,7 +170,7 @@ async function UpdateMarksForStudentTestResult(
     };
 
     // *************** Check if all marks entered
-    if (studentTestResult_input.marks.length === notations.length) {
+    if (studentTestResult_input.marks.length === test.notations.length) {
       // *************** Update ENTER_MARKS task to COMPLETED
       await TaskModel.updateOne(
         {
@@ -186,6 +186,9 @@ async function UpdateMarksForStudentTestResult(
       await TaskModel.create({
         type: 'VALIDATE_MARKS',
         user_id: currentStudentTestResult.mark_validator_id,
+        test_id: currentStudentTestResult.test_id,
+        created_at: new Date(),
+        created_by: defaultUser,
       });
     }
 
@@ -366,19 +369,26 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
     created_by: defaultUser,
   });
 
-  // *************** determine if task is completed
-  const isComplete = task_input.marks.length === notations.length;
-
-  taskData.task_status = isComplete ? 'COMPLETED' : 'IN_PROGRESS';
-  taskData.updated_by.push({
-    user_id: defaultUser,
-    updated_at: new Date(),
-  });
-
-  await taskData.save();
-
-  // *************** if task is completed, create VALIDATE_MARKS task
-  if (isComplete) {
+  // *************** check if input marks have same length with notations
+  if (task_input.marks.length === testData.notations.length) {
+    // *************** update task
+    await TaskModel.updateOne(
+      {
+        _id: _id,
+        type: 'ENTER_MARKS',
+        task_status: 'PENDING',
+      },
+      {
+        task_status: 'COMPLETED',
+        $push: {
+          updated_by: {
+            user_id: defaultUser,
+            updated_at: new Date(),
+          },
+        },
+      }
+    );
+    // *************** create task validate marks
     const validateTask = await TaskModel.create({
       test_id: task_input.test_id,
       user_id: task_input.user_id,
@@ -389,6 +399,17 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
 
     return validateTask._id;
   }
+
+  // *************** update task if enter marks not completed
+  await TaskModel.updateOne(_id, {
+    task_status: 'IN_PROGRESS',
+    $push: {
+      updated_by: {
+        user_id: defaultUser,
+        updated_at: new Date(),
+      },
+    },
+  });
 
   // *************** if not completed, return current task
   return taskData._id;
