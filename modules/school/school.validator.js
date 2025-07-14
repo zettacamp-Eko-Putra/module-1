@@ -2,20 +2,25 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Validates the school input object to ensure all required fields are present
- * and properly formatted. Throws an ApolloError if any validation rule is violated.
+ * Utility function to validate input object for creating or updating a School.
+ *
+ * This function ensures that:
+ * - `school_legal_name` exists, is a string, and contains no special characters.
+ * - `school_commercial_name` exists and is a string.
+ * - `address` is an array with at least one entry, and each entry contains valid
+ *   `street`, `city`, `province`, and `postal_code` fields.
  *
  * @function ValidateSchoolInput
- * @param {Object} school_input - The school input data to validate.
- * @param {string} school_input.school_legal_name - Required. Must be a non-empty string.
- * @param {string} school_input.school_commercial_name - Required. Must be a non-empty string.
- * @param {Array<Object>} school_input.address - Required. Must contain at least one address object.
- * @param {string} school_input.address[].street - Required. Must be a non-empty string.
- * @param {string} school_input.address[].city - Required. Must be a non-empty string.
- * @param {string} school_input.address[].province - Required. Must be a non-empty string.
- * @param {string} school_input.address[].postal_code - Required. Must be a non-empty string.
+ * @param {Object} schoolInput - The input object for the School.
+ * @param {string} schoolInput.school_legal_name - Legal name of the school.
+ * @param {string} schoolInput.school_commercial_name - Commercial name of the school.
+ * @param {Array<Object>} schoolInput.address - Array of address objects.
+ * @param {string} schoolInput.address[].street - Street name of the address.
+ * @param {string} schoolInput.address[].city - City name of the address.
+ * @param {string} schoolInput.address[].province - Province name of the address.
+ * @param {string} schoolInput.address[].postal_code - Postal code of the address.
  *
- * @throws {ApolloError} If any required field is missing or improperly formatted.
+ * @throws {ApolloError} If any required field is missing or invalid.
  */
 function ValidateSchoolInput(schoolInput) {
   // *************** validate school school_legal_name

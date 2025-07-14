@@ -7,26 +7,35 @@ const {
 } = require('../../utilities/common-validator/mongo-validator.js');
 
 /**
- * Validates the student input object for required fields and proper data formats.
- * Throws an ApolloError if any validation rule is violated.
+ * Utility function to validate input object for creating or updating a Student.
+ *
+ * This function ensures that:
+ * - `first_name`, `last_name` must be strings and are required.
+ * - `civility` must be one of: 'Mr', 'Mrs'.
+ * - `postal_code_of_birth` must be a string and is required.
+ * - `mobile_phone` must be present and not exceed 12 characters.
+ * - `address` must be a non-empty array, and each address must contain valid `street`, `city`, `province`, and `postal_code`.
+ * - `date_of_birth` must be a valid date if provided.
+ * - `school_id` must be a valid MongoDB ObjectId.
+ * - `email` must follow valid email format.
  *
  * @function ValidateStudentInput
- * @param {Object} student_input - The student input data to validate.
- * @param {string} student_input.first_name - Required. Must be a non-empty string.
- * @param {string} student_input.last_name - Required. Must be a non-empty string.
- * @param {string} student_input.civility - Required. Must be one of: "Mr", "Mrs".
- * @param {string} student_input.postal_code_of_birth - Required. Must be a non-empty string.
- * @param {string} student_input.mobile_phone - Required. Must not exceed 12 characters.
- * @param {Array<Object>} student_input.address - Required. Must contain at least one address object.
- * @param {string} student_input.address[].street - Required. Must be a non-empty string.
- * @param {string} student_input.address[].city - Required. Must be a non-empty string.
- * @param {string} student_input.address[].province - Required. Must be a non-empty string.
- * @param {string} student_input.address[].postal_code - Required. Must be a non-empty string.
- * @param {string} [student_input.date_of_birth] - Optional. If provided, must be a valid date string.
- * @param {string} student_input.school_id - Required. Must be a non-empty string.
- * @param {string} student_input.email - Required. Must be a valid email address.
+ * @param {Object} studentInput - The input object for the student.
+ * @param {string} studentInput.first_name - First name of the student.
+ * @param {string} studentInput.last_name - Last name of the student.
+ * @param {string} studentInput.civility - Civility title, either 'Mr' or 'Mrs'.
+ * @param {string} studentInput.postal_code_of_birth - Postal code of student's birth location.
+ * @param {string} studentInput.mobile_phone - Student's mobile phone number (max 12 characters).
+ * @param {Array<Object>} studentInput.address - Array of address objects.
+ * @param {string} studentInput.address[].street - Street name.
+ * @param {string} studentInput.address[].city - City name.
+ * @param {string} studentInput.address[].province - Province name.
+ * @param {string} studentInput.address[].postal_code - Postal code.
+ * @param {string} [studentInput.date_of_birth] - Optional date of birth (ISO string).
+ * @param {string} studentInput.school_id - MongoDB ObjectId of the school.
+ * @param {string} studentInput.email - Valid email address.
  *
- * @throws {ApolloError} If any field fails validation.
+ * @throws {ApolloError} If any required field is missing or invalid.
  */
 function ValidateStudentInput(studentInput) {
   // *************** validate student first_name

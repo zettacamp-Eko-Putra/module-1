@@ -27,15 +27,17 @@ function ValidateType(type) {
 }
 
 /**
- * Utility function to validate task status value.
+ * Validates the task status.
  *
- * This function ensures that the provided `task_status`
- * is one of the allowed values: `'PENDING'`, `'IN_PROGRESS'`, or `'COMPLETED'`.
+ * Ensures that the provided task status is one of the allowed values:
+ * - 'PENDING'
+ * - 'IN_PROGRESS'
+ * - 'COMPLETED'
  *
  * @function ValidateStatus
- * @param {string} task_status - The status value to be validated.
+ * @param {string} taskStatus - The task status to validate.
  *
- * @throws {ApolloError} - Throws an ApolloError if `task_status` is not a valid status.
+ * @throws {ApolloError} If the task status is not one of the allowed values.
  */
 function ValidateStatus(taskStatus) {
   // *************** default value of taskStatus
@@ -49,19 +51,20 @@ function ValidateStatus(taskStatus) {
 }
 
 /**
- * Validates the task input object before updating or creating a task.
- * Ensures the test_id and user_id are valid MongoDB ObjectIds,
- * and that the due_date (if changed) is a future date.
+ * Validates the input for a Task.
  *
- * @function ValidateTask
- * @param {Object} task_input - Input object containing task data.
- * @param {string} task_input.test_id - ID of the test associated with the task.
- * @param {string} task_input.user_id - ID of the user assigned to the task.
- * @param {string|Date} [task_input.due_date] - Optional due date for the task.
+ * This function ensures:
+ * - If `test_id` is provided, it must be a valid MongoDB ObjectId.
+ * - `user_id` must be a valid MongoDB ObjectId.
+ * - If `due_date` is provided, it must be a future date.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - test_id or user_id is not a valid ObjectId.
- * - due_date is provided and is not a future date.
+ * @function ValidateTaskInput
+ * @param {Object} taskInput - The input object for the task.
+ * @param {string} [taskInput.test_id] - (Optional) The ID of the test associated with the task.
+ * @param {string} taskInput.user_id - The ID of the user assigned to the task.
+ * @param {Date|string} [taskInput.due_date] - (Optional) The due date of the task.
+ *
+ * @throws {ApolloError} If any validation fails.
  */
 function ValidateTaskInput(taskInput) {
   // *************** Validate test id

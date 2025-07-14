@@ -2,18 +2,20 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Validates the input object for creating or updating a subject.
+ * Validates the input for a Subject.
+ *
+ * This function checks that:
+ * - `name` is a non-empty string and does not contain special characters.
+ * - `description` is a non-empty string.
+ * - `coefficient` is a non-negative number.
  *
  * @function ValidateSubjectInput
- * @param {Object} subject_input - Input object containing subject details.
- * @param {string} subject_input.name - Name of the subject to validate.
- * @param {string} subject_input.description - Description of the subject to validate.
- * @param {number} subject_input.coefficient - Coefficient value used for evaluation.
+ * @param {Object} subjectInput - The input object for the subject.
+ * @param {string} subjectInput.name - The name of the subject.
+ * @param {string} subjectInput.description - The description of the subject.
+ * @param {number} subjectInput.coefficient - The coefficient of the subject.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - The name is missing, not a string, or contains special characters.
- * - The description is missing or not a string.
- * - The coefficient is missing, not a number, or is negative.
+ * @throws {ApolloError} If any of the validations fail.
  */
 function ValidateSubjectInput(subjectInput) {
   // *************** validate subject name

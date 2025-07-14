@@ -2,28 +2,31 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Validates the user input object for required fields and proper data formats.
- * Throws an ApolloError if any validation rule is violated.
+ * Validates the user input fields for creating or updating a user.
  *
+ * Checks for required fields, data types, maximum lengths, valid enums,
+ * valid email format, and array structure for address.
+ *
+ * @async
  * @function ValidateUserInput
- * @param {Object} user_input - The user input data to validate.
- * @param {string} user_input.first_name - Required. Must be a non-empty string.
- * @param {string} user_input.last_name - Required. Must be a non-empty string.
- * @param {string} user_input.civility - Required. Must be one of: "Mr", "Mrs".
- * @param {string} [user_input.office_phone] - Optional. Must not exceed 12 characters.
- * @param {string} [user_input.direct_line] - Optional. Must not exceed 12 characters.
- * @param {string} user_input.mobile_phone - Required. Must not exceed 12 characters.
- * @param {string} user_input.entity - Required. Must be one of: "ADMTC", "Academic", "Company".
- * @param {Array<Object>} user_input.address - Required. Must contain at least one address object.
- * @param {string} user_input.address[].street - Required. Street name.
- * @param {string} user_input.address[].city - Required. City name.
- * @param {string} user_input.address[].province - Required. Province name.
- * @param {string} user_input.address[].postal_code - Required. Postal code.
- * @param {string} user_input.email - Required. Must be a valid email format.
- * @param {string} user_input.password - Required. Must be at least 6 characters.
- * @param {string} user_input.role - Required. User role identifier.
+ * @param {Object} userInput - The input object containing user details.
+ * @param {string} userInput.first_name - First name of the user (required).
+ * @param {string} userInput.last_name - Last name of the user (required).
+ * @param {string} userInput.civility - Civility of the user (Mr or Mrs) (required).
+ * @param {string} [userInput.office_phone] - Optional office phone (max 12 chars).
+ * @param {string} [userInput.direct_line] - Optional direct line (max 12 chars).
+ * @param {string} userInput.mobile_phone - Mobile phone (required, max 12 chars).
+ * @param {string} userInput.entity - Entity type (ADMTC, Academic, Company) (required).
+ * @param {Array<Object>} userInput.address - Array of address objects (required).
+ * @param {string} userInput.address[].street - Street of the address (required).
+ * @param {string} userInput.address[].city - City of the address (required).
+ * @param {string} userInput.address[].province - Province of the address (required).
+ * @param {string} userInput.address[].postal_code - Postal code of the address (required).
+ * @param {string} userInput.email - Valid email address (required).
+ * @param {string} userInput.password - Password (min. 6 characters) (required).
+ * @param {string} userInput.role - Role of the user (required).
  *
- * @throws {ApolloError} If any field fails validation.
+ * @throws {ApolloError} If any of the validations fail.
  */
 async function ValidateUserInput(userInput) {
   // *************** validate user first_name

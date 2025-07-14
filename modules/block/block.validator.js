@@ -2,17 +2,18 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Validates the input object for creating or updating a block.
+ * Utility function to validate input object for creating or updating a Block.
+ *
+ * This function ensures that:
+ * - The `name` field exists, is a string, and contains no special characters.
+ * - The `description` field exists and is a string.
  *
  * @function ValidateBlockInput
- * @param {Object} block_input - Input object containing block details.
- * @param {string} block_input.name - Name of the block to validate.
- * @param {string} block_input.description - Description of the block to validate.
+ * @param {Object} blockInput - The input object for the Block.
+ * @param {string} blockInput.name - The name of the Block.
+ * @param {string} blockInput.description - The description of the Block.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - The name is missing or not a string.
- * - The name contains special characters (only letters, numbers, spaces, hyphens, and dots are allowed).
- * - The description is missing or not a string.
+ * @throws {ApolloError} If any required field is missing or invalid.
  */
 function ValidateBlockInput(blockInput) {
   // *************** validate block name

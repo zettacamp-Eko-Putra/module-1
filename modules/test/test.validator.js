@@ -2,14 +2,14 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Utility function to validate the published status value.
+ * Validates the published status input.
  *
- * Ensures that the given `published_status` is either `'PUBLISHED'` or `'NOT_PUBLISHED'`.
+ * Ensures the provided status is one of the allowed enum values: 'PUBLISHED' or 'NOT_PUBLISHED'.
  *
  * @function ValidatePublishedStatus
- * @param {string} published_status - The status string to validate.
+ * @param {string} publishedStatus - The published status to validate.
  *
- * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
+ * @throws {ApolloError} If the published status is not one of the allowed values.
  */
 function ValidatePublishedStatus(publishedStatus) {
   // *************** default value of published status
@@ -23,27 +23,24 @@ function ValidatePublishedStatus(publishedStatus) {
 }
 
 /**
- * Utility function to validate test input object.
+ * Validates the input for creating or updating a test.
  *
- * This function validates the structure and data types of a test input object
- * including its name, description, weight, and notations array.
- *
- * Validation Rules:
- * - `name` is required, must be a string, and cannot contain special characters.
- * - `description` is required and must be a string.
- * - `weight` must be a number between 0 and 1.
- * - `notations` must be a non-empty array of objects with:
- *    - `notation_text`: non-empty string.
- *    - `max_point`: non-negative number.
+ * Ensures that:
+ * - `name` is a non-empty string without special characters.
+ * - `description` is a non-empty string.
+ * - `weight` is a number between 0 and 1.
+ * - `notations` is a non-empty array with valid `notation_text` and `max_point` values.
  *
  * @function ValidateTestInput
- * @param {Object} test_input - The input object for creating or updating a test.
- * @param {string} test_input.name - The name of the test.
- * @param {string} test_input.description - The description of the test.
- * @param {number} test_input.weight - The weight of the test (0–1).
- * @param {Array<{ notation_text: string, max_point: number }>} test_input.notations - List of test notations.
+ * @param {Object} testInput - The input object for the test.
+ * @param {string} testInput.name - The name of the test.
+ * @param {string} testInput.description - The description of the test.
+ * @param {number} testInput.weight - The weight of the test (must be between 0 and 1).
+ * @param {Array<Object>} testInput.notations - Array of notations.
+ * @param {string} testInput.notations[].notation_text - The text for each notation.
+ * @param {number} testInput.notations[].max_point - The maximum point for each notation.
  *
- * @throws {ApolloError} - Throws an error if any of the validation rules are violated.
+ * @throws {ApolloError} If any validation rule fails.
  */
 function ValidateTestInput(testInput) {
   // *************** validate test name

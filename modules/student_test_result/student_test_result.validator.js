@@ -2,14 +2,16 @@
 const { ApolloError } = require('apollo-server');
 
 /**
- * Utility function to validate the validation status value.
+ * Utility function to validate the validation status of a student test result.
  *
- * Ensures that the given `validation_status` is either `'VALIDATED'` or `'NOT_VALIDATED'`.
+ * Allowed values are:
+ * - 'VALIDATED'
+ * - 'NOT_VALIDATED'
  *
  * @function ValidateValidationStatus
- * @param {string} validation_status - The validation status string to validate.
+ * @param {string} validationStatus - The validation status to validate.
  *
- * @throws {ApolloError} - Throws an error if the input is not one of the allowed values.
+ * @throws {ApolloError} If the provided status is not one of the allowed values.
  */
 function ValidateValidationStatus(validationStatus) {
   // *************** default value of published status
@@ -23,16 +25,21 @@ function ValidateValidationStatus(validationStatus) {
 }
 
 /**
- * Validates the input object for updating student test result marks.
+ * Utility function to validate the input for a Student Test Result.
+ *
+ * This function ensures that:
+ * - `marks` must be a non-empty array.
+ * - Each item in `marks` must contain:
+ *   - `notation_text`: a non-empty string.
+ *   - `mark`: a number that is zero or greater.
  *
  * @function ValidateStudentTestResultInput
- * @param {Object} StudentTestResult_input - Input object containing marks.
- * @param {Array<{notation_text: string, mark: number}>} StudentTestResult_input.marks - Array of mark entries to validate.
+ * @param {Object} studentTestResultInput - The input object for student test result.
+ * @param {Array<Object>} studentTestResultInput.marks - Array of mark entries.
+ * @param {string} studentTestResultInput.marks[].notation_text - Text describing the notation (e.g., "Grammar", "Structure").
+ * @param {number} studentTestResultInput.marks[].mark - Score/point for the corresponding notation.
  *
- * @throws {ApolloError} - Throws an ApolloError if:
- * - `marks` is not an array or is empty.
- * - Any `notation_text` is not a non-empty string.
- * - Any `mark` is not a number or is less than 0.
+ * @throws {ApolloError} If `marks` is missing, empty, or contains invalid entries.
  */
 function ValidateStudentTestResultInput(studentTestResultInput) {
   // *************** Validate marks
