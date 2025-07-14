@@ -40,7 +40,6 @@ const taskTypeDefs = gql`
   input TaskInput {
     test_id: ID
     user_id: ID
-    type: TypeTask!
     due_date: Date
   }
 
