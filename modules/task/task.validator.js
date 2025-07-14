@@ -17,7 +17,7 @@ const {
  *
  * @throws {ApolloError} - Throws an ApolloError if the `type` is not valid.
  */
-function ValidateType(type) {
+function ValidateTaskType(type) {
   // *************** default value of typeTask
   const typeTask = ['ASSIGN_CORRECTOR', 'ENTER_MARKS', 'VALIDATE_MARKS'];
 
@@ -39,7 +39,7 @@ function ValidateType(type) {
  *
  * @throws {ApolloError} If the task status is not one of the allowed values.
  */
-function ValidateStatus(taskStatus) {
+function ValidateTaskStatus(taskStatus) {
   // *************** default value of taskStatus
   const taskStatusEnum = ['PENDING', 'IN_PROGRESS', 'COMPLETED'];
 
@@ -88,6 +88,6 @@ function ValidateTaskInput(taskInput) {
 // *************** EXPORT MODULE ***************
 module.exports = {
   ValidateTaskInput,
-  ValidateType,
-  ValidateStatus,
+  ValidateTaskType,
+  ValidateTaskStatus,
 };

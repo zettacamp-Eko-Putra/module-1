@@ -11,7 +11,7 @@ const { ApolloError } = require('apollo-server');
  *
  * @throws {ApolloError} If the published status is not one of the allowed values.
  */
-function ValidatePublishedStatus(publishedStatus) {
+function ValidateTestPublishedStatus(publishedStatus) {
   // *************** default value of published status
   const publishedStatusEnum = ['PUBLISHED', 'NOT_PUBLISHED'];
 
@@ -93,4 +93,4 @@ function ValidateTestInput(testInput) {
   });
 }
 // *************** EXPORT MODULE ***************
-module.exports = { ValidateTestInput, ValidatePublishedStatus };
+module.exports = { ValidateTestInput, ValidateTestPublishedStatus };

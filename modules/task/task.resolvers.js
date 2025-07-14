@@ -10,8 +10,8 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 const { ValidateTaskInput } = require('./task.validator.js');
-const { ValidateType } = require('./task.validator.js');
-const { ValidateStatus } = require('./task.validator.js');
+const { ValidateTaskType } = require('./task.validator.js');
+const { ValidateTaskStatus } = require('./task.validator.js');
 
 // *************** GLOBAL VARIABLE ***************
 const defaultUser = process.env.DEFAULT_USER_ID;
@@ -38,13 +38,13 @@ async function GetAllTasks(_, { type, task_status }) {
 
     // *************** Add type to filter if provided
     if (type) {
-      ValidateType(type);
+      ValidateTaskType(type);
       filter.type = type;
     }
 
     // *************** Add task_status to filter if provided
     if (task_status) {
-      ValidateStatus(task_status);
+      ValidateTaskStatus(task_status);
       filter.task_status = task_status;
     }
 

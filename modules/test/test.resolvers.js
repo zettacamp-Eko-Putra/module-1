@@ -11,7 +11,7 @@ const StudentModel = require('../student/student.models.js');
 
 // *************** IMPORT VALIDATOR ***************
 const { ValidateTestInput } = require('./test.validator.js');
-const { ValidatePublishedStatus } = require('./test.validator.js');
+const { ValidateTestPublishedStatus } = require('./test.validator.js');
 const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
@@ -39,7 +39,7 @@ async function GetAllTests(_, { published_status }) {
 
     // *************** Add published_status to filter if provided by client
     if (published_status) {
-      ValidatePublishedStatus(published_status);
+      ValidateTestPublishedStatus(published_status);
       filter.published_status = published_status;
     }
 
