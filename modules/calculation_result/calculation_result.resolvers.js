@@ -10,6 +10,9 @@ const {
   ValidateIdMongoose,
 } = require('../../utilities/common-validator/mongo-validator.js');
 
+// *************** GLOBAL VARIABLE ***************
+const defaultUser = process.env.DEFAULT_USER_ID;
+
 /**
  * Retrieves all calculation results with status 'ACTIVE'.
  *
@@ -77,10 +80,61 @@ async function GetOneCalculationsResult(_, { _id }) {
   }
 }
 
+/**
+ * Soft deletes a calculation result by updating its status to 'DELETED'.
+ *
+ * This function validates the provided `_id`, then finds the corresponding 
+ * active calculation result and updates its `status` to 'DELETED', 
+ * along with setting the `deleted_at` timestamp and `deleted_by` user.
+ *
+ * @async
+ * @function DeleteCalculationResult
+ * @param {Object} _ - Unused resolver root argument.
+ * @param {Object} args - Resolver arguments.
+ * @param {string} args._id - The ID of the calculation result to delete.
+ * @returns {Promise<string>} The ID of the deleted calculation result.
+ *
+ * @throws {ApolloError} If the ID is invalid, the document is not found, already deleted, or a database error occurs.
+ */
+async function DeleteCalculationResult(_, { _id }) {
+  try {
+    // *************** Validating calculation result ID
+    ValidateIdMongoose(_id, '_id');
+
+    // *************** finding calculation result based on id and status and update the data
+    const deleteCalculationResult =
+      await CalculationResultModel.findOneAndUpdate(
+        { _id, status: 'ACTIVE' },
+        {
+          // *************** changing status field to deleted and adding timestamp
+          status: 'DELETED',
+          deleted_at: new Date(),
+          deleted_by: defaultUser,
+        }
+      )
+        .select('_id')
+        .lean();
+
+    // *************** showing error message if calculation result already deleted
+    if (!deleteCalculationResult) {
+      throw new ApolloError('calculation result already deleted');
+    }
+
+    // *************** returning calculation result deleted data to user
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
+  }
+}
+
 // *************** EXPORT MODULE ***************
 module.exports = {
   Query: {
     GetAllCalculationResults,
     GetOneCalculationsResult,
+  },
+  Mutation: {
+    DeleteCalculationResult,
   },
 };
