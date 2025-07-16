@@ -12,11 +12,45 @@ const subjectTypeDefs = gql`
     coefficient: Float!
     test_ids: [Test]
     status: SubjectStatus!
+    passing_criteria: [PassingCriteria]
     created_at: Date
     created_by: ID
     updated_by: [UpdatedBy]
     deleted_at: Date
     deleted_by: ID
+  }
+
+  type PassingCriteria {
+    logical_operator: LogicalOperatorEnum
+    condition: [SubjectCondition]
+  }
+
+  type SubjectCondition {
+    condition_type: ConditionTypeEnum
+    condition_outcome: ConditionOutcomeEnum
+    test_id: [Test]
+    min_mark: Int
+    operator: OperatorEnum
+  }
+
+  enum OperatorEnum {
+    GREATER_THAN
+    GREATER_THAN_OR_EQUAL
+  }
+
+  enum ConditionOutcomeEnum {
+    PASS
+    FAIL
+  }
+
+  enum ConditionTypeEnum {
+    SINGLE_TEST
+    AVERAGE_MARK_TEST
+  }
+
+  enum LogicalOperatorEnum {
+    OR
+    AND
   }
 
   enum SubjectStatus {
