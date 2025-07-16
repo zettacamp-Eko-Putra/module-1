@@ -14,6 +14,7 @@ const testTypeDefs = gql`
     notations: [Notation]!
     status: TestStatus!
     published_status: PublishedStatus!
+    passing_criteria: PassingCriteria!
     created_at: Date
     created_by: ID
     updated_by: [UpdatedBy]
@@ -24,6 +25,28 @@ const testTypeDefs = gql`
   type Notation {
     notation_text: String!
     max_point: Float!
+  }
+
+  type PassingCriteria {
+    logical_operator: LogicalOperatorEnum
+    condition_outcome: ConditionOutcomeEnum
+    min_mark: Int
+    operator: OperatorEnum
+  }
+
+  enum OperatorEnum {
+    GREATER_THAN
+    GREATER_THAN_OR_EQUAL
+  }
+
+  enum ConditionOutcomeEnum {
+    PASS
+    FAIL
+  }
+
+  enum LogicalOperatorEnum {
+    OR
+    AND
   }
 
   input PublishTestInput {
