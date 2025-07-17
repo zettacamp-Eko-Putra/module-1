@@ -54,7 +54,7 @@ const SubjectSchema = new Schema(
             // enum operator to compare with min_mark
             operator: {
               type: String,
-              enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
+              enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL', ' LESS_THAN'],
               required: true,
             },
           },
