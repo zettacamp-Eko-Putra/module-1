@@ -24,7 +24,6 @@ const blockTypeDefs = gql`
 
   type BlockCondition {
     condition_type: ConditionTypeEnum
-    condition_outcome: ConditionOutcomeEnum
     subject_id: [Subject]
     test_id: [Test]
     min_mark: Int

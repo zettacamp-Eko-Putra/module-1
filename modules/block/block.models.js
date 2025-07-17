@@ -26,12 +26,6 @@ const BlockSchema = new Schema(
         // condition passing criteria for the block
         condition: [
           {
-            // enum condition outcome for the condition
-            condition_outcome: {
-              type: String,
-              enum: ['PASS', 'FAIL'],
-              required: true,
-            },
             // condition type for block passing criteria condition
             condition_type: {
               type: String,
