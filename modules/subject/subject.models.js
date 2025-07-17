@@ -32,12 +32,6 @@ const SubjectSchema = new Schema(
         // condition passing criteria for the subject
         condition: [
           {
-            // enum condition outcome for the condition
-            condition_outcome: {
-              type: String,
-              enum: ['PASS', 'FAIL'],
-              required: true,
-            },
             // condition type for subject passing criteria condition
             condition_type: {
               type: String,
@@ -54,7 +48,7 @@ const SubjectSchema = new Schema(
             // enum operator to compare with min_mark
             operator: {
               type: String,
-              enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL', ' LESS_THAN'],
+              enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
               required: true,
             },
           },

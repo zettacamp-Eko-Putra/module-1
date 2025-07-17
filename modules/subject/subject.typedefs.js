@@ -27,7 +27,6 @@ const subjectTypeDefs = gql`
 
   type SubjectCondition {
     condition_type: ConditionTypeEnum
-    condition_outcome: ConditionOutcomeEnum
     test_id: [Test]
     min_mark: Int
     operator: OperatorEnum
@@ -36,12 +35,6 @@ const subjectTypeDefs = gql`
   enum OperatorEnum {
     GREATER_THAN
     GREATER_THAN_OR_EQUAL
-    LESS_THAN
-  }
-
-  enum ConditionOutcomeEnum {
-    PASS
-    FAIL
   }
 
   enum ConditionTypeEnum {
