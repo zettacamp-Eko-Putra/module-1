@@ -37,6 +37,7 @@ const testTypeDefs = gql`
   enum OperatorEnum {
     GREATER_THAN
     GREATER_THAN_OR_EQUAL
+    LESS_THAN
   }
 
   enum ConditionOutcomeEnum {
