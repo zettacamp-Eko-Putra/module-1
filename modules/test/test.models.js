@@ -39,26 +39,17 @@ const TestSchema = new Schema(
     published_date: { type: Date },
 
     // Passing criteria for the test
-    passing_criteria: [
-      {
-        // enum condition outcome for the passing criteria
-        condition_outcome: {
-          type: String,
-          enum: ['PASS', 'FAIL'],
-          required: true,
-        },
+    passing_criteria: {
+      // minimum mark for passing criteria
+      min_mark: { type: Number, required: true },
 
-        // minimum mark for passing criteria
-        min_mark: { type: Number, required: true },
-
-        // enum operator to compare with min_mark
-        operator: {
-          type: String,
-          enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL', 'LESS_THAN'],
-          required: true,
-        },
+      // enum operator to compare with min_mark
+      operator: {
+        type: String,
+        enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
+        required: true,
       },
-    ],
+    },
 
     // user id who create the test
     created_by: { type: Schema.Types.ObjectId, ref: 'user' },

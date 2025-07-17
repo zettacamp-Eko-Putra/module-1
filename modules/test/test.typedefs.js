@@ -29,7 +29,6 @@ const testTypeDefs = gql`
 
   type PassingCriteria {
     logical_operator: LogicalOperatorEnum
-    condition_outcome: ConditionOutcomeEnum
     min_mark: Int
     operator: OperatorEnum
   }
@@ -37,12 +36,6 @@ const testTypeDefs = gql`
   enum OperatorEnum {
     GREATER_THAN
     GREATER_THAN_OR_EQUAL
-    LESS_THAN
-  }
-
-  enum ConditionOutcomeEnum {
-    PASS
-    FAIL
   }
 
   enum LogicalOperatorEnum {
