@@ -26,14 +26,15 @@ const baseTypeDefs = gql`
     user_id: ID
     updated_at: Date
   }
-  type PassingCriteria {
-    logical_operator: [OperatorEnum]
-    condition: [BlockCondition]
-  }
 
   enum OperatorEnum {
     GREATER_THAN
     GREATER_THAN_OR_EQUAL
+  }
+
+  enum LogicalOperatorEnum {
+    AND
+    OR
   }
 `;
 
