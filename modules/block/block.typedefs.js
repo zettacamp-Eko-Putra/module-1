@@ -8,7 +8,7 @@ const blockTypeDefs = gql`
     name: String!
     description: String!
     subject_ids: [Subject]
-    passing_criteria: [PassingCriteria]
+    passing_criteria: [BlockPassingCriteria]
     status: BlockStatus!
     created_at: Date
     created_by: ID
@@ -25,6 +25,11 @@ const blockTypeDefs = gql`
     operator: OperatorEnum
   }
 
+  type BlockPassingCriteria {
+    logical_operator: LogicalOperatorEnum
+    condition: [BlockCondition]
+  }
+
   enum BlockConditionTypeEnum {
     SINGLE_SUBJECT
     AVERAGE_MARK_SUBJECT
@@ -39,6 +44,20 @@ const blockTypeDefs = gql`
   input BlockInput {
     name: String!
     description: String!
+    passing_criteria: BlockPassingCriteriaInput
+  }
+
+  input BlockPassingCriteriaInput {
+    logical_operator: LogicalOperatorEnum
+    condition: [BlockConditionInput]
+  }
+
+  input BlockConditionInput {
+    condition_type: BlockConditionTypeEnum
+    subject_id: ID
+    test_id: ID
+    min_mark: Int
+    operator: OperatorEnum
   }
 
   extend type Query {
