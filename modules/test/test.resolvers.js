@@ -149,6 +149,7 @@ async function CreateTest(_, { test_input }) {
       description: test_input.description,
       weight: test_input.weight,
       notations: test_input.notations,
+      passing_criteria: test_input.passing_criteria,
       created_by: defaultUser,
     };
 
@@ -230,6 +231,7 @@ async function UpdateTest(_, { _id, test_input }) {
       description: test_input.description,
       weight: test_input.weight,
       notations: test_input.notations,
+      passing_criteria: test_input.passing_criteria,
     };
 
     // *************** finding test based on id and overwrite it with new data and saving it to database
