@@ -56,7 +56,7 @@ async function GetAllCalculationResults() {
  *
  * @throws {ApolloError} If the ID is invalid, the document is not found, or a database error occurs.
  */
-async function GetOneCalculationsResult(_, { _id }) {
+async function GetOneCalculationResult(_, { _id }) {
   try {
     // *************** Validating calculation result ID
     ValidateIdMongoose(_id, '_id');
@@ -83,8 +83,8 @@ async function GetOneCalculationsResult(_, { _id }) {
 /**
  * Soft deletes a calculation result by updating its status to 'DELETED'.
  *
- * This function validates the provided `_id`, then finds the corresponding 
- * active calculation result and updates its `status` to 'DELETED', 
+ * This function validates the provided `_id`, then finds the corresponding
+ * active calculation result and updates its `status` to 'DELETED',
  * along with setting the `deleted_at` timestamp and `deleted_by` user.
  *
  * @async
@@ -132,7 +132,7 @@ async function DeleteCalculationResult(_, { _id }) {
 module.exports = {
   Query: {
     GetAllCalculationResults,
-    GetOneCalculationsResult,
+    GetOneCalculationResult,
   },
   Mutation: {
     DeleteCalculationResult,
