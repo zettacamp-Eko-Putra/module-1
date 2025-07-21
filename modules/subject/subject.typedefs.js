@@ -20,32 +20,18 @@ const subjectTypeDefs = gql`
     deleted_by: ID
   }
 
-  type PassingCriteria {
-    logical_operator: LogicalOperatorEnum
-    condition: [SubjectCondition]
-  }
-
   type SubjectCondition {
-    condition_type: ConditionTypeEnum
+    condition_type: SubjectConditionTypeEnum
     test_id: [Test]
     min_mark: Int
     operator: OperatorEnum
   }
 
-  enum OperatorEnum {
-    GREATER_THAN
-    GREATER_THAN_OR_EQUAL
-  }
-
-  enum ConditionTypeEnum {
+  enum SubjectConditionTypeEnum {
     SINGLE_TEST
     AVERAGE_MARK_TEST
   }
 
-  enum LogicalOperatorEnum {
-    OR
-    AND
-  }
 
   enum SubjectStatus {
     ACTIVE
