@@ -17,33 +17,18 @@ const blockTypeDefs = gql`
     deleted_by: ID
   }
 
-  type PassingCriteria {
-    logical_operator: [LogicalOperatorEnum]
-    condition: [BlockCondition]
-  }
-
   type BlockCondition {
-    condition_type: ConditionTypeEnum
+    condition_type: BlockConditionTypeEnum
     subject_id: [Subject]
     test_id: [Test]
     min_mark: Int
     operator: OperatorEnum
   }
 
-  enum OperatorEnum {
-    GREATER_THAN
-    GREATER_THAN_OR_EQUAL
-  }
-
-  enum ConditionTypeEnum {
+  enum BlockConditionTypeEnum {
     SINGLE_SUBJECT
     AVERAGE_MARK_SUBJECT
     SINGLE_TEST
-  }
-
-  enum LogicalOperatorEnum {
-    OR
-    AND
   }
 
   enum BlockStatus {
