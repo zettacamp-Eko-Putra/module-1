@@ -30,7 +30,6 @@ const BlockSchema = new Schema(
             condition_type: {
               type: String,
               enum: ['SINGLE_SUBJECT', 'AVERAGE_MARK_SUBJECT', 'SINGLE_TEST'],
-              required: true,
             },
             // subject id for condition and type SINGLE_SUBJECT, AVERAGE_MARK_SUBJECT
             subject_id: [{ type: Schema.Types.ObjectId, ref: 'subject' }],
@@ -45,7 +44,6 @@ const BlockSchema = new Schema(
             operator: {
               type: String,
               enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
-              required: true,
             },
           },
         ],
