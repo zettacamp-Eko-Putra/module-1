@@ -32,6 +32,11 @@ const testTypeDefs = gql`
     operator: OperatorEnum
   }
 
+  input TestPassingCriteriaInput {
+    min_mark: Int
+    operator: OperatorEnum
+  }
+
   input PublishTestInput {
     test_id: ID!
     user_id: ID!
@@ -53,7 +58,7 @@ const testTypeDefs = gql`
     description: String!
     weight: Float!
     notations: [NotationInput]!
-    published_date: Date
+    passing_criteria: TestPassingCriteriaInput!
   }
 
   input NotationInput {
