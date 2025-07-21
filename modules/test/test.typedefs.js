@@ -14,7 +14,7 @@ const testTypeDefs = gql`
     notations: [Notation]!
     status: TestStatus!
     published_status: PublishedStatus!
-    passing_criteria: PassingCriteria!
+    passing_criteria: TestPassingCriteria!
     created_at: Date
     created_by: ID
     updated_by: [UpdatedBy]
@@ -27,20 +27,9 @@ const testTypeDefs = gql`
     max_point: Float!
   }
 
-  type PassingCriteria {
-    logical_operator: LogicalOperatorEnum
+  type TestPassingCriteria {
     min_mark: Int
     operator: OperatorEnum
-  }
-
-  enum OperatorEnum {
-    GREATER_THAN
-    GREATER_THAN_OR_EQUAL
-  }
-
-  enum LogicalOperatorEnum {
-    OR
-    AND
   }
 
   input PublishTestInput {
