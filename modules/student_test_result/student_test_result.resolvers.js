@@ -7,6 +7,9 @@ const TestModel = require('../test/test.models.js');
 const TaskModel = require('../task/task.models.js');
 const UserModel = require('../user/user.models.js');
 
+// *************** IMPORT HELPER FUNCTION ***************
+const CalculateStudentTestResult = require('../calculation_result/calculation_result.helper.js');
+
 // *************** IMPORT VALIDATOR ***************
 const {
   ValidateStudentTestResultInput,
@@ -447,7 +450,7 @@ async function ValidateMarks(_, { _id, student_test_result_id }) {
   ValidateIdMongoose(student_test_result_id, 'StudentTestResult_id');
 
   // *************** get task data
-  const getTaskData = await TaskModel.findOne({
+  const getTaskData = await TaskModel.exists({
     _id: _id,
     type: 'VALIDATE_MARKS',
     status: 'ACTIVE',
@@ -458,7 +461,7 @@ async function ValidateMarks(_, { _id, student_test_result_id }) {
   }
 
   // *************** student test result data
-  const getStudentTestResultData = await StudentTestResultModel.findOne({
+  const getStudentTestResultData = await StudentTestResultModel.exists({
     _id: student_test_result_id,
     status: 'ACTIVE',
     validation_status: 'NOT_VALIDATED',
@@ -476,6 +479,12 @@ async function ValidateMarks(_, { _id, student_test_result_id }) {
 
   // *************** update task
   await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
+
+  // *************** get student ID
+  const studentId = getStudentTestResultData.student_id;
+
+  // *************** calculate student test result
+  await CalculateStudentTestResult(studentId);
 
   return _id;
 }
