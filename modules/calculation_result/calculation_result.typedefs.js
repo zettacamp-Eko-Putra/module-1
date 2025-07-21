@@ -50,6 +50,10 @@ const calculationResultTypeDefs = gql`
     GetAllCalculationResults: [CalculationResult]
     GetOneCalculationResult(_id: ID!): CalculationResult
   }
+
+  extend type Mutation {
+    DeleteCalculationResult(_id: ID!): ID
+  }
 `;
 
 // *************** EXPORT MODULE ***************
