@@ -1,3 +1,6 @@
+// *************** IMPORT LIBRARY ***************
+const { ApolloError } = require('apollo-server');
+
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('../student_test_result/student_test_result.models');
 const TestModel = require('../test/test.models');
@@ -11,45 +14,50 @@ const Compare = require('../../utilities/compare.helper');
  * @param {Object} test - The test object containing at least the _id field.
  * @returns {Object} - The test result including status (PASS/FAIL), average mark, and weighted mark.
  */
-async function TestCalculation(test) {
-  // *************** Get student's average mark for the test
-  const studentTestResultAverageMark = await StudentTestResultModel.findOne({
-    test_id: test._id,
-    status: 'ACTIVE',
-    validation_status: 'VALIDATED',
-  }).select('average_mark');
+async function TestCalculation(studentTestResult) {
+  try {
+    const { test_id, average_mark } = studentTestResult;
 
-  // *************** Get test data including weight and passing criteria
-  const testData = await TestModel.findOne({
-    _id: test._id,
-    status: 'ACTIVE',
-    published_status: 'PUBLISHED',
-  });
+    // *************** Get test data including weight and passing criteria
+    const testData = await TestModel.findOne({
+      _id: test_id,
+      status: 'ACTIVE',
+      published_status: 'PUBLISHED',
+    });
 
-  // *************** Calculate the weighted mark
-  const weightedMark = studentTestResultAverageMark * testData.weight;
+    if (!testData) {
+      throw new ApolloError('test not found');
+    }
 
-  // Default test result is FAIL
-  let testResult = 'FAIL';
+    // *************** Calculate the weighted mark
+    const weightedMark = average_mark * testData.weight;
 
-  // Destructure passing criteria from test data
-  const { operator, min_mark } = testData.passing_criteria;
+    // Default test result is FAIL
+    let testResult = 'FAIL';
 
-  // *************** Check if the student passed based on passing criteria
-  const passOneTest = Compare(operator, weightedMark, min_mark);
+    // Destructure passing criteria from test data
+    const { operator, min_mark } = testData.passing_criteria;
 
-  if (passOneTest) {
-    testResult = 'PASS';
+    // *************** Check if the student passed based on passing criteria
+    const passOneTest = Compare(operator, weightedMark, min_mark);
+
+    if (passOneTest) {
+      testResult = 'PASS';
+    }
+    const payloadTest = {
+      test_id,
+      subject_id: testData.subject_id,
+      test_result: testResult,
+      average_mark,
+      weighted_mark: weightedMark,
+    };
+
+    // *************** Return calculated test result
+    return payloadTest;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** Return calculated test result
-  return {
-    test_id: test._id,
-    subject_id: testData.subject_id,
-    test_result: testResult,
-    average_mark: studentTestResultAverageMark,
-    weighted_mark: weightedMark,
-  };
 }
 
 // *************** EXPORT FUNCTION ***************

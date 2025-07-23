@@ -58,7 +58,7 @@ async function SubjectCalculation({ subject, getAllTestResults }) {
 
     // *************** calculate total weighted mark
     const totalWeightedMark = getAllTestResults.reduce(
-      (acc, test) => acc + test.weightedMark,
+      (acc, test) => acc + test.weighted_mark,
       0
     );
 
@@ -111,11 +111,7 @@ async function SubjectCalculation({ subject, getAllTestResults }) {
 
         // *************** check if any of the conditions passed
         if (passOneTest || passAverageTest) {
-          return {
-            subject_id: subject._id,
-            total_mark: totalMark,
-            subjectResult: 'PASS',
-          };
+          subjectResult = 'PASS';
         }
       }
 
@@ -142,24 +138,18 @@ async function SubjectCalculation({ subject, getAllTestResults }) {
 
       // *************** check if all conditions passed
       if (allConditionPass) {
-        return {
-          subject_id: subject._id,
-          total_mark: totalMark,
-          subjectResult: 'PASS',
-        };
+        subjectResult = 'PASS';
       }
-    } else {
-      return {
-        subject_id: subject._id,
-        total_mark: totalMark,
-        subject_results: subjectResult,
-      };
     }
-    return {
+
+    const payloadSubject = {
+      block_id: subject.block_id,
       subject_id: subject._id,
       total_mark: totalMark,
-      subject_results: subjectResult,
+      subject_result: subjectResult,
     };
+
+    return payloadSubject;
   } catch (error) {
     // *************** Throw error message
     throw new ApolloError(error.message);

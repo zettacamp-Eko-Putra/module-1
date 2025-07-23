@@ -24,37 +24,35 @@ const SubjectSchema = new Schema(
     status: { type: String, enum: ['ACTIVE', 'DELETED'], default: 'ACTIVE' },
 
     // Passing criteria for the subject
-    passing_criteria: [
-      {
-        // logical operator for passing criteria
-        logical_operator: { type: String, enum: ['OR', 'AND'], required: true },
+    passing_criteria: {
+      // logical operator for passing criteria
+      logical_operator: { type: String, enum: ['OR', 'AND'], required: true },
 
-        // condition passing criteria for the subject
-        condition: [
-          {
-            // condition type for subject passing criteria condition
-            condition_type: {
-              type: String,
-              enum: ['SINGLE_TEST', 'AVERAGE_MARK_TEST'],
-              required: true,
-            },
-
-            // test id for condition type
-            test_id: [{ type: Schema.Types.ObjectId, ref: 'test' }],
-
-            // minimum mark for condition
-            min_mark: { type: Number, required: true },
-
-            // enum operator to compare with min_mark
-            operator: {
-              type: String,
-              enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
-              required: true,
-            },
+      // condition passing criteria for the subject
+      condition: [
+        {
+          // condition type for subject passing criteria condition
+          condition_type: {
+            type: String,
+            enum: ['SINGLE_TEST', 'AVERAGE_MARK_TEST'],
+            required: true,
           },
-        ],
-      },
-    ],
+
+          // test id for condition type
+          test_id: [{ type: Schema.Types.ObjectId, ref: 'test' }],
+
+          // minimum mark for condition
+          min_mark: { type: Number, required: true },
+
+          // enum operator to compare with min_mark
+          operator: {
+            type: String,
+            enum: ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'],
+            required: true,
+          },
+        },
+      ],
+    },
 
     // user id who create the subject
     created_by: { type: Schema.Types.ObjectId, ref: 'user' },

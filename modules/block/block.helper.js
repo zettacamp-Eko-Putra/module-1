@@ -108,19 +108,15 @@ async function BlockCalculation({ block, getAllSubjectResults }) {
         if (allConditionPass) {
           blockResult = 'PASS';
         }
-      } else {
-        return {
-          block_id: block._id,
-          total_mark: averageTotalSubjectMark,
-          block_result: blockResult,
-        };
       }
     }
-    return {
+    const payloadBlock = {
       block_id: block._id,
       total_mark: averageTotalSubjectMark,
       block_result: blockResult,
     };
+
+    return payloadBlock;
   } catch (error) {
     throw new ApolloError(error.message);
   }

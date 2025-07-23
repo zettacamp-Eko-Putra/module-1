@@ -84,7 +84,7 @@ function ValidateSubjectInput(subjectInput) {
     }
 
     // *************** test id
-    ValidateIdMongoose(test_id, `test_id at index ${index}`);
+    if (test_id) ValidateIdMongoose(test_id, `test_id at index ${index}`);
 
     // *************** validate min_mark
     if (typeof min_mark !== 'number' || min_mark < 0) {

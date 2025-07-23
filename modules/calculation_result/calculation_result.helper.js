@@ -1,3 +1,6 @@
+// *************** IMPORT LIBRARY ***************
+const { ApolloError } = require('apollo-server');
+
 // *************** IMPORT MODULE ***************
 const StudentTestResultModel = require('../student_test_result/student_test_result.models.js');
 const SubjectModel = require('../subject/subject.models.js');
@@ -33,8 +36,11 @@ async function CalculateStudentTestResult(studentId) {
     const getAllStudentTestResults = await StudentTestResultModel.find({
       student_id: studentId,
       status: 'ACTIVE',
-      validation_status: 'VALIDATED',
     }).lean();
+
+    if (!getAllStudentTestResults) {
+      throw new ApolloError('student result not found');
+    }
 
     // *************** calculate test results for each test
     const getAllTestResults = await Promise.all(
@@ -42,7 +48,7 @@ async function CalculateStudentTestResult(studentId) {
     );
 
     // *************** get all subject ids from test results
-    const subjectIds = getAllStudentTestResults.map((test) => test.subject_id);
+    const subjectIds = getAllTestResults.map((test) => test.subject_id);
 
     // *************** get all subjects based on subject ids and status
     const getAllSubjects = await SubjectModel.find({
@@ -81,17 +87,49 @@ async function CalculateStudentTestResult(studentId) {
       : 'FAIL';
 
     // *************** create calculation result input
-    const calculationReseultInput = {
+    const calculationResultInput = {
       student_id: studentId,
-      test_results: getAllTestResults,
-      subject_results: getAllSubjectResults,
-      block_results: getAllBlockResults,
-      overal_result: overalResult,
+      overall_result: overalResult,
+      results: getAllBlockResults.map((block) => {
+        const relatedSubjects = getAllSubjectResults.filter(
+          (subject) =>
+            subject.block_id &&
+            block.block_id &&
+            subject.block_id.toString() === block.block_id.toString()
+        );
+
+        return {
+          block_id: block.block_id,
+          block_result: block.block_result,
+          total_mark: block.total_mark,
+          subject_results: relatedSubjects.map((subject) => {
+            const relatedTests = getAllTestResults.filter(
+              (test) =>
+                test.subject_id &&
+                subject.subject_id &&
+                test.subject_id.toString() === subject.subject_id.toString()
+            );
+
+            return {
+              subject_id: subject.subject_id,
+              subject_result: subject.subject_result,
+              total_mark: subject.total_mark,
+              test_results: relatedTests.map((test) => ({
+                test_id: test.test_id,
+                test_result: test.test_result,
+                average_mark: test.average_mark,
+                weighted_mark: test.weighted_mark,
+              })),
+            };
+          }),
+        };
+      }),
     };
 
     // *************** create calculation result in database
-    await CalculationResultModel.create(calculationReseultInput);
+    await CalculationResultModel.create(calculationResultInput);
   } catch (error) {
+    // *************** Throw error message
     throw new ApolloError(error.message);
   }
 }
