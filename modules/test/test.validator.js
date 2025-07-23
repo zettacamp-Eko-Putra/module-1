@@ -91,6 +91,26 @@ function ValidateTestInput(testInput) {
       throw new ApolloError(`max point at index ${index} not valid`);
     }
   });
+
+  // *************** validate passing criteria
+  if (!testInput.passing_criteria) {
+    throw new ApolloError('Passing criteria is required.');
+  }
+
+  const { min_mark, operator } = testInput.passing_criteria;
+
+  // *************** validate min mark
+  if (typeof min_mark !== 'number' || min_mark < 0) {
+    throw new ApolloError('Minimum mark must be a non-negative number.');
+  }
+
+  // *************** validate operator
+  const operatorEnum = ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'];
+  if (!operatorEnum.includes(operator)) {
+    throw new ApolloError(
+      `Operator must be one of: ${operatorEnum.join(', ')}`
+    );
+  }
 }
 // *************** EXPORT MODULE ***************
 module.exports = { ValidateTestInput, ValidateTestPublishedStatus };

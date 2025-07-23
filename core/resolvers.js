@@ -7,6 +7,7 @@ const SubjectResolvers = require('../modules/subject/subject.resolvers');
 const TestResolvers = require('../modules/test/test.resolvers');
 const StudentTestResultResolvers = require('../modules/student_test_result/student_test_result.resolvers');
 const TaskResolvers = require('../modules/task/task.resolvers');
+const CalculationResultResolvers = require('../modules/calculation_result/calculation_result.resolvers');
 
 // *************** Combine all resolver definitions
 const resolvers = [
@@ -18,6 +19,7 @@ const resolvers = [
   TestResolvers,
   StudentTestResultResolvers,
   TaskResolvers,
+  CalculationResultResolvers,
 ];
 
 // *************** EXPORT MODULE ***************

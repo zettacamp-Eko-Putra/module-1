@@ -133,6 +133,7 @@ async function CreateSubject(_, { subject_input }) {
       name: inputName,
       description: subject_input.description,
       coefficient: subject_input.coefficient,
+      passing_criteria: subject_input.passing_criteria,
       created_by: defaultUser,
     };
 
@@ -225,6 +226,7 @@ async function UpdateSubject(_, { _id, subject_input }) {
       name: inputName,
       description: subject_input.description,
       coefficient: subject_input.coefficient,
+      passing_criteria: subject_input.passing_criteria,
     };
 
     // *************** finding subject based on id and overwrite it with new data and saving it to database

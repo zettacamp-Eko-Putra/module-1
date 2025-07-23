@@ -186,6 +186,7 @@ async function UpdateBlock(_, { _id, block_input }) {
     const blockData = {
       name: inputName,
       description: block_input.description,
+      passing_criteria: block_input.passing_criteria,
     };
 
     // *************** finding block based on id and overwrite it with new data and saving it to database

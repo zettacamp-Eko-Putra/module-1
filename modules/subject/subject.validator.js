@@ -1,6 +1,11 @@
 // *************** IMPORT LIBRARY ***************
 const { ApolloError } = require('apollo-server');
 
+// *************** IMPORT VALIDATOR ***************
+const {
+  ValidateIdMongoose,
+} = require('../../utilities/common-validator/mongo-validator');
+
 /**
  * Validates the input for a Subject.
  *
@@ -50,6 +55,51 @@ function ValidateSubjectInput(subjectInput) {
       'coefficient is required and must be number and cannot be negative'
     );
   }
+
+  // *************** validate operator enum
+  const logicalOperatorEnum = ['AND', 'OR'];
+  if (
+    !logicalOperatorEnum.includes(
+      subjectInput.passing_criteria.logical_operator
+    )
+  ) {
+    throw new ApolloError(
+      `logical_operator must be one of: ${logicalOperatorEnum.join(', ')}`
+    );
+  }
+
+  const conditionTypeEnum = ['SINGLE_TEST', 'AVERAGE_MARK_TEST'];
+  const operatorEnum = ['GREATER_THAN', 'GREATER_THAN_OR_EQUAL'];
+
+  subjectInput.passing_criteria.condition.forEach((condition, index) => {
+    const { condition_type, test_id, min_mark, operator } = condition;
+
+    // *************** validate condition_type
+    if (!conditionTypeEnum.includes(condition_type)) {
+      throw new ApolloError(
+        `condition_type at index ${index} must be one of: ${conditionTypeEnum.join(
+          ', '
+        )}`
+      );
+    }
+
+    // *************** test id
+    if (test_id) ValidateIdMongoose(test_id, `test_id at index ${index}`);
+
+    // *************** validate min_mark
+    if (typeof min_mark !== 'number' || min_mark < 0) {
+      throw new ApolloError(
+        `min_mark at index ${index} must be a non-negative number`
+      );
+    }
+
+    // *************** validate operator enum
+    if (!operatorEnum.includes(operator)) {
+      throw new ApolloError(
+        `operator at index ${index} must be one of: ${operatorEnum.join(', ')}`
+      );
+    }
+  });
 }
 // *************** EXPORT MODULE ***************
 module.exports = { ValidateSubjectInput };

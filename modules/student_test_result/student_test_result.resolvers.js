@@ -7,6 +7,9 @@ const TestModel = require('../test/test.models.js');
 const TaskModel = require('../task/task.models.js');
 const UserModel = require('../user/user.models.js');
 
+// *************** IMPORT HELPER FUNCTION ***************
+const runStudentCalculationInWorker = require('../../utilities/run_calculation.helper.js');
+
 // *************** IMPORT VALIDATOR ***************
 const {
   ValidateStudentTestResultInput,
@@ -442,42 +445,53 @@ async function EnterMarksForStudentTestResult(_, { _id, task_input }) {
  * - Student test result is not found, not active, or already validated.
  */
 async function ValidateMarks(_, { _id, student_test_result_id }) {
-  // *************** validate id and input id
-  ValidateIdMongoose(_id, '_id');
-  ValidateIdMongoose(student_test_result_id, 'StudentTestResult_id');
+  try {
+    // *************** validate id and input id
+    ValidateIdMongoose(_id, '_id');
+    ValidateIdMongoose(student_test_result_id, 'StudentTestResult_id');
 
-  // *************** get task data
-  const getTaskData = await TaskModel.findOne({
-    _id: _id,
-    type: 'VALIDATE_MARKS',
-    status: 'ACTIVE',
-    task_status: 'PENDING',
-  });
-  if (!getTaskData) {
-    throw new ApolloError('Task not found');
+    // *************** get task data
+    const getTaskData = await TaskModel.exists({
+      _id: _id,
+      type: 'VALIDATE_MARKS',
+      status: 'ACTIVE',
+      task_status: 'PENDING',
+    });
+    if (!getTaskData) {
+      throw new ApolloError('Task not found');
+    }
+
+    // *************** student test result data
+    const getStudentTestResultData = await StudentTestResultModel.findOne({
+      _id: student_test_result_id,
+      status: 'ACTIVE',
+      validation_status: 'NOT_VALIDATED',
+    });
+
+    if (!getStudentTestResultData) {
+      throw new ApolloError('Student test result not found');
+    }
+
+    // *************** get student ID
+    const studentId = getStudentTestResultData.student_id;
+
+    // *************** calculate student test result
+    await runStudentCalculationInWorker(studentId);
+
+    // *************** update student test result
+    await StudentTestResultModel.updateOne(
+      { _id: student_test_result_id },
+      { validation_status: 'VALIDATED' }
+    );
+
+    // *************** update task
+    await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
+
+    return _id;
+  } catch (error) {
+    // *************** Throw error message
+    throw new ApolloError(error.message);
   }
-
-  // *************** student test result data
-  const getStudentTestResultData = await StudentTestResultModel.findOne({
-    _id: student_test_result_id,
-    status: 'ACTIVE',
-    validation_status: 'NOT_VALIDATED',
-  });
-
-  if (!getStudentTestResultData) {
-    throw new ApolloError('Student test result not found');
-  }
-
-  // *************** update student test result
-  await StudentTestResultModel.updateOne(
-    { _id: student_test_result_id },
-    { validation_status: 'VALIDATED' }
-  );
-
-  // *************** update task
-  await TaskModel.updateOne({ _id }, { task_status: 'COMPLETED' });
-
-  return _id;
 }
 
 // *************** LOADER ***************
